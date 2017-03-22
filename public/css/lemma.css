@@ -1,0 +1,52 @@
+.table-interpretations-translations {
+    width: 100%;
+}
+
+.table-interpretations-translations th:first-letter {
+    text-transform: uppercase;    
+}
+
+.table-interpretations-translations th {
+    padding-bottom: 10px;
+}
+
+.table-interpretations-translations th,
+.table-interpretations-translations td {
+    padding-right: 10px;
+}
+
+.table-interpretations-translations tr td:not(:first-child) {
+    width: 50%;
+}
+
+.show-meaning-translation {
+    padding-left: 25px;
+}
+
+.add-new-meaning {
+    margin-bottom: 20px;
+}
+
+.lemma-meaning h4 {
+    margin-top: 25px;
+}
+
+.show-more-examples,
+.hide-more-examples {
+    display: block;
+    cursor: pointer;
+    text-align: right;
+}
+
+.more-examples {
+    display: none;
+}
+
+.lemma-examples td {
+    padding-right: 10px;
+    vertical-align: top;
+}
+
+.lemma-examples td:last-child {
+    padding-bottom: 20px;
+}

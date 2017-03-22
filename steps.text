@@ -1,0 +1,14 @@
+mysql> set names binary; SOURCE ruwikisource20170201.sql;
+
+shell> php artisan migrate:install
+php artisan app:name Wcorpus
+
+php artisan make:auth 
+php artisan migrate
+
+http://localhost/register
+
+-- LEMMA ---------------------------------------
+php artisan make:model 'Models\Lemma' --migration
+php artisan make:controller 'LemmaController' --resource
+php artisan migrate

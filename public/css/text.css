@@ -1,0 +1,66 @@
+s {
+/*    display: block;
+    margin-bottom: 20px;*/
+    text-decoration: none;
+}
+
+.numered-sentence {
+    margin-bottom: 20px;
+}
+
+.word-marked {
+    background: #fefea6;
+}
+
+.lemma-linked {
+    color: #337ab7;
+    cursor:pointer;
+/*    text-decoration: underline;*/
+}
+
+.lemma-linked.has-checked {
+    color: green;
+}
+
+.links-to-lemmas {
+    background: #dcf7f8;
+    color: black;
+    display: none;
+    left: 0;
+    margin-top: -2px;
+    max-width: 100px;
+    padding: 10px;
+    position: absolute;
+    width: auto;
+    z-index:100;
+}
+
+.has-checked .links-to-lemmas {
+    background: #a6f4bc;
+}
+
+.links-to-lemmas a {
+    display: block;
+}
+
+.links-to-lemmas a span {
+    color: black;
+    text-decoration: none;
+}
+
+w, .text-has-checked-meaning {
+    position: relative;
+}
+
+.text-has-checked-meaning button {
+    bottom: -30px;
+    /*height: 20px;*/
+    right: 0;
+    padding: 3px 12px;
+    position: absolute;
+}
+
+
+textarea.form-control[readonly] {
+    border: 1px solid red;
+}
