@@ -12,3 +12,8 @@ http://localhost/register
 php artisan make:model 'Models\Lemma' --migration
 php artisan make:controller 'LemmaController' --resource
 php artisan migrate
+
+-- TEXT ---------------------------------------
+php artisan make:model 'Models\Text' --migration
+php artisan make:controller 'TextController' --resource
+php artisan migrate
