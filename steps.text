@@ -1,4 +1,6 @@
 mysql> set names binary; SOURCE ruwikisource20170201.sql;
+alter table page add index page_namespace(`page_namespace`);
+alter table page add index page_latest(`page_latest`);
 
 shell> php artisan migrate:install
 php artisan app:name Wcorpus

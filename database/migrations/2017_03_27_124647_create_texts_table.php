@@ -15,10 +15,13 @@ class CreateTextsTable extends Migration
     {
         Schema::create('texts', function (Blueprint $table) {
             $table->increments('id');
-            $table->text('wiki_text')->collate('utf8_bin');
-            $table->text('text')->collate('utf8_bin');
+            $table->string('title',255);
+            $table->mediumText('wikitext')->collate('utf8_bin');
+            $table->mediumText('text')->nullable()->collate('utf8_bin');
             //$table->timestamps();
-        });
+            
+//            $table->index('title');
+});
     }
 
     /**
