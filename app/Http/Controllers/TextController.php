@@ -89,6 +89,7 @@ class TextController extends Controller
     /**
      * Extract texts from wikisource,
      * fill table texts this data
+     * id=wikisource.page.page_id
      * id=wikisource.text.old_id=wikisource.page.page_latest
      * title = wikisource.page.page_title
      * wikitext=wikisource.text.old_text
