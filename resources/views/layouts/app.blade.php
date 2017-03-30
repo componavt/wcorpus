@@ -43,7 +43,18 @@
                 <div class="collapse navbar-collapse" id="app-navbar-collapse">
                     <!-- Left Side Of Navbar -->
                     <ul class="nav navbar-nav">
-                        &nbsp;
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                Texts <span class="caret"></span>
+                            </a>
+                            
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="/text">List of texts</a>
+                                    <a href="/text/extractFromWikiSource">Extraction texts from wikisource</a>
+                                </li>
+                            </ul>
+                        </li>
                     </ul>
 
                     <!-- Right Side Of Navbar -->

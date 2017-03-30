@@ -16,12 +16,16 @@ class CreateTextsTable extends Migration
         Schema::create('texts', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('page_latest')->unsigned();
+            $table->integer('author_id')->unsigned()->nullable();
+            $table->integer('publication_id')->unsigned()->nullable();
             $table->string('title',255);
             $table->mediumText('wikitext')->collate('utf8_bin');
             $table->mediumText('text')->nullable()->collate('utf8_bin');
             //$table->timestamps();
             
 //            $table->index('title');
+//            $table->index('author_id');
+//            $table->index('publication_id');
 });
     }
 

@@ -13,7 +13,6 @@
         }
         $format .= '><i class="fa fa-trash-o fa-lg"></i> %s</a>';
         $link = URL::route($route, $args_for_route);
-                //LaravelLocalization::localizeURL($route);
         $token = csrf_token();
         if (isset($without_text) && $without_text) {
             $title = '';

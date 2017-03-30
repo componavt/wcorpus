@@ -23,4 +23,9 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index');
 
-Route::get('/extractFromWikiSource','TextController@extractFromWikiSource');
+Route::get('/text/extractFromWikiSource','TextController@extractFromWikiSource');
+
+Route::resource('/text', 'TextController',
+                ['names' => ['update' => 'text.update',
+                             'store' => 'text.store',
+                             'destroy' => 'text.destroy']]);
