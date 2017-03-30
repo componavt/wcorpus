@@ -19,3 +19,5 @@ php artisan migrate
 php artisan make:model 'Models\Text' --migration
 php artisan make:controller 'TextController' --resource
 php artisan migrate
+
+alter table texts add page_latest int after id;

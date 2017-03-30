@@ -90,7 +90,7 @@ class TextController extends Controller
      * Extract texts from wikisource,
      * fill table texts this data
      * id=wikisource.page.page_id
-     * id=wikisource.text.old_id=wikisource.page.page_latest
+     * page_latest=wikisource.text.old_id=wikisource.page.page_latest
      * title = wikisource.page.page_title
      * wikitext=wikisource.text.old_text
      *
@@ -128,7 +128,8 @@ class TextController extends Controller
                     ->first();
                     
             DB::connection('mysql')->table('texts')->insert([
-                    'id' => $page->page_latest,
+                    'id' => $page->id,
+                    'page_latest' => $page->page_latest,
                     'title' => $page->page_title,
                     'wikitext' => $text->old_text,
                     'text' => null
