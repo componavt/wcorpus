@@ -147,7 +147,11 @@
                 "markdown",
                 "parser"
             ],
+<<<<<<< HEAD
             "time": "2017-03-29 16:04:15"
+=======
+            "time": "2017-03-29T16:04:15+00:00"
+>>>>>>> 38469714af94ccf6b9015baaa76f3eb094c6c103
         },
         {
             "name": "jakub-onderka/php-console-color",
@@ -363,7 +367,11 @@
                 "framework",
                 "laravel"
             ],
+<<<<<<< HEAD
             "time": "2017-03-21 19:34:41"
+=======
+            "time": "2017-03-21T19:34:41+00:00"
+>>>>>>> 38469714af94ccf6b9015baaa76f3eb094c6c103
         },
         {
             "name": "laravel/tinker",
@@ -422,6 +430,60 @@
                 "psysh"
             ],
             "time": "2016-12-30 18:13:17"
+        },
+        {
+            "name": "laravelcollective/html",
+            "version": "v5.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/LaravelCollective/html.git",
+                "reference": "7570f25d58a00fd6909c0563808590f9cdb14d47"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/LaravelCollective/html/zipball/7570f25d58a00fd6909c0563808590f9cdb14d47",
+                "reference": "7570f25d58a00fd6909c0563808590f9cdb14d47",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/http": "5.4.*",
+                "illuminate/routing": "5.4.*",
+                "illuminate/session": "5.4.*",
+                "illuminate/support": "5.4.*",
+                "illuminate/view": "5.4.*",
+                "php": ">=5.6.4"
+            },
+            "require-dev": {
+                "illuminate/database": "5.4.*",
+                "mockery/mockery": "~0.9.4",
+                "phpunit/phpunit": "~5.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Collective\\Html\\": "src/"
+                },
+                "files": [
+                    "src/helpers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylorotwell@gmail.com"
+                },
+                {
+                    "name": "Adam Engebretson",
+                    "email": "adam@laravelcollective.com"
+                }
+            ],
+            "description": "HTML and Form Builders for the Laravel Framework",
+            "homepage": "http://laravelcollective.com",
+            "time": "2017-01-26T19:27:05+00:00"
         },
         {
             "name": "league/flysystem",
@@ -504,7 +566,11 @@
                 "sftp",
                 "storage"
             ],
+<<<<<<< HEAD
             "time": "2017-03-22 15:43:14"
+=======
+            "time": "2017-03-22T15:43:14+00:00"
+>>>>>>> 38469714af94ccf6b9015baaa76f3eb094c6c103
         },
         {
             "name": "monolog/monolog",
@@ -980,7 +1046,11 @@
                 "identifier",
                 "uuid"
             ],
+<<<<<<< HEAD
             "time": "2017-03-26 20:37:53"
+=======
+            "time": "2017-03-26T20:37:53+00:00"
+>>>>>>> 38469714af94ccf6b9015baaa76f3eb094c6c103
         },
         {
             "name": "swiftmailer/swiftmailer",
