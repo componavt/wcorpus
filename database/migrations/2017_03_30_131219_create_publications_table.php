@@ -16,11 +16,11 @@ class CreatePublicationsTable extends Migration
         Schema::create('publications', function (Blueprint $table) {
             $table->increments('id');
             
-            $table->integer('author_id')->unsigned();
+            $table->integer('author_id')->unsigned()->nullable();
             $table->     foreign('author_id')->references('id')->on('authors');
 
             $table->string('title',255);
-            $table->string('creation_date',20);
+            $table->string('creation_date',20)->nullable();
             //$table->timestamps();
             
             $table->index('title');

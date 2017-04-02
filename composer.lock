@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3bd7635e3494f8e2ef349911d2e32611",
-    "content-hash": "96098e473b028cdb2529580554a1ae3e",
+    "hash": "f994ba020ce9eb96a6c0c931e463827c",
+    "content-hash": "ff46d37b1a8e0acf10fd24a24f604239",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -147,11 +147,7 @@
                 "markdown",
                 "parser"
             ],
-<<<<<<< HEAD
             "time": "2017-03-29 16:04:15"
-=======
-            "time": "2017-03-29T16:04:15+00:00"
->>>>>>> 38469714af94ccf6b9015baaa76f3eb094c6c103
         },
         {
             "name": "jakub-onderka/php-console-color",
@@ -367,11 +363,7 @@
                 "framework",
                 "laravel"
             ],
-<<<<<<< HEAD
             "time": "2017-03-21 19:34:41"
-=======
-            "time": "2017-03-21T19:34:41+00:00"
->>>>>>> 38469714af94ccf6b9015baaa76f3eb094c6c103
         },
         {
             "name": "laravel/tinker",
@@ -483,7 +475,7 @@
             ],
             "description": "HTML and Form Builders for the Laravel Framework",
             "homepage": "http://laravelcollective.com",
-            "time": "2017-01-26T19:27:05+00:00"
+            "time": "2017-01-26 19:27:05"
         },
         {
             "name": "league/flysystem",
@@ -566,11 +558,7 @@
                 "sftp",
                 "storage"
             ],
-<<<<<<< HEAD
             "time": "2017-03-22 15:43:14"
-=======
-            "time": "2017-03-22T15:43:14+00:00"
->>>>>>> 38469714af94ccf6b9015baaa76f3eb094c6c103
         },
         {
             "name": "monolog/monolog",
@@ -1046,11 +1034,7 @@
                 "identifier",
                 "uuid"
             ],
-<<<<<<< HEAD
             "time": "2017-03-26 20:37:53"
-=======
-            "time": "2017-03-26T20:37:53+00:00"
->>>>>>> 38469714af94ccf6b9015baaa76f3eb094c6c103
         },
         {
             "name": "swiftmailer/swiftmailer",

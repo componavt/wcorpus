@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use DB;
 
 use Wcorpus\Models\Author;
+use Wcorpus\Models\Publication;
 use Wcorpus\Models\Text;
 
 class TextController extends Controller
@@ -59,7 +60,9 @@ class TextController extends Controller
      */
     public function index()
     {
-        $texts = Text::select('id', 'title')->orderBy('title');
+        $texts = Text::
+                select('id', 'title','author_id','publication_id')->
+                orderBy('title');
 
         if ($this->url_args['search_title']) {
             $texts = $texts->where('title','like', $this->url_args['search_title']);
@@ -71,7 +74,8 @@ class TextController extends Controller
         
         $numAll = $texts->get()->count();
 
-        $texts = $texts->paginate($this->url_args['limit_num']);         
+        $texts = $texts->with('author')
+                ->paginate($this->url_args['limit_num']);         
         
         $author_values = Author::getListWithQuantity('texts');        
         
@@ -165,7 +169,47 @@ class TextController extends Controller
     }
     
     /**
-     * Extract texts from wikisource,
+     * Parse wikitext,
+     * search author name, publication title, creation date, text of publication
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function parseWikitext()
+    {
+//select substring(`wikitext`,1,10) as beg, count(*) as count from texts group by beg order by count desc limit 0,100;
+        
+        // all texts have not empty wikitext, stop when there is no empty (null) texts 
+        $is_exist_not_parse_text = 1;
+        
+        while ($is_exist_not_parse_text) {
+            $texts=Text::whereNull('text')->orderBy('title')->take(100)->get();
+//dd($texts);            
+            if ($texts) {
+                foreach ($texts as $text) {
+print "<p>".$text->id;                    
+                    $text->author_id = Author::parseWikitext($text->wikitext);
+                    
+                    $text_info = Text::parseWikitext($text->wikitext);
+                    $text->text = $text_info['text'];
+                    
+                    $text->publication_id = Publication::parseWikitext(
+                                                            $text->wikitext, 
+                                                            $text->author_id,
+                                                            $text_info['title'],
+                                                            $text_info['creation_date']
+                            );
+
+                    $text->push();
+                }
+                $is_exist_not_parse_text = 0;                
+            } else {
+                $is_exist_not_parse_text = 0;
+            }
+        }
+    }
+    
+    /**
+     * Extract texts from wikisource (mediawiki database),
      * fill table texts this data
      * id=wikisource.page.page_id
      * page_latest=wikisource.text.old_id=wikisource.page.page_latest

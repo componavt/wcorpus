@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Author extends Model
 {
+    protected $fillable = ['name'];
+    public $timestamps = false;
+
     // Author __has_many__ Texts
     public function texts()
     {
@@ -57,4 +60,40 @@ class Author extends Model
         return $list;         
     }
 
+    /** Parse wikitext and extract information about author
+     * 
+     * {{Отексте
+     * ...
+     * |АВТОР= [[Ганс Христиан Андерсен|Гансъ Христіанъ Андерсенъ]] (1805—1875)
+     * |...
+     * }}
+     * 
+     * OR
+     * 
+     * {{Отексте
+     * ...
+     * |АВТОР = [[Борис Степанович Житков]]
+     * |...
+     * }}
+     * 
+     * OR
+     * 
+     * {{Отексте
+     * ...
+     * | АВТОР  = Влас Михайлович Дорошевич
+     * |...
+     * }}
+     * 
+     *  @param $wikitext - wikified text
+     *  @return INT author ID
+     */
+    public static function parseWikitext($wikitext) {
+        if (preg_match("/\{\{О\s?тексте[^\}]+АВТОР\s*=\s*\[*([^\|\]\}]+)/",$wikitext,$regs)) {
+            $name=trim($regs[1]);
+            print "<br>".$name;
+            $author = self::firstOrCreate(['name'=>$name]);
+            return $author->id;
+        }
+        
+    }
 }
