@@ -44,22 +44,28 @@ class Text extends Model
      * Аналогичный {{Poem|1|2|3}}, только 2 заключен в <poem> и </poem>
      * 
      * @param String $wikitext - wikified text
-     * @return INT author ID
+     * @return Array
      */
     public static function parseWikitext($wikitext) {
+        $title = 
+        $text =
+        $creation_date = null;
+    
+        if( !$wikitext ) {
+            return ['text'=>$text, 'title' => $title, 'creation_date' => $creation_date];
+        }
+        
         if (preg_match("/\{\{Poemx?\|([^\|])|(\<poem\>)*([^\|])(\<\/poem\>)*|([^\}])\}\}]+)/i",$wikitext,$regs)) {
             $title = trim($regs[1]);
             $text = trim($regs[3]);
             $creation_date = trim($regs[5]);
         } else {
             $text = preg_replace("/(\{\{[^\}]\}\})/","",$wikitext);
-            $title = $creation_date = null;
         }
         return ['text'=>$text,
                 'title' => $title,
                 'creation_date' => $creation_date
                ];
-        
     }
     /** Takes data from search form (title, language) and 
      * returns string for url such_as 
