@@ -57,6 +57,11 @@ class Publication extends Model
     public static function parseWikitext($wikitext, $author_id, $text_title, $text_date) {
         $title = '';
         $creation_date='';
+        
+        if (!$wikitext) {
+            return null;
+        }
+        
         if (preg_match("/\{\{О\s?тексте[^\}]+НАЗВАНИЕ\s*=\s*\[*([^\|\]\}]+)/",$wikitext,$regs)) {
             $title = trim($regs[1]);
             
@@ -80,7 +85,7 @@ class Publication extends Model
         $publication->creation_date = $creation_date;
         $publication->save();
         
-        print "<br>".$regs[1];
+        print "<br>".$title;
         return $publication->id;
     }
 

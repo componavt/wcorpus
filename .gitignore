@@ -7,7 +7,7 @@
 Homestead.json
 Homestead.yaml
 .env
-/nbproject/private/
+nbproject/private/
 
 node_modules/
 bootstrap/cache/
