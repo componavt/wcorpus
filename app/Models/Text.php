@@ -2,6 +2,7 @@
 
 namespace Wcorpus\Models;
 
+use Wcorpus\Wikiparser\TemplateExtractor;
 use Illuminate\Database\Eloquent\Model;
 
 class Text extends Model
@@ -55,6 +56,12 @@ class Text extends Model
             return ['text'=>$text, 'title' => $title, 'creation_date' => $creation_date];
         }
         
+        // extracts a text of second parameter from the template {{Poemx|1|2|3}}
+        $template_name = "Poemx";
+        $parameter_number = 2;
+        $text = TemplateExtractor::getParameterValue($template_name, $parameter_number, $wikitext);
+        
+        /*
         if (preg_match("/\{\{Poemx?\|([^\|]*)\|(\<poem\>)*([^\|]+)(\<\/poem\>)*\|([^\}]*)\}\}/i",$wikitext,$regs)) {
             $title = trim($regs[1]);
             $text = trim($regs[3]);
@@ -64,7 +71,8 @@ class Text extends Model
             }
         } else {
             $text = preg_replace("/(\{\{[^\}]\}\})/","",$wikitext);
-        }
+        }*/
+        
         return ['text'=>$text,
                 'title' => $title,
                 'creation_date' => $creation_date
