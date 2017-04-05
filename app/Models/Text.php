@@ -59,7 +59,7 @@ class Text extends Model
         // extracts a text of second parameter from the template {{Poemx|1|2|3}}
         $template_name = "Poemx";
         $parameter_number = 2;
-        $text = TemplateExtractor::getParameterValue($template_name, $parameter_number, $wikitext);
+        $text = TemplateExtractor::getParameterValueWithoutNames($template_name, $parameter_number, $wikitext);
         
         /*
         if (preg_match("/\{\{Poemx?\|([^\|]*)\|(\<poem\>)*([^\|]+)(\<\/poem\>)*\|([^\}]*)\}\}/i",$wikitext,$regs)) {
