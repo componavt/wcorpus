@@ -1,0 +1,8 @@
+<?php
+
+namespace Wcorpus\Wikiparser;
+
+class Lemmatiser 
+{
+    //
+}

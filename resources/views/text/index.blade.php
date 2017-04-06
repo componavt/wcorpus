@@ -46,6 +46,8 @@ List of texts
                 <th>Title</th>
                 <th>Author</th>
                 <th>Publication</th>
+                <th>Wikitext length</th>
+                <th>Parsed text length</th>
                 @if (Auth::check())
                 <th></th>
                 @endif
@@ -63,6 +65,16 @@ List of texts
                 <td>
                     @if($text->publication)
                         {{$text->publication->title}}
+                    @endif
+                </td>
+                <td>
+                    @if($text->wikitext)
+                        {{strlen($text->wikitext)}}
+                    @endif
+                </td>
+                <td>
+                    @if($text->text)
+                        {{strlen($text->text)}}
                     @endif
                 </td>
                 @if (Auth::check())

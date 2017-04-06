@@ -32,12 +32,50 @@ class TemplateExtractor
         
         $start_pos = $pos + strlen($template);
         $found = false;
+        $failed = false;
         $parameter_count = 1;
         
-        while (!$found) {
+        while (!$found && !$failed) {
             $end_pos = strpos($wikitext, '|',$start_pos);
-
+            if ($end_pos===false) { // нет больше |, остались только }}
+                $end_pos = strpos($wikitext, '}}',$start_pos);
+            }
+//print "\n\n$parameter_count. start: $start_pos, end: $end_pos\n";            
+            if ($end_pos===false) { // нет ни |, ни }}, возьмем все до конца строки
+                $result = substr($wikitext, $start_pos);
+                if ($parameter_number == $parameter_count) {
+                    $found = true;
+                } else {
+                    $failed = true;
+                }
+                continue;
+            } 
             $result = substr($wikitext, $start_pos, $end_pos-$start_pos);
+            
+            
+            // Looks for internal templates and deletes them
+            $template_inside_start_pos = strpos($wikitext, "{{",$start_pos);
+            while ($template_inside_start_pos!==false && $template_inside_start_pos < $end_pos) {
+                $template_inside_end_pos = strpos($wikitext, "}}",$template_inside_start_pos);
+                
+                $end_pos = strpos($wikitext, '|',$template_inside_end_pos);
+                if ($end_pos===false) { // нет больше |, остались только }}
+                    $end_pos = strpos($wikitext, '}}',$template_inside_end_pos);
+                }
+                if ($end_pos===false) { // нет ни |, ни }}, возьмем все до конца строки
+                    $result = substr($wikitext, $start_pos);
+                    if ($parameter_number == $parameter_count) {
+                        $found = true;
+                    } else {
+                        $failed = true;
+                    }
+                    continue;
+                } else {
+                    $result = substr($wikitext, $start_pos, $end_pos-$start_pos);
+                }
+                     
+                $template_inside_start_pos = strpos($wikitext, "{{",$template_inside_end_pos);
+            }
 
 //print "\nstart: $start_pos, end: $end_pos, result: $result\n";            
             if ($parameter_number == $parameter_count) {
@@ -47,7 +85,13 @@ class TemplateExtractor
                 $parameter_count ++;
             }
         }
-        return $result;
+        
+        $result = trim($result);
+        if ($found) {
+            return $result;
+        } else {
+            return '';
+        }
     }
     
     
@@ -70,14 +114,14 @@ class TemplateExtractor
         if ($start_pos === false || $end_pos === false) {
             return $result;
         }
-        
-        
-        if ($end_pos === false) {
-            return $result;
+
+        while ($start_pos!==false && $end_pos!==false) {
+//print "\n\n$result\n$start_pos=$end_pos\n";            
+            $result = substr($result, 0, $start_pos)
+                    . substr($result, $end_pos + 2);
+            $start_pos = strpos($result, $template);
+            $end_pos = strpos($result, '}}', $start_pos);
         }
-        
-        $result = substr($wikitext, 0, $start_pos)
-                . substr($wikitext, $end_pos + 2);
 
 //print "\nstart: $start_pos, end: $end_pos, result: $result\n";            
         

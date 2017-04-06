@@ -16,13 +16,17 @@ Texts
         <p><b>Publication title:</b> {{$text->publication->title}}    
         @endif
 
+        @if($text->publication && $text->publication->creation_date)
+        <p><b>Creation date:</b> {{$text->publication->creation_date}}    
+        @endif
+
         @if($text->author)
         <p><b>Author:</b> {{$text->author->name}}    
         @endif
 
         @if($text->text)
         <h3>Parsed text:</h3> 
-        <pre>{{$text->text}}</pre>
+        <pre>{{str_replace('{','\{',$text->text)}}</pre>
         @endif
 
         <h3>Text from wikisource:</h3>

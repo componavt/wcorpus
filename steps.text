@@ -28,6 +28,12 @@ php artisan migrate
 
 alter table texts add index title(`title`);
 
+-- SENTENCE ---------------------------------------
+php artisan make:model 'Models\Sentence' --migration
+php artisan make:controller 'SentenceController' --resource
+php artisan migrate
+
+
 
 
 

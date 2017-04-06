@@ -5,6 +5,7 @@
         <group>
             <file>file:/E:/all/projects/git/wcorpus/resources/views/header/top_left_menu.blade.php</file>
             <file>file:/E:/all/projects/git/wcorpus/resources/views/layouts/app.blade.php</file>
+            <file>file:/E:/all/projects/git/wcorpus/app/Models/Lemma.php</file>
             <file>file:/E:/all/projects/git/wcorpus/resources/views/header/head.blade.php</file>
             <file>file:/E:/all/projects/git/wcorpus/app/Models/Text.php</file>
             <file>file:/E:/all/projects/git/wcorpus/resources/views/text/show.blade.php</file>
@@ -13,9 +14,11 @@
             <file>file:/E:/all/projects/git/wcorpus/resources/views/header/header.blade.php</file>
             <file>file:/E:/all/projects/git/wcorpus/resources/views/footer/foot_script.blade.php</file>
             <file>file:/E:/all/projects/git/wcorpus/routes/web.php</file>
+            <file>file:/E:/all/projects/git/wcorpus/steps.text</file>
             <file>file:/E:/all/projects/git/wcorpus/tests/Unit/TextTest.php</file>
             <file>file:/E:/all/projects/git/wcorpus/database/migrations/2017_03_30_131219_create_publications_table.php</file>
             <file>file:/E:/all/projects/git/wcorpus/app/Wikiparser/TemplateExtractor.php</file>
+            <file>file:/E:/all/projects/git/wcorpus/composer.json</file>
             <file>file:/E:/all/projects/git/wcorpus/.gitignore</file>
         </group>
     </open-files>

@@ -61,7 +61,8 @@ class TextController extends Controller
     public function index()
     {
         $texts = Text::
-                select('id', 'title','author_id','publication_id')->
+//                select('id', 'title','author_id','publication_id')->
+                whereNotNull('text')->
                 orderBy('title');
 
         if ($this->url_args['search_title']) {
