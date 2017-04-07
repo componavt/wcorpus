@@ -62,6 +62,7 @@ class TextController extends Controller
     {
         $texts = Text::
 //                select('id', 'title','author_id','publication_id')->
+                select('id')->
                 whereNotNull('text')->
                 orderBy('title');
 
@@ -75,7 +76,8 @@ class TextController extends Controller
         
         $numAll = $texts->get()->count();
 
-        $texts = $texts->with('author')
+        $texts = $texts
+                //->with('author')
                 ->paginate($this->url_args['limit_num']);         
         
         $author_values = Author::getListWithQuantity('texts');        
@@ -281,5 +283,17 @@ print "<p>".$text->id;
 //print $pages->count();   
         }
         print 'done.';
+    }
+    
+    /**
+     * Collect statistics about which templates are contained in the wiki texts
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function templateStats()
+    {
+        $templates=[];
+        // обойти все wikitext и посчитать сколько и каких шаблонов есть
+        $texts = Text::orderBy('id')->take(10);
     }
 }

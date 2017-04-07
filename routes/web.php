@@ -22,6 +22,7 @@ Route::get('/home', 'HomeController@index');
 
 Route::get('/text/extractFromWikiSource','TextController@extractFromWikiSource');
 Route::get('/text/parseWikitext','TextController@parseWikitext');
+Route::get('/text/templateStats','TextController@templateStats');
 
 Route::resource('/text', 'TextController',
                 ['names' => ['update' => 'text.update',

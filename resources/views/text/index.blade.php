@@ -54,27 +54,28 @@ List of texts
             </tr>
         </thead>
             @foreach($texts as $text)
+            <?php $text_obj = \Wcorpus\Models\Text::find($text->id); ?>
             <tr>
                 <td>{{ $list_count++ }}</td>
-                <td><a href="text/{{$text->id}}{{$args_by_get}}">{{$text->title}}</a></td>
+                <td><a href="text/{{$text->id}}{{$args_by_get}}">{{$text_obj->title}}</a></td>
                 <td>
-                    @if($text->author)
-                        {{$text->author->name}}
+                    @if($text_obj->author)
+                        {{$text_obj->author->name}}
                     @endif
                 </td>
                 <td>
-                    @if($text->publication)
-                        {{$text->publication->title}}
+                    @if($text_obj->publication)
+                        {{$text_obj->publication->title}}
                     @endif
                 </td>
                 <td>
-                    @if($text->wikitext)
-                        {{strlen($text->wikitext)}}
+                    @if($text_obj->wikitext)
+                        {{strlen($text_obj->wikitext)}}
                     @endif
                 </td>
                 <td>
-                    @if($text->text)
-                        {{strlen($text->text)}}
+                    @if($text_obj->text)
+                        {{strlen($text_obj->text)}}
                     @endif
                 </td>
                 @if (Auth::check())

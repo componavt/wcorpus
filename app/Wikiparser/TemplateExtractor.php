@@ -60,7 +60,7 @@ class TemplateExtractor
                 
                 $end_pos = strpos($wikitext, '|',$template_inside_end_pos);
                 if ($end_pos===false) { // нет больше |, остались только }}
-                    $end_pos = strpos($wikitext, '}}',$template_inside_end_pos);
+                    $end_pos = strpos($wikitext, '}}',$template_inside_end_pos+2);
                 }
                 if ($end_pos===false) { // нет ни |, ни }}, возьмем все до конца строки
                     $result = substr($wikitext, $start_pos);
@@ -126,5 +126,25 @@ class TemplateExtractor
 //print "\nstart: $start_pos, end: $end_pos, result: $result\n";            
         
         return $result;
+    }
+    
+    
+    /** Replace wiki link to plain text
+     * 
+     * @param String $wikitext
+     */
+    public static function removeWikiLinks(String $wikitext) : String
+    {
+        if (!$wikitext) {
+            return '';
+        }
+        while (preg_match("/^(.*)\[\[([^\]]+)\]\](.*)/us",$wikitext,$regs)) {
+            if (preg_match("/^[^\|]+\|(.+)$/",$regs[2],$regs1)) {
+                $regs[2] = $regs1[1];
+            }
+            $wikitext = $regs[1].$regs[2].$regs[3];
+        }
+        
+        return $wikitext;
     }    
 }

@@ -92,4 +92,53 @@ Ne tol'ko pred toboyu - i predo mnoy one:";
         $this->assertEquals($expected, $text_result);
     }
     
+    // -----------------------------------------------------------------
+    
+    public function testRemoveWikiLinks_empty()
+    {
+        $wikitext = "";
+        $text_result = TemplateExtractor::removeWikiLinks($wikitext);
+        $this->assertEquals(0, strlen($text_result));
+    }
+    
+    public function testRemoveWikiLinks_withLink()
+    {
+        $wikitext = "[[Постановление ГКО № 6884с от 4.11.44|Постановлением ГОКО от 4 ноября 1944 г. № 6884с]]";
+        $expected = "Постановлением ГОКО от 4 ноября 1944 г. № 6884с";
+        $text_result = TemplateExtractor::removeWikiLinks($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testRemoveWikiLinks_withoutLink()
+    {
+        $wikitext = "[[Постановлением ГОКО от 4 ноября 1944 г. № 6884с]]";
+        $expected = "Постановлением ГОКО от 4 ноября 1944 г. № 6884с";
+        $text_result = TemplateExtractor::removeWikiLinks($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testRemoveWikiLinks_withLinkInsideText()
+    {
+        $wikitext = "1. Razreshit' NKO SSSR vo izmeneniye poryadka, \nustanovlennogo [[Postanovleniye GKO № 6884s ot 4.11.44|Postanovleniyem GOKO ot 4 noyabrya 1944 g. № 6884s]], napravit' dlya raboty na predpriyatiya ugol'noy promyshlennosti, chernoy metallurgii i na lesozagotovki Narkomlesa SSSR v rayony Kamskogo basseyna voyennosluzhashchikh Krasnoy Armii, osvobozhdennykh iz nemetskogo plena, proshedshikh predvaritel'nuyu registratsiyu; repatriiruyemykh sovetskikh grazhdan, priznannykh po sostoyaniyu zdorov'ya godnymi k voyennoy sluzhbe i podlezhashchikh po zakonu mobilizatsii v Krasnuyu Armiyu.";
+        $expected = "1. Razreshit' NKO SSSR vo izmeneniye poryadka, \nustanovlennogo Postanovleniyem GOKO ot 4 noyabrya 1944 g. № 6884s, napravit' dlya raboty na predpriyatiya ugol'noy promyshlennosti, chernoy metallurgii i na lesozagotovki Narkomlesa SSSR v rayony Kamskogo basseyna voyennosluzhashchikh Krasnoy Armii, osvobozhdennykh iz nemetskogo plena, proshedshikh predvaritel'nuyu registratsiyu; repatriiruyemykh sovetskikh grazhdan, priznannykh po sostoyaniyu zdorov'ya godnymi k voyennoy sluzhbe i podlezhashchikh po zakonu mobilizatsii v Krasnuyu Armiyu.";
+        $text_result = TemplateExtractor::removeWikiLinks($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testRemoveWikiLinks_withLinkInsideTextManyString()
+    {
+        $wikitext = "В целях оказания неотложной помощи рабочей силой предприятиям угольной промышленности, черной металлургии и лесозаготовкам Наркомлеса СССР в районах Камского бассейна Государственный Комитет Обороны постановляет:
+
+1.  Разрешить НКО СССР во изменение порядка, установленного [[Постановление ГКО № 6884с от 4.11.44|Постановлением ГОКО от 4 ноября 1944 г. № 6884с]], направить для работы на предприятия угольной промышленности, черной металлургии и на лесозаготовки Наркомлеса СССР в районы Камского бассейна военнослужащих Красной Армии, освобожденных из немецкого плена, прошедших предварительную регистрацию; репатриируемых советских граждан, признанных по состоянию здоровья годными к военной службе и подлежащих по закону мобилизации в Красную Армию.
+
+2.  Обязать НКО СССР (т. Смородинова) в соответствии с пунктом 1 настоящего постановления направить до 1 ноября 1945 г. 360 тыс. человек.";
+        $expected = "В целях оказания неотложной помощи рабочей силой предприятиям угольной промышленности, черной металлургии и лесозаготовкам Наркомлеса СССР в районах Камского бассейна Государственный Комитет Обороны постановляет:
+
+1.  Разрешить НКО СССР во изменение порядка, установленного Постановлением ГОКО от 4 ноября 1944 г. № 6884с, направить для работы на предприятия угольной промышленности, черной металлургии и на лесозаготовки Наркомлеса СССР в районы Камского бассейна военнослужащих Красной Армии, освобожденных из немецкого плена, прошедших предварительную регистрацию; репатриируемых советских граждан, признанных по состоянию здоровья годными к военной службе и подлежащих по закону мобилизации в Красную Армию.
+
+2.  Обязать НКО СССР (т. Смородинова) в соответствии с пунктом 1 настоящего постановления направить до 1 ноября 1945 г. 360 тыс. человек.";
+        $text_result = TemplateExtractor::removeWikiLinks($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
 }
