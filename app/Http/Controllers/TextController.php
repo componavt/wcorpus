@@ -294,6 +294,26 @@ print "<p>".$text->id;
     {
         $templates=[];
         // обойти все wikitext и посчитать сколько и каких шаблонов есть
-        $texts = Text::orderBy('id')->take(10);
+        $texts = Text::select('wikitext')->where('wikitext','like','%{{%')->orderBy('id')->take(10)->get();
+        
+        foreach ($texts as $text) {
+            if (preg_match_all("/\{\{([^\|]+)\|/",$text->wikitext, $regs, PREG_PATTERN_ORDER)) {
+                foreach ($regs[1] as $temp_name) {
+                    $temp_name = trim($temp_name);
+                    if (isset($templates[$temp_name])) {
+                        $templates[$temp_name] ++;
+                    } else {
+                        $templates[$temp_name] = 1;
+                    }
+                }
+            }
+        }
+
+        arsort($templates);
+        print "<table border=\"1\">";
+        foreach ($templates as $temp=>$count) {
+            print "<tr><td>$temp</td><td>$count</td></tr>\n";            
+        }
+        print "</table>";
     }
 }
