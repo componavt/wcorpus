@@ -147,4 +147,152 @@ class TemplateExtractor
         
         return $wikitext;
     }    
+    
+    /**
+     * Split a text into paragraphs
+     *
+     * @param $text String text 
+     * @return Array collection of paragraphs
+     */
+    public static function splitIntoParagraphs($text): Array
+    {
+        $paragraphs = [];
+        $text = trim($text);
+        
+        if (!$text) {
+            return $paragraphs;
+        }
+/*        
+        $text = str_replace(chr(13),'',$text);
+        $paragraphs = explode("\n\n",$text);
+ * 
+ */
+        
+/*  
+        if (preg_match_all("/(\n|^)([^\n]+)(?=\n|$)/s",$text,$regs, PREG_PATTERN_ORDER)) {
+            foreach ($regs[2] as $reg) {
+                   $reg = trim($reg);
+                   if ($reg) {
+                        $paragraphs[] = $reg;
+                   }
+            }
+        } else {
+            $paragraphs[] = $text;
+        }
+ * 
+ */
+        
+/*
+        $text = str_replace("\r\n","\n",$text);
+        $text = str_replace("\r","\n",$text);
+        $paragraphs = preg_split("/\n{2,}/m",$text);
+ */
+        $text = nl2br($text);
+        $text = preg_replace("/\<br \/\>\s*/","\n",$text);
+        $paragraphs = explode("\n\n",$text);
+//print_r($paragraphs);
+        return $paragraphs;
+    }    
+    
+    /**
+     * Split a paragraph into sentences
+     * Punctuation marks are discarded
+     *
+     * @param $text String text 
+     * @return Array collection of sentences
+     */
+    public static function splitIntoSentences($text): Array
+    {
+        $sentences = [];
+        $text = trim($text);
+
+        if (!$text) {
+            return $sentences;
+        }
+        
+        $text = str_replace(chr(13),'',$text);
+        $text = str_replace(chr(10),' ',$text);
+
+        $sen_count = 1;
+        $word_count = 1;
+
+        $end1 = ['.','?','!','…'];
+        $end2 = ['.»','?»','!»','."','?"','!"','.”','?”','!”'];
+        $pseudo_end = false;
+        if (!in_array(mb_substr($text,-1,1),$end1) && !in_array(mb_substr($text,-1,2),$end2)) {
+            $text .= '.';
+            $pseudo_end = true;
+        }
+
+        if (preg_match_all("/(.+?)(\.|\?|!|\.»|\?»|!»|\.\"|\?\"|!\"|\.”|\?”|!”|…{1,})(\s|(<br(| \/)>\s*){1,}|$)/is", // :|
+                           $text, $desc_out)) {
+            for ($k=0; $k<sizeof($desc_out[1]); $k++) {
+                $sentence = trim($desc_out[1][$k]);
+
+                // <br> in in the beginning of the string is moved before the sentence
+                if (preg_match("/^(<br(| \/)>)(.+)$/is",$sentence,$regs)) {
+                    $sentence = trim($regs[3]);
+                }
+
+                $sentences[] = str_replace("<br \>\n",'',$sentence);
+            }
+        }
+        return $sentences;
+    }
+    
+    /**
+     * Divides sentence on words
+     *
+     * @param $sentence String text without mark up
+     * @param $word_count Integer initial word count
+     *
+     * @return Array text with markup (split to words) and next word count
+     */
+/*    
+    public static function markupSentence($sentence,$word_count): Array
+    {
+        $delimeters = ',.!?"[](){}«»=”:,'; // - and ' - part of word
+        // different types of dashes and hyphens: '-', '‒', '–', '—', '―' 
+        // if dashes inside words, then they are part of words,
+        // if dashes surrounded by spaces, then dashes are not parts of words.
+        $dashes = '-‒–—―';
+        
+        $str = '';
+        $i = 0;
+        $is_word = false; // word tag <w> is not opened
+        $token = $sentence;
+        while ($i<mb_strlen($token)) {
+            $char = mb_substr($token,$i,1);
+            if (mb_strpos($delimeters, $char) || preg_match("/\s/",$char)) {
+                if ($is_word) {
+                    $str .= '</w>';
+                    $is_word = false;
+                }
+                $str .= $char;
+            } elseif ($char == '<') { // && strpos($token,'>',$i+1)
+                if ($is_word) {
+                    $str .= '</w>';
+                    $is_word = false;
+                }
+                $j = mb_strpos($token,'>',$i+1);
+                $str .= mb_substr($token,$i,$j-$i+1);
+                $i = $j;
+            } else {
+                $next_char = ($i+1 < mb_strlen($token)) ? mb_substr($token,$i+1,1) : '';
+                $next_char_is_special = (!$next_char || mb_strpos($delimeters, $next_char) || preg_match("/\s/",$next_char) || mb_strpos($dashes,$next_char));
+//                if (!$is_word && !preg_match("/^-\s/",mb_substr($token,$i,2))) {
+                if (!$is_word && !(mb_strpos($dashes,$char)!==false && $next_char_is_special)) { // && $next_char_is_special
+                    $str .= '<w id="'.$word_count++.'">';
+                    $is_word = true;
+                }
+                $str .= $char;
+            }
+            $i++;
+        }
+        if ($is_word) {
+            $str .= '</w>';
+        }
+        return [$str,$word_count];
+    }
+*/
 }
