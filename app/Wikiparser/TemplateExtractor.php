@@ -183,13 +183,14 @@ class TemplateExtractor
  */
         
 /*
-        $text = str_replace("\r\n","\n",$text);
-        $text = str_replace("\r","\n",$text);
-        $paragraphs = preg_split("/\n{2,}/m",$text);
- */
+        $text = preg_replace("/\r\n/u","\n",$text);
+        $text = preg_replace("/\r/u","\n",$text);
+        $paragraphs = preg_split("/\n{2,}/su",$text);
+*/
         $text = nl2br($text);
-        $text = preg_replace("/\<br \/\>\s*/","\n",$text);
+        $text = preg_replace("/\<br \/\>\s*/u","\n",$text);
         $paragraphs = explode("\n\n",$text);
+            
 //print_r($paragraphs);
         return $paragraphs;
     }    
@@ -210,9 +211,15 @@ class TemplateExtractor
             return $sentences;
         }
         
-        $text = str_replace(chr(13),'',$text);
-        $text = str_replace(chr(10),' ',$text);
-
+        $text = preg_replace("/\n/",' ',$text);
+        
+        if (preg_match_all("/((\d+\.\s*)*[А-ЯA-Z]((т.п.|т.д.|пр.|g.)|[^?!.\(]|\([^\)]*\))*[.?!])/u",$text,$regs, PREG_PATTERN_ORDER)) {
+            $sentences = $regs[0];
+        } else {
+            $sentences[] = $text;
+        }
+        
+/*
         $sen_count = 1;
         $word_count = 1;
 
@@ -237,6 +244,7 @@ class TemplateExtractor
                 $sentences[] = str_replace("<br \>\n",'',$sentence);
             }
         }
+*/
         return $sentences;
     }
     
