@@ -295,8 +295,69 @@ Spat' ne dayet mne vsyu noch'.";
         $this->assertEquals($expected, $text_result);
     }
     
-    /*
-     * 
-Вопрос здесь не в том, сколько дней или лет вы учите тот или иной язык, вопрос в том, что вам реально нужно обучить программу понимать текст. Конкретный язык программирования тут не при чём, это вопрос теории. Вы не можете по-лёгкому, на основе формальных критериев, отличить конец предложения от сокращения. Сравните, например: «В дуэли участвовали г. Пушкин и г. Дантес» и «Мои стихи — одно сплошное г. Пушкин бы застрелился, но не стал читать такое.     
-     */
+    // -----------------------------------------------------------------
+    
+    public function testsplitIntoWords_empty()
+    {
+        $text = "";
+        $expected = [];
+        $text_result = TemplateExtractor::splitIntoParagraphs($text);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testsplitIntoWords_simple()
+    {
+        $text = "Это было в Черном море в ноябре месяце.";
+        $expected = ["Это",
+                     "было",
+                     "в",
+                     "Черном",
+                     "море",
+                     "в",
+                     "ноябре",
+                     "месяце"
+                    ];
+        $text_result = TemplateExtractor::splitIntoWords($text);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testsplitIntoWords_withDash()
+    {
+        $text = "И всякую ночь,  около  полуночи,  я  поднимал щеколду и приотворял его дверь - тихо-тихо!";
+        $expected = ["И",
+            "всякую",
+            "ночь",  
+            "около",  
+            "полуночи",  
+            "я",
+            "поднимал",
+            "щеколду", 
+            "и", 
+            "приотворял", 
+            "его", 
+            "дверь",
+            "тихо-тихо"
+                    ];
+        $text_result = TemplateExtractor::splitIntoWords($text);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testsplitIntoWords_withApostrophe()
+    {
+        $text = "A watch's minute hand moves more quickly than did mine.";
+        $expected = ["A",
+            "watch's",
+            "minute",
+            "hand",
+            "moves",
+            "more",
+            "quickly",
+            "than",
+            "did",
+            "mine"
+                    ];
+        $text_result = TemplateExtractor::splitIntoWords($text);
+        $this->assertEquals($expected, $text_result);
+    }
+    
 }

@@ -246,8 +246,33 @@ class TemplateExtractor
         }
 */
         return $sentences;
+    }    
+    
+    /**
+     * Split a sentence into words without punctuation marks
+     *
+     * @param $text String text 
+     * @return Array collection of words
+     */
+    public static function splitIntoWords($text): Array
+    {
+        $words = [];
+        $text = trim($text);
+
+        if (!$text) {
+            return $words;
+        }
+        
+        if (preg_match_all("/(([[:alpha:]]+['-])*[[:alpha:]]+'?)/u",$text,$regs, PREG_PATTERN_ORDER)) {
+            $words = $regs[0];
+        } else {
+            $words[] = $text;
+        }
+
+        return $words;
     }
     
+    // \\p{P}?[ \\t\\n\\r]+
     /**
      * Divides sentence on words
      *
