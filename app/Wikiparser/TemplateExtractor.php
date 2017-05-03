@@ -148,129 +148,33 @@ class TemplateExtractor
         return $wikitext;
     }    
     
-    /**
-     * Split a text into paragraphs
-     *
-     * @param $text String text 
-     * @return Array collection of paragraphs
+    /** Remove html-comments <!-- -->
+     * 
+     * If the end --> is missed all text before <!-- is removed
+     * 
+     * @param String $wikitext
      */
-    public static function splitIntoParagraphs($text): Array
+    public static function removeComments(String $wikitext) : String
     {
-        $paragraphs = [];
-        $text = trim($text);
-        
-        if (!$text) {
-            return $paragraphs;
+        if (!$wikitext) {
+            return '';
         }
-/*        
-        $text = str_replace(chr(13),'',$text);
-        $paragraphs = explode("\n\n",$text);
- * 
- */
-        
-/*  
-        if (preg_match_all("/(\n|^)([^\n]+)(?=\n|$)/s",$text,$regs, PREG_PATTERN_ORDER)) {
-            foreach ($regs[2] as $reg) {
-                   $reg = trim($reg);
-                   if ($reg) {
-                        $paragraphs[] = $reg;
-                   }
-            }
-        } else {
-            $paragraphs[] = $text;
-        }
- * 
- */
-        
-/*
-        $text = preg_replace("/\r\n/u","\n",$text);
-        $text = preg_replace("/\r/u","\n",$text);
-        $paragraphs = preg_split("/\n{2,}/su",$text);
-*/
-        $text = nl2br($text);
-        $text = preg_replace("/\<br \/\>\s*/u","\n",$text);
-        $paragraphs = explode("\n\n",$text);
             
-//print_r($paragraphs);
-        return $paragraphs;
-    }    
-    
-    /**
-     * Split a paragraph into sentences
-     * Punctuation marks are discarded
-     *
-     * @param $text String text 
-     * @return Array collection of sentences
-     */
-    public static function splitIntoSentences($text): Array
-    {
-        $sentences = [];
-        $text = trim($text);
+        $start_pos = mb_strpos($wikitext, "<!--");
+        $end_pos = true;
 
-        if (!$text) {
-            return $sentences;
-        }
-        
-        $text = preg_replace("/\n/",' ',$text);
-        
-        if (preg_match_all("/((\d+\.\s*)*[А-ЯA-Z]((т.п.|т.д.|пр.|g.)|[^?!.\(]|\([^\)]*\))*[.?!])/u",$text,$regs, PREG_PATTERN_ORDER)) {
-            $sentences = $regs[0];
-        } else {
-            $sentences[] = $text;
-        }
-        
-/*
-        $sen_count = 1;
-        $word_count = 1;
-
-        $end1 = ['.','?','!','…'];
-        $end2 = ['.»','?»','!»','."','?"','!"','.”','?”','!”'];
-        $pseudo_end = false;
-        if (!in_array(mb_substr($text,-1,1),$end1) && !in_array(mb_substr($text,-1,2),$end2)) {
-            $text .= '.';
-            $pseudo_end = true;
-        }
-
-        if (preg_match_all("/(.+?)(\.|\?|!|\.»|\?»|!»|\.\"|\?\"|!\"|\.”|\?”|!”|…{1,})(\s|(<br(| \/)>\s*){1,}|$)/is", // :|
-                           $text, $desc_out)) {
-            for ($k=0; $k<sizeof($desc_out[1]); $k++) {
-                $sentence = trim($desc_out[1][$k]);
-
-                // <br> in in the beginning of the string is moved before the sentence
-                if (preg_match("/^(<br(| \/)>)(.+)$/is",$sentence,$regs)) {
-                    $sentence = trim($regs[3]);
-                }
-
-                $sentences[] = str_replace("<br \>\n",'',$sentence);
+        while ($start_pos!==false && $end_pos!==false) {
+            $end_pos = mb_strpos($wikitext, "-->", $start_pos+4);
+            $newtext = mb_substr($wikitext,0,$start_pos);
+            if ($end_pos!==false) {
+                $newtext .= mb_substr($wikitext,$end_pos+3);
             }
+            $wikitext = $newtext;
+            $start_pos = mb_strpos($wikitext, "<!--");
         }
-*/
-        return $sentences;
+        return $wikitext;
     }    
     
-    /**
-     * Split a sentence into words without punctuation marks
-     *
-     * @param $text String text 
-     * @return Array collection of words
-     */
-    public static function splitIntoWords($text): Array
-    {
-        $words = [];
-        $text = trim($text);
-
-        if (!$text) {
-            return $words;
-        }
-        
-        if (preg_match_all("/(([[:alpha:]]+['-])*[[:alpha:]]+'?)/u",$text,$regs, PREG_PATTERN_ORDER)) {
-            $words = $regs[0];
-        } else {
-            $words[] = $text;
-        }
-
-        return $words;
-    }
     
     // \\p{P}?[ \\t\\n\\r]+
     /**

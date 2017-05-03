@@ -60,7 +60,7 @@ class Author extends Model
         return $list;         
     }
 
-    /** Parse wikitext and extract information about author
+    /** Parse wikitext and extract author name
      * 
      * {{Отексте
      * ...
@@ -85,15 +85,40 @@ class Author extends Model
      * }}
      * 
      *  @param $wikitext - wikified text
-     *  @return INT author ID
+     *  @return String author name
      */
-    public static function parseWikitext($wikitext) {
-        if (preg_match("/\{\{О\s?тексте[^\}]+АВТОР\s*=\s*\[*([^\|\]\}]+)/",$wikitext,$regs)) {
+    public static function searchAuthorName($wikitext) {
+        if (!$wikitext) {
+            return null;
+        }
+        if (preg_match("/\{\{О\s?тексте[^\}]+АВТОР\s*=\s*\[*([^\(\|\]\}]+)/",$wikitext,$regs)) {
             $name=trim($regs[1]);
-            print "<br>".$name;
-            $author = self::firstOrCreate(['name'=>$name]);
-            return $author->id;
+            //print "<br>".$name;
+            
+            return $name;
+        } else {
+            return null;
         }
         
+    }
+    
+    /** Parse wikitext and extract information about author
+     * 
+     *  @param $wikitext - wikified text
+     *  @return INT author ID
+     */
+    public static function searchAuthorID($wikitext) {
+        if (!$wikitext) {
+            return null;
+        }
+        
+        $author_name = self::searchAuthorName($wikitext);
+        
+        if (!$author_name) {
+            return null;
+        }
+//        print "<br>".$author_name;
+        $author = self::firstOrCreate(['name'=>$author_name]);
+        return $author->id;        
     }
 }

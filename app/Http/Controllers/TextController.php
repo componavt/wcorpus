@@ -63,7 +63,8 @@ class TextController extends Controller
         $texts = Text::
 //                select('id', 'title','author_id','publication_id')->
                 select('id')->
-                whereNotNull('text')->
+                where('id','<',2000)->
+                //whereNotNull('text')->
                 orderBy('title');
 
         if ($this->url_args['search_title']) {
@@ -185,18 +186,22 @@ class TextController extends Controller
         $is_exist_not_parse_text = 1;
         
         while ($is_exist_not_parse_text) {
-            $texts=Text::whereNull('text')->orderBy('title')->take(100)->get();
+            $texts=Text::whereNull('text')->orderBy('title')->take(10)->get();
 //dd($texts);            
             if ($texts) {
                 foreach ($texts as $text) {
-print "<p>".$text->id;                    
-                    $text->author_id = Author::parseWikitext($text->wikitext);
+print "<p>".$text->id;           
+                    $wikitext = TemplateExtractor::removeComments($text->wikitext); // remove comments
                     
-                    $text_info = Text::parseWikitext($text->wikitext);
+                    $wikitext = TemplateExtractor::removeWikiLinks($wikitext); // remove wiki links
+                    
+                    $text->author_id = Author::searchAuthorID($wikitext); // extract author
+                    
+                    $text_info = Text::parseWikitext($wikitext);
                     $text->text = $text_info['text'];
                     
                     $text->publication_id = Publication::parseWikitext(
-                                                            $text->wikitext, 
+                                                            $wikitext, 
                                                             $text->author_id,
                                                             $text_info['title'],
                                                             $text_info['creation_date']

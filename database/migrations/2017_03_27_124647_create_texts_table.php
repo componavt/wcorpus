@@ -23,7 +23,8 @@ class CreateTextsTable extends Migration
             $table->mediumText('text')->nullable()->collate('utf8_bin');
             //$table->timestamps();
             
-//            $table->index('title');
+            $table->index('title');
+            $table->index('text',100);
 //            $table->index('author_id');
 //            $table->index('publication_id');
 });

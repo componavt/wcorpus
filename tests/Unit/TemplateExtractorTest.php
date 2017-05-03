@@ -143,220 +143,74 @@ Ne tol'ko pred toboyu - i predo mnoy one:";
     
     // -----------------------------------------------------------------
     
-    public function testsplitIntoSentences_empty()
+    public function testRemoveComments_empty()
     {
-        $text = "";
-        $expected = [];
-        $text_result = TemplateExtractor::splitIntoSentences($text);
+        $wikitext = "";
+        $text_result = TemplateExtractor::removeComments($wikitext);
+        $this->assertEquals(0, strlen($text_result));
+    }
+    
+    public function testRemoveComments_onlyComments()
+    {
+        $wikitext = "<!--Постановление ГКО № 6884с от 4.11.44|Постановлением ГОКО от 4 ноября 1944 г. № 6884с-->";
+        $expected = "";
+        $text_result = TemplateExtractor::removeComments($wikitext);
         $this->assertEquals($expected, $text_result);
     }
     
-    public function testsplitIntoSentences_simple()
+    public function testRemoveComments_inBegining()
     {
-        $text = "Это было в Черном море в ноябре месяце. Русская парусная шхуна «Мария» под командой хозяина Афанасия Нечепуренки шла в Болгарию с грузом жмыхов в трюме. Была ночь, и дул свежий ветер с востока, холодный и с дождем. Ветер был почти попутный.";
-        $expected = ["Это было в Черном море в ноябре месяце.",
-            "Русская парусная шхуна «Мария» под командой хозяина Афанасия Нечепуренки шла в Болгарию с грузом жмыхов в трюме.", 
-            "Была ночь, и дул свежий ветер с востока, холодный и с дождем.",
-            "Ветер был почти попутный."];
-        $text_result = TemplateExtractor::splitIntoSentences($text);
+        $wikitext = "<!--Постановление ГКО № 6884с от 4.11.44|Постановлением ГОКО от 4 ноября 1944 г. № 6884с-->text";
+        $expected = "text";
+        $text_result = TemplateExtractor::removeComments($wikitext);
         $this->assertEquals($expected, $text_result);
     }
     
-    public function testsplitIntoSentences_poetry()
+    public function testRemoveComments_inEnding()
     {
-        $text = "Drug moy, drug moy,\nYA ochen' i ochen' bolen.\nSam ne znayu, otkuda vzyalas' eta bol'.\nTo li veter svistit\nNad pustym i bezlyudnym polem,\nTo l', kak roshchu v sentyabr',\nOsypayet mozgi alkogol'.";
-        $expected = ["Drug moy, drug moy, YA ochen' i ochen' bolen.",
-            "Sam ne znayu, otkuda vzyalas' eta bol'.",
-            "To li veter svistit Nad pustym i bezlyudnym polem, To l', kak roshchu v sentyabr', Osypayet mozgi alkogol'."];
-        $text_result = TemplateExtractor::splitIntoSentences($text);
+        $wikitext = "text<!--Постановление ГКО № 6884с от 4.11.44|Постановлением ГОКО от 4 ноября 1944 г. № 6884с-->";
+        $expected = "text";
+        $text_result = TemplateExtractor::removeComments($wikitext);
         $this->assertEquals($expected, $text_result);
     }
     
-    public function testsplitIntoSentences_directSpeech()
+    public function testRemoveComments_inside()
     {
-        $text = "- Mozhet byt', vy otpravites' so mnoy v konsul'stvo, kapitan? Vy uspokoites' i ob`yasnites', — skazal nakonets konsul.";
-        $expected = ["Mozhet byt', vy otpravites' so mnoy v konsul'stvo, kapitan?",
-            "Vy uspokoites' i ob`yasnites', — skazal nakonets konsul."];
-        $text_result = TemplateExtractor::splitIntoSentences($text);
+        $wikitext = "start text<!--Постановление ГКО № 6884с от 4.11.44|Постановлением ГОКО от 4 ноября 1944 г. № 6884с-->end text";
+        $expected = "start textend text";
+        $text_result = TemplateExtractor::removeComments($wikitext);
         $this->assertEquals($expected, $text_result);
     }
     
-    public function testsplitIntoSentences_directSpeechLongDash()
+    public function testRemoveComments_beginningCommentInside()
     {
-        $text = "— Mozhet byt', vy otpravites' so mnoy v konsul'stvo, kapitan? Vy uspokoites' i ob`yasnites', — skazal nakonets konsul.";
-        $expected = ["Mozhet byt', vy otpravites' so mnoy v konsul'stvo, kapitan?",
-            "Vy uspokoites' i ob`yasnites', — skazal nakonets konsul."];
-        $text_result = TemplateExtractor::splitIntoSentences($text);
+        $wikitext = "start text<!--Постановление <!--ГКО № 6884с от 4.11.44|Постановлением ГОКО от 4 ноября 1944 г. № 6884с-->end text";
+        $expected = "start textend text";
+        $text_result = TemplateExtractor::removeComments($wikitext);
         $this->assertEquals($expected, $text_result);
     }
     
-    
-    public function testsplitIntoSentences_directSpeechLongDash2()
+    public function testRemoveComments_commentInside()
     {
-        $text = "— Ремонт, — сказал Паркер. — Он с трудом переводил дух, и консулу жалко было смотреть, как волновался этот человек. — Маленький… ремонт, сэр… в доке.";
-        $expected = ["Ремонт, — сказал Паркер.",
-            "Он с трудом переводил дух, и консулу жалко было смотреть, как волновался этот человек.",
-            "Маленький… ремонт, сэр… в доке."];
-        $text_result = TemplateExtractor::splitIntoSentences($text);
-        $this->assertEquals($expected, $text_result);
-    }
-/*    
-    public function testsplitIntoSentences_PointWithinSentence()
-    {
-        $text = "1. Razreshit' NKO SSSR vo izmeneniye poryadka, ustanovlennogo Postanovleniyem GOKO ot 4 noyabrya 1944 g. № 6884s, napravit' dlya raboty na predpriyatiya ugol'noy promyshlennosti, chernoy metallurgii i na lesozagotovki Narkomlesa SSSR v rayony Kamskogo basseyna voyennosluzhashchikh Krasnoy Armii, osvobozhdennykh iz nemetskogo plena, proshedshikh predvaritel'nuyu registratsiyu; repatriiruyemykh sovetskikh grazhdan, priznannykh po sostoyaniyu zdorov'ya godnymi k voyennoy sluzhbe i podlezhashchikh po zakonu mobilizatsii v Krasnuyu Armiyu.";
-        $expected = ["1. Razreshit' NKO SSSR vo izmeneniye poryadka, ustanovlennogo Postanovleniyem GOKO ot 4 noyabrya 1944 g. № 6884s, napravit' dlya raboty na predpriyatiya ugol'noy promyshlennosti, chernoy metallurgii i na lesozagotovki Narkomlesa SSSR v rayony Kamskogo basseyna voyennosluzhashchikh Krasnoy Armii, osvobozhdennykh iz nemetskogo plena, proshedshikh predvaritel'nuyu registratsiyu; repatriiruyemykh sovetskikh grazhdan, priznannykh po sostoyaniyu zdorov'ya godnymi k voyennoy sluzhbe i podlezhashchikh po zakonu mobilizatsii v Krasnuyu Armiyu."];
-        $text_result = TemplateExtractor::splitIntoSentences($text);
-        $this->assertEquals($expected, $text_result);
-    }
-
-    public function testsplitIntoSentences_WithinAbbr()
-    {
-        $text = "Vopros zdes' ne v tom, skol'ko dney ili let vy uchite tot ili inoy yazyk, vopros v tom, chto vam real'no nuzhno obuchit' programmu ponimat' tekst. Konkretnyy yazyk programmirovaniya tut ne pri chom, eto vopros teorii. Vy ne mozhete po-logkomu, na osnove formal'nykh kriteriyev, otlichit' konets predlozheniya ot sokrashcheniya. Sravnite, naprimer: «V dueli uchastvovali g. Pushkin i g. Dantes» i «Moi stikhi — odno sploshnoye g. Pushkin by zastrelilsya, no ne stal chitat' takoye.";
-        $expected = ["Vopros zdes' ne v tom, skol'ko dney ili let vy uchite tot ili inoy yazyk, vopros v tom, chto vam real'no nuzhno obuchit' programmu ponimat' tekst.", 
-            "Konkretnyy yazyk programmirovaniya tut ne pri chom, eto vopros teorii.",
-            "Vy ne mozhete po-logkomu, na osnove formal'nykh kriteriyev, otlichit' konets predlozheniya ot sokrashcheniya.", 
-            "Sravnite, naprimer: «V dueli uchastvovali g. Pushkin i g. Dantes» i «Moi stikhi — odno sploshnoye g. ",
-            "Pushkin by zastrelilsya, no ne stal chitat' takoye."];
-        $text_result = TemplateExtractor::splitIntoSentences($text);
-        $this->assertEquals($expected, $text_result);
-    }
-*/
-    // -----------------------------------------------------------------
-    
-    public function testsplitIntoParagraphs_empty()
-    {
-        $text = "";
-        $expected = [];
-        $text_result = TemplateExtractor::splitIntoParagraphs($text);
+        $wikitext = "start text<!--Постановление <!--ГКО № 6884с от 4.11.44|Постановлением--> ГОКО от 4 ноября 1944 г. № 6884с-->end text";
+        $expected = "start text ГОКО от 4 ноября 1944 г. № 6884с-->end text";
+        $text_result = TemplateExtractor::removeComments($wikitext);
         $this->assertEquals($expected, $text_result);
     }
     
-    public function testSplitIntoParagraphs_simple()
+    public function testRemoveComments_moreOneComments()
     {
-        $text = "Drug moy, drug moy.
-            
-The end.";
-
-        $expected = [
-            "Drug moy, drug moy.",
-            
-            "The end."];
-
-        $text_result = TemplateExtractor::splitIntoParagraphs($text);
+        $wikitext = "start text<!--Постановление--> \n<!--ГКО № 6884с от 4.11.44|Постановлением--> ГОКО от 4 ноября 1944<!-- г. № 6884с-->end text";
+        $expected = "start text \n ГОКО от 4 ноября 1944end text";
+        $text_result = TemplateExtractor::removeComments($wikitext);
         $this->assertEquals($expected, $text_result);
     }
     
-    public function testSplitIntoParagraphs_poetry()
+    public function testRemoveComments_withoutEnd()
     {
-        $text = "Drug moy, drug moy,
-YA ochen' i ochen' bolen.
-
-Golova moya mashet ushami,
-Kak kryl'yami ptitsa.";
-      
-        $expected = [
-            "Drug moy, drug moy,\nYA ochen' i ochen' bolen.",
-
-"Golova moya mashet ushami,\nKak kryl'yami ptitsa."];
-
-        $text_result = TemplateExtractor::splitIntoParagraphs($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
-    public function testSplitIntoParagraphs_longPoetry()
-    {
-        $text = "Drug moy, drug moy,
-YA ochen' i ochen' bolen.
-Sam ne znayu, otkuda vzyalas' eta bol'.
-To li veter svistit
-Nad pustym i bezlyudnym polem,
-To l', kak roshchu v sentyabr',
-Osypayet mozgi alkogol'.
-
-Golova moya mashet ushami,
-Kak kryl'yami ptitsa.
-Yey na sheye nogi
-Mayachit' bol'she nevmoch'.
-Chernyy chelovek,
-Chernyy, chernyy,
-Chernyy chelovek
-Na krovat' ko mne saditsya,
-Chernyy chelovek
-Spat' ne dayet mne vsyu noch'.";
-      
-        $expected = [
-            // first paragraph
-            "Drug moy, drug moy,\nYA ochen' i ochen' bolen.\nSam ne znayu, otkuda vzyalas' eta bol'.\nTo li veter svistit\nNad pustym i bezlyudnym polem,\nTo l', kak roshchu v sentyabr',\nOsypayet mozgi alkogol'.",
-            
-            // second paragraph
-"Golova moya mashet ushami,\nKak kryl'yami ptitsa.\nYey na sheye nogi\nMayachit' bol'she nevmoch'.\nChernyy chelovek,\nChernyy, chernyy,\nChernyy chelovek\nNa krovat' ko mne saditsya,\nChernyy chelovek\nSpat' ne dayet mne vsyu noch'."];
-
-        $text_result = TemplateExtractor::splitIntoParagraphs($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
-    // -----------------------------------------------------------------
-    
-    public function testsplitIntoWords_empty()
-    {
-        $text = "";
-        $expected = [];
-        $text_result = TemplateExtractor::splitIntoParagraphs($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
-    public function testsplitIntoWords_simple()
-    {
-        $text = "Это было в Черном море в ноябре месяце.";
-        $expected = ["Это",
-                     "было",
-                     "в",
-                     "Черном",
-                     "море",
-                     "в",
-                     "ноябре",
-                     "месяце"
-                    ];
-        $text_result = TemplateExtractor::splitIntoWords($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
-    public function testsplitIntoWords_withDash()
-    {
-        $text = "И всякую ночь,  около  полуночи,  я  поднимал щеколду и приотворял его дверь - тихо-тихо!";
-        $expected = ["И",
-            "всякую",
-            "ночь",  
-            "около",  
-            "полуночи",  
-            "я",
-            "поднимал",
-            "щеколду", 
-            "и", 
-            "приотворял", 
-            "его", 
-            "дверь",
-            "тихо-тихо"
-                    ];
-        $text_result = TemplateExtractor::splitIntoWords($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
-    public function testsplitIntoWords_withApostrophe()
-    {
-        $text = "A watch's minute hand moves more quickly than did mine.";
-        $expected = ["A",
-            "watch's",
-            "minute",
-            "hand",
-            "moves",
-            "more",
-            "quickly",
-            "than",
-            "did",
-            "mine"
-                    ];
-        $text_result = TemplateExtractor::splitIntoWords($text);
+        $wikitext = "start text<!--Постановление--> \n<!--ГКО № 6884с от 4.11.44|Постановлением--> ГОКО от 4 ноября 1944<!-- г. № 6884с end text";
+        $expected = "start text \n ГОКО от 4 ноября 1944";
+        $text_result = TemplateExtractor::removeComments($wikitext);
         $this->assertEquals($expected, $text_result);
     }
     

@@ -6,24 +6,41 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-use Wcorpus\Models\Text;
+use Wcorpus\Models\Author;
 
 // This file was created by:
 // php artisan make:test TextTest --unit
 
-class TextTest extends TestCase
+class AuthorTest extends TestCase
 {
     
-    public function testParseWikitext_Empty()
+    public function testSearchAuthorName_Empty()
     {
         $wikitext = "";
-        $text = new Text();
-        $array_result = $text->parseWikitext( $wikitext );
-        $text_result  = $array_result['text'];
+        $expected  = null;
+        $text_result = Author::searchAuthorName( $wikitext );
         
-        $this->assertEquals(0, strlen($text_result));
+        $this->assertEquals($expected, $text_result);
+    }
+
+    public function testSearchAuthorName_withYears()
+    {
+        $wikitext = "{{О тексте
+| АВТОР          = Александр Сергеевич Пушкин (1799—1837)
+| НАЗВАНИЕ       = Для берегов отчизны дальной…
+| ДАТАСОЗДАНИЯ   = 1830<ref>Датируется, согласно автографу, 27 ноября 1830 г.; вероятно, это—дата окончательной отделки, и стихотворение написано в 1828 г.</ref>
+| ДАТАПУБЛИКАЦИИ = 1841<ref>Опубликовано по копии, сообщенной вероятно Плетневым, Владиславлевым, в альманахе «Утреняя Заря на 1841 год» под заглавием «Разлука».</ref>
+}}
+
+\{\{poemx|Для берегов отчизны дальной…|
+Для берегов отчизны дальной";
+        $expected  = "Александр Сергеевич Пушкин";
+        $text_result = Author::searchAuthorName( $wikitext );
+//print       "\n$text_result\n";  
+        $this->assertEquals($expected, $text_result);
     }
     
+/*    
     // {{Poemx|1|2|3}}, 2 is text, see https://ru.wikisource.org/wiki/template:Poemx
     public function testParseWikitext_poemxWithTitle()
     {
@@ -124,144 +141,5 @@ class TextTest extends TestCase
         $this->assertEquals($expected, $text_result);
     }
 */
-    // -----------------------------------------------------------------
-    
-    public function testsplitIntoParagraphs_empty()
-    {
-        $text = "";
-        $expected = [];
-        $text_result = Text::splitIntoParagraphs($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
-    public function testSplitIntoParagraphs_simple()
-    {
-        $text = "Drug moy, drug moy.
-            
-The end.";
-
-        $expected = [
-            "Drug moy, drug moy.",
-            
-            "The end."];
-
-        $text_result = Text::splitIntoParagraphs($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
-    public function testSplitIntoParagraphs_poetry()
-    {
-        $text = "Drug moy, drug moy,
-YA ochen' i ochen' bolen.
-
-Golova moya mashet ushami,
-Kak kryl'yami ptitsa.";
-      
-        $expected = [
-            "Drug moy, drug moy,\nYA ochen' i ochen' bolen.",
-
-"Golova moya mashet ushami,\nKak kryl'yami ptitsa."];
-
-        $text_result = Text::splitIntoParagraphs($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
-    public function testSplitIntoParagraphs_longPoetry()
-    {
-        $text = "Drug moy, drug moy,
-YA ochen' i ochen' bolen.
-Sam ne znayu, otkuda vzyalas' eta bol'.
-To li veter svistit
-Nad pustym i bezlyudnym polem,
-To l', kak roshchu v sentyabr',
-Osypayet mozgi alkogol'.
-
-Golova moya mashet ushami,
-Kak kryl'yami ptitsa.
-Yey na sheye nogi
-Mayachit' bol'she nevmoch'.
-Chernyy chelovek,
-Chernyy, chernyy,
-Chernyy chelovek
-Na krovat' ko mne saditsya,
-Chernyy chelovek
-Spat' ne dayet mne vsyu noch'.";
-      
-        $expected = [
-            // first paragraph
-            "Drug moy, drug moy,\nYA ochen' i ochen' bolen.\nSam ne znayu, otkuda vzyalas' eta bol'.\nTo li veter svistit\nNad pustym i bezlyudnym polem,\nTo l', kak roshchu v sentyabr',\nOsypayet mozgi alkogol'.",
-            
-            // second paragraph
-"Golova moya mashet ushami,\nKak kryl'yami ptitsa.\nYey na sheye nogi\nMayachit' bol'she nevmoch'.\nChernyy chelovek,\nChernyy, chernyy,\nChernyy chelovek\nNa krovat' ko mne saditsya,\nChernyy chelovek\nSpat' ne dayet mne vsyu noch'."];
-
-        $text_result = Text::splitIntoParagraphs($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
-    // -----------------------------------------------------------------
-    
-    public function testsplitIntoWords_empty()
-    {
-        $text = "";
-        $expected = [];
-        $text_result = Text::splitIntoParagraphs($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
-    public function testsplitIntoWords_simple()
-    {
-        $text = "Это было в Черном море в ноябре месяце.";
-        $expected = ["Это",
-                     "было",
-                     "в",
-                     "Черном",
-                     "море",
-                     "в",
-                     "ноябре",
-                     "месяце"
-                    ];
-        $text_result = Text::splitIntoWords($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
-    public function testsplitIntoWords_withDash()
-    {
-        $text = "И всякую ночь,  около  полуночи,  я  поднимал щеколду и приотворял его дверь - тихо-тихо!";
-        $expected = ["И",
-            "всякую",
-            "ночь",  
-            "около",  
-            "полуночи",  
-            "я",
-            "поднимал",
-            "щеколду", 
-            "и", 
-            "приотворял", 
-            "его", 
-            "дверь",
-            "тихо-тихо"
-                    ];
-        $text_result = Text::splitIntoWords($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
-    public function testsplitIntoWords_withApostrophe()
-    {
-        $text = "A watch's minute hand moves more quickly than did mine.";
-        $expected = ["A",
-            "watch's",
-            "minute",
-            "hand",
-            "moves",
-            "more",
-            "quickly",
-            "than",
-            "did",
-            "mine"
-                    ];
-        $text_result = Text::splitIntoWords($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
     
 }
