@@ -52,35 +52,25 @@ class Text extends Model
      * @return Array
      */
     public static function parseWikitext($wikitext) {
-        $title = 
-        $text =
-        $creation_date = null;
+        $text_info = ['text'=>$wikitext,
+                      'title' => null,
+                      'creation_date' => null
+               ];
     
         if( !$wikitext ) {
-            return ['text'=>$text, 'title' => $title, 'creation_date' => $creation_date];
+            return $text_info;
         }
         
         // extracts a text of second parameter from the template {{Poemx|1|2|3}}
-        $template_name = "Poemx";
+/*        $template_name = "Poemx";
         $parameter_number = 2;
-        $text = TemplateExtractor::getParameterValueWithoutNames($template_name, $parameter_number, $wikitext);
+        $text = TemplateExtractor::getParameterValueWithoutNames($template_name, $parameter_number, $wikitext); */
         
-        /*
-        if (preg_match("/\{\{Poemx?\|([^\|]*)\|(\<poem\>)*([^\|]+)(\<\/poem\>)*\|([^\}]*)\}\}/i",$wikitext,$regs)) {
-            $title = trim($regs[1]);
-            $text = trim($regs[3]);
-            $creation_date = trim($regs[5]);
-            if (mb_strlen($creation_date)>50) {
-                $creation_date = mb_substr($creation_date,0,50);
-            }
-        } else {
-            $text = preg_replace("/(\{\{[^\}]\}\})/","",$wikitext);
-        }*/
+        $text_info = TemplateExtractor::extractPoetry($text_info);
+            
+        $text_info['text'] = preg_replace("/(\{\{[^\}]\}\})/","",$text_info['text']);
         
-        return ['text'=>$text,
-                'title' => $title,
-                'creation_date' => $creation_date
-               ];
+        return $text_info;
     }
     /** Takes data from search form (title, language) and 
      * returns string for url such_as 

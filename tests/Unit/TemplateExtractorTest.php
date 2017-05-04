@@ -214,4 +214,153 @@ Ne tol'ko pred toboyu - i predo mnoy one:";
         $this->assertEquals($expected, $text_result);
     }
     
+    // -----------------------------------------------------------------
+    
+    public function testRemoveLangTemplates_empty()
+    {
+        $wikitext = "";
+        $text_result = TemplateExtractor::removeLangTemplates($wikitext);
+        $this->assertEquals(0, strlen($text_result));
+    }
+    
+    public function testRemoveLangTemplates_normal()
+    {
+        $wikitext = "{{lang|en|season}}";
+        $expected = "season";
+        $text_result = TemplateExtractor::removeLangTemplates($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testRemoveLangTemplates_utf()
+    {
+        $wikitext = "{{lang|he|והיה כי יארכו הימים}}";
+        $expected = "והיה כי יארכו הימים";
+        $text_result = TemplateExtractor::removeLangTemplates($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testRemoveLangTemplates_brief()
+    {
+        $wikitext = "{{lang-en|season}}";
+        $expected = "season";
+        $text_result = TemplateExtractor::removeLangTemplates($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testRemoveLangTemplates_emptyText()
+    {
+        $wikitext = "{{lang|it|Maria Santissima del Divin Patre.}}<ref>{{lang-it|}}</ref>";
+        $expected = "Maria Santissima del Divin Patre.<ref></ref>";
+        $text_result = TemplateExtractor::removeLangTemplates($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    // -----------------------------------------------------------------
+    
+    public function testExtractPoetry_empty()
+    {
+        $initial =
+        $expected =
+                ['text'=>'',
+                 'title' => null,
+                 'creation_date' => null];
+        $text_result = TemplateExtractor::extractPoetry($initial);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testExtractPoetry_normal()
+    {
+        $initial =
+                ['text'=>'{{poemx|?|
+Пусть для ваших открытых сердец
+До сих пор это — светлая фея
+С упоительной лирой Орфея,
+Для меня это — старый мудрец.
+
+По лицу его тяжко проходит
+Бороздой Вековая Мечта,
+И для мира немые уста
+Только бледной улыбкой поводит.|}}',
+                 'title' => null,
+                 'creation_date' => null];
+        
+        $expected =
+                ['text'=>'Пусть для ваших открытых сердец
+До сих пор это — светлая фея
+С упоительной лирой Орфея,
+Для меня это — старый мудрец.
+
+По лицу его тяжко проходит
+Бороздой Вековая Мечта,
+И для мира немые уста
+Только бледной улыбкой поводит.',
+                 'title' => '?',
+                 'creation_date' => ''];
+        $text_result = TemplateExtractor::extractPoetry($initial);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    // -----------------------------------------------------------------
+    
+    public function testRemoveAnyTemplates_empty()
+    {
+        $wikitext = "";
+        $text_result = TemplateExtractor::removeAnyTemplates($wikitext);
+        $this->assertEquals(0, strlen($text_result));
+    }
+    
+    public function testRemoveAnyTemplates_normal()
+    {
+        $wikitext = "aaa {{lang|en|season}}bbb";
+        $expected = "aaa bbb";
+        $text_result = TemplateExtractor::removeAnyTemplates($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testRemoveAnyTemplates_nested()
+    {
+        $wikitext = "{{Otekste
+| NAZVANIYe=?
+| PODZAGOLOVOK=«Pust' dlya vashikh otkrytykh serdets…»
+| AVTOR=Innokentiy Fodorovich Annenskiy (1856—1909)
+| SODERZHANIYe=
+| IZTSIKLA=
+| IZSBORNIKA=Tikhiye pesni
+| DATASOZDANIYA=
+| DATAPUBLIKATSII = 1904Vpervyye — v knige {{Annenskiy:Tikhiye pesni, 1904|stranitsy=29}}.
+| ISTOCHNIK={{Annenskiy:Izbrannyye proizvedeniya, 1988|stranitsy=44}}.
+| VIKIPEDIYA=
+| DRUGOYe=
+| PREDYDUSHCHIY=Tam
+| SLEDUYUSHCHIY=Pervyy fortep'yannyy sonet
+| KACHESTVO=4
+}}
+
+Пусть для ваших открытых сердец
+До сих пор это — светлая фея
+С упоительной лирой Орфея,
+Для меня это — старый мудрец.
+
+По лицу его тяжко проходит
+Бороздой Вековая Мечта,
+И для мира немые уста
+Только бледной улыбкой поводит.
+
+== Примечания ==
+{{примечания}}";
+        $expected = "Пусть для ваших открытых сердец
+До сих пор это — светлая фея
+С упоительной лирой Орфея,
+Для меня это — старый мудрец.
+
+По лицу его тяжко проходит
+Бороздой Вековая Мечта,
+И для мира немые уста
+Только бледной улыбкой поводит.
+
+== Примечания ==";
+        $text_result = TemplateExtractor::removeAnyTemplates($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
 }

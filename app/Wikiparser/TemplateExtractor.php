@@ -15,6 +15,8 @@ class TemplateExtractor
      * @param String $template_name
      * @param int $parameter_number
      * @param String $wikitext which contains template
+     * 
+     * @return String
      */
     public static function getParameterValueWithoutNames(String $template_name,int $parameter_number,String $wikitext) : String
     {
@@ -99,6 +101,8 @@ class TemplateExtractor
      * 
      * @param String $template_name
      * @param String $wikitext
+     * 
+     * @return String
      */
     public static function removeTemplate(String $template_name, String $wikitext) : String
     {
@@ -132,6 +136,8 @@ class TemplateExtractor
     /** Replace wiki link to plain text
      * 
      * @param String $wikitext
+     * 
+     * @return String
      */
     public static function removeWikiLinks(String $wikitext) : String
     {
@@ -153,6 +159,8 @@ class TemplateExtractor
      * If the end --> is missed all text before <!-- is removed
      * 
      * @param String $wikitext
+     * 
+     * @return String
      */
     public static function removeComments(String $wikitext) : String
     {
@@ -175,61 +183,72 @@ class TemplateExtractor
         return $wikitext;
     }    
     
-    
-    // \\p{P}?[ \\t\\n\\r]+
-    /**
-     * Divides sentence on words
-     *
-     * @param $sentence String text without mark up
-     * @param $word_count Integer initial word count
-     *
-     * @return Array text with markup (split to words) and next word count
+    /** Replace temlates lang to plain text
+     * 
+     * {{lang|he|והיה כי יארכו הימים}}
+     * {{lang-en|сезон}}
+     * {{lang-it|}}
+     * 
+     * @param String $wikitext
+     * 
+     * @return String
      */
-/*    
-    public static function markupSentence($sentence,$word_count): Array
+    public static function removeLangTemplates(String $wikitext) : String
     {
-        $delimeters = ',.!?"[](){}«»=”:,'; // - and ' - part of word
-        // different types of dashes and hyphens: '-', '‒', '–', '—', '―' 
-        // if dashes inside words, then they are part of words,
-        // if dashes surrounded by spaces, then dashes are not parts of words.
-        $dashes = '-‒–—―';
+        if (!$wikitext) {
+            return '';
+        }
         
-        $str = '';
-        $i = 0;
-        $is_word = false; // word tag <w> is not opened
-        $token = $sentence;
-        while ($i<mb_strlen($token)) {
-            $char = mb_substr($token,$i,1);
-            if (mb_strpos($delimeters, $char) || preg_match("/\s/",$char)) {
-                if ($is_word) {
-                    $str .= '</w>';
-                    $is_word = false;
-                }
-                $str .= $char;
-            } elseif ($char == '<') { // && strpos($token,'>',$i+1)
-                if ($is_word) {
-                    $str .= '</w>';
-                    $is_word = false;
-                }
-                $j = mb_strpos($token,'>',$i+1);
-                $str .= mb_substr($token,$i,$j-$i+1);
-                $i = $j;
-            } else {
-                $next_char = ($i+1 < mb_strlen($token)) ? mb_substr($token,$i+1,1) : '';
-                $next_char_is_special = (!$next_char || mb_strpos($delimeters, $next_char) || preg_match("/\s/",$next_char) || mb_strpos($dashes,$next_char));
-//                if (!$is_word && !preg_match("/^-\s/",mb_substr($token,$i,2))) {
-                if (!$is_word && !(mb_strpos($dashes,$char)!==false && $next_char_is_special)) { // && $next_char_is_special
-                    $str .= '<w id="'.$word_count++.'">';
-                    $is_word = true;
-                }
-                $str .= $char;
+        $wikitext = preg_replace("/\{\{lang\s*\|\s*[^\|]+\|([^\}]*)\}\}/iu","\\1",$wikitext);
+        $wikitext = preg_replace("/\{\{lang\-[^\|]+\|([^\}]*)\}\}/iu","\\1",$wikitext);
+
+        return $wikitext;
+    }    
+    
+    /** Replace wiki link to plain text
+     * 
+     * @param Array $text_info = ['text'=><wikitext>,
+                                  'title' => null,
+                                  'creation_date' => null
+     * 
+     * @return Array
+     */
+    public static function extractPoetry(Array $text_info) : Array
+    {
+        if (!$text_info['text']) {
+            return $text_info;
+        }
+        
+        if (preg_match("/\{\{Poemx?\|([^\|]*)\|(\<poem\>)*([^\|]+)(\<\/poem\>)*\|([^\}]*)\}\}/i",$text_info['text'],$regs)) {
+            $text_info['title'] = trim($regs[1]);
+            $text_info['text'] = trim($regs[3]);
+            $text_info['creation_date'] = trim($regs[5]);
+            if (mb_strlen($text_info['creation_date'])>50) {
+                $text_info['creation_date'] = mb_substr($creation_date,0,50);
             }
-            $i++;
+        } 
+        
+        return $text_info;
+    }    
+    
+    /** Remove all occurences of templates from wiki text
+     * 
+     * @param String $wikitext
+     * 
+     * @return String
+     */
+    public static function removeAnyTemplates(String $wikitext) : String
+    {
+        if( !$wikitext ) {
+            return '';
         }
-        if ($is_word) {
-            $str .= '</w>';
+        
+//        $wikitext = preg_replace("/(\{\{[^\}]*\}\})/","",$wikitext);
+
+        while (preg_match("/^(.*)\{\{[^\}]*\}\}(.*)$/us",$wikitext,$regs)) {
+            $wikitext = trim($regs[1].$regs[2]);
         }
-        return [$str,$word_count];
+        return $wikitext;
     }
-*/
+    
 }

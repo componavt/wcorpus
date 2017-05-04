@@ -32,6 +32,7 @@ class TextController extends Controller
                     'limit_num'       => (int)$request->input('limit_num'),
                     'page'            => (int)$request->input('page'),
                     'search_title'  => $request->input('search_title'),
+                    'search_wikitext'  => $request->input('search_wikitext'),
                     'search_author'  => (int)$request->input('search_author'),
 //                    'search_id'       => (int)$request->input('search_id'),
                 ];
@@ -63,12 +64,16 @@ class TextController extends Controller
         $texts = Text::
 //                select('id', 'title','author_id','publication_id')->
                 select('id')->
-                where('id','<',2000)->
-                //whereNotNull('text')->
+//                where('id','<',2000)->
+                whereNotNull('text')->
                 orderBy('title');
 
         if ($this->url_args['search_title']) {
             $texts = $texts->where('title','like', $this->url_args['search_title']);
+        } 
+
+        if ($this->url_args['search_wikitext']) {
+            $texts = $texts->where('wikitext','like', $this->url_args['search_wikitext']);
         } 
 
         if ($this->url_args['search_author']) {
@@ -82,6 +87,7 @@ class TextController extends Controller
                 ->paginate($this->url_args['limit_num']);         
         
         $author_values = Author::getListWithQuantity('texts');        
+//dd($texts);
         
             return view('text.index')
                   ->with(array(
@@ -195,6 +201,8 @@ print "<p>".$text->id;
                     
                     $wikitext = TemplateExtractor::removeWikiLinks($wikitext); // remove wiki links
                     
+                    $wikitext = TemplateExtractor::removeLangTemplates($wikitext); // remove lang templates
+
                     $text->author_id = Author::searchAuthorID($wikitext); // extract author
                     
                     $text_info = Text::parseWikitext($wikitext);

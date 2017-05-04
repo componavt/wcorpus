@@ -20,6 +20,12 @@ List of texts
                 'attributes'=>['size' => 15,
                                'placeholder'=>'Title']])
                                
+        @include('widgets.form._formitem_text',
+                ['name' => 'search_wikitext',
+                'value' => $url_args['search_wikitext'],
+                'attributes'=>['size' => 15,
+                               'placeholder'=>'Wikitext']])
+                               
         @include('widgets.form._formitem_select',
                 ['name' => 'search_author',
                  'values' =>$author_values,
@@ -37,7 +43,6 @@ List of texts
         {!! Form::close() !!}
 
         <p>Founded records: {{$numAll}}</p>
-
         @if ($texts)
         <table class="table">
         <thead>
