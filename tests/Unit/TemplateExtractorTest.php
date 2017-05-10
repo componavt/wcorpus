@@ -53,11 +53,20 @@ Ne tol'ko pred toboyu - i predo mnoy one:";
     
     public function testGetParameterValueWithoutNames_withTemplateInsideIncorrectNumberParam()
     {
-        $wikitext = "{{poemx||{{epigraf||Vot oni — skorbnyye, gordyye teni…||[[Valeriy Yakovlevich Bryusov|V. Bryusov]]}}
+/*        $wikitext = "{{poemx||{{epigraf||Vot oni — skorbnyye, gordyye teni…||[[Valeriy Yakovlevich Bryusov|V. Bryusov]]}}
 Ne tol'ko pred toboyu - i predo mnoy one:
 }}";
         $expected = "{{epigraf||Vot oni — skorbnyye, gordyye teni…||[[Valeriy Yakovlevich Bryusov|V. Bryusov]]}}
 Ne tol'ko pred toboyu - i predo mnoy one:";
+*/        
+        $wikitext = "{{Otekste
+| AVTOR = Nadezhda Grigor'yevna L'vova (1891—1913) 
+| NAZVANIYe = «…Ne tol'ko pred toboyu — i predo mnoy one…»
+}}{{poemx||{{epigraf||Vot oni — skorbnyye, gordyye teni…||Valeriy Yakovlevich Bryusov|V. Bryusov}}
+Ne tol'ko pred toboyu — i predo mnoy one:
+}}";
+        $expected = "{{epigraf||Vot oni — skorbnyye, gordyye teni…||Valeriy Yakovlevich Bryusov|V. Bryusov}}
+Ne tol'ko pred toboyu — i predo mnoy one:";
         
         $template_name = "poemx";
         $parameter_number = 2;
@@ -299,7 +308,27 @@ Ne tol'ko pred toboyu - i predo mnoy one:";
         $text_result = TemplateExtractor::extractPoetry($initial);
         $this->assertEquals($expected, $text_result);
     }
-    
+/*    
+    public function testExtractPoetry_epigraph()
+    {
+        $initial =
+                ['text'=>"{{Otekste
+| AVTOR = Nadezhda Grigor'yevna L'vova (1891—1913) 
+| NAZVANIYe = «…Ne tol'ko pred toboyu — i predo mnoy one…»
+}}{{poemx||{{epigraf||Vot oni — skorbnyye, gordyye teni…||Valeriy Yakovlevich Bryusov|V. Bryusov}}
+Ne tol'ko pred toboyu — i predo mnoy one:
+}}",
+                 'title' => null,
+                 'creation_date' => null];
+        
+        $expected =
+                ['text'=>"Ne tol'ko pred toboyu — i predo mnoy one:",
+                 'title' => '',
+                 'creation_date' => ''];
+        $text_result = TemplateExtractor::extractPoetry($initial);
+        $this->assertEquals($expected['text'], $text_result['text']);
+    }
+*/    
     // -----------------------------------------------------------------
     
     public function testRemoveAnyTemplates_empty()
@@ -360,6 +389,85 @@ Ne tol'ko pred toboyu - i predo mnoy one:";
 
 == Примечания ==";
         $text_result = TemplateExtractor::removeAnyTemplates($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    // -----------------------------------------------------------------
+    
+    public function testRemoveTale_empty()
+    {
+        $wikitext = "";
+        $text_result = TemplateExtractor::removeTale($wikitext);
+        $this->assertEquals(0, strlen($text_result));
+    }
+    
+    public function testRemoveTale_normal()
+    {
+        $wikitext = "{{Отексте
+| НАЗВАНИЕ=?
+| ПОДЗАГОЛОВОК=«Пусть для ваших открытых сердец…»
+| АВТОР=[[Иннокентий Фёдорович Анненский]] (1856—1909)
+| СОДЕРЖАНИЕ=
+| ИЗЦИКЛА=
+| ИЗСБОРНИКА=[[Тихие песни (Анненский)|Тихие песни]]
+| ДАТАСОЗДАНИЯ=
+| ДАТАПУБЛИКАЦИИ = 1904Впервые — в книге {{Анненский:Тихие песни, 1904|страницы=29}}.
+| ИСТОЧНИК={{Анненский:Избранные произведения, 1988|страницы=44}}.
+| ВИКИПЕДИЯ=
+| ДРУГОЕ=
+| ПРЕДЫДУЩИЙ=[[Там (Анненский)|Там]]
+| СЛЕДУЮЩИЙ=[[Первый фортепьянный сонет (Анненский)|Первый фортепьянный сонет]]
+| КАЧЕСТВО=4
+}}
+
+{{poemx|?|
+Пусть для ваших открытых сердец
+До сих пор это — светлая фея
+С упоительной лирой Орфея,
+Для меня это — старый мудрец.
+
+По лицу его тяжко проходит
+Бороздой Вековая Мечта,
+И для мира немые уста
+Только бледной улыбкой поводит.|}}
+
+== Примечания ==
+{{примечания}}
+
+[[Категория:Поэзия Иннокентия Фёдоровича Анненского]]
+[[Категория:Русская поэзия, малые формы]]
+[[Категория:Литература 1900-х годов]]
+[[Категория:Тихие песни (Анненский)]]
+[[Категория:Восьмистишия]]
+[[Категория:Трёхстопный анапест]]";
+        $expected = "{{Отексте
+| НАЗВАНИЕ=?
+| ПОДЗАГОЛОВОК=«Пусть для ваших открытых сердец…»
+| АВТОР=[[Иннокентий Фёдорович Анненский]] (1856—1909)
+| СОДЕРЖАНИЕ=
+| ИЗЦИКЛА=
+| ИЗСБОРНИКА=[[Тихие песни (Анненский)|Тихие песни]]
+| ДАТАСОЗДАНИЯ=
+| ДАТАПУБЛИКАЦИИ = 1904Впервые — в книге {{Анненский:Тихие песни, 1904|страницы=29}}.
+| ИСТОЧНИК={{Анненский:Избранные произведения, 1988|страницы=44}}.
+| ВИКИПЕДИЯ=
+| ДРУГОЕ=
+| ПРЕДЫДУЩИЙ=[[Там (Анненский)|Там]]
+| СЛЕДУЮЩИЙ=[[Первый фортепьянный сонет (Анненский)|Первый фортепьянный сонет]]
+| КАЧЕСТВО=4
+}}
+
+{{poemx|?|
+Пусть для ваших открытых сердец
+До сих пор это — светлая фея
+С упоительной лирой Орфея,
+Для меня это — старый мудрец.
+
+По лицу его тяжко проходит
+Бороздой Вековая Мечта,
+И для мира немые уста
+Только бледной улыбкой поводит.|}}";
+        $text_result = TemplateExtractor::removeTale($wikitext);
         $this->assertEquals($expected, $text_result);
     }
     

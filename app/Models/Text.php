@@ -61,15 +61,20 @@ class Text extends Model
             return $text_info;
         }
         
-        // extracts a text of second parameter from the template {{Poemx|1|2|3}}
-/*        $template_name = "Poemx";
-        $parameter_number = 2;
-        $text = TemplateExtractor::getParameterValueWithoutNames($template_name, $parameter_number, $wikitext); */
-        
-        $text_info = TemplateExtractor::extractPoetry($text_info);
-            
-        $text_info['text'] = preg_replace("/(\{\{[^\}]\}\})/","",$text_info['text']);
-        
+        if (preg_match("/\{\{poem/",$wikitext)) {
+            // extracts a text of second parameter from the template {{Poemx|1|2|3}}
+            $template_name = "poemx";
+            $text_info['title'] = TemplateExtractor::getParameterValueWithoutNames($template_name, 1, $wikitext); 
+            $text_info['text'] = TemplateExtractor::getParameterValueWithoutNames($template_name, 2, $wikitext); 
+            $text_info['creation_date'] = TemplateExtractor::getParameterValueWithoutNames($template_name, 3, $wikitext); 
+    //print "\n\n".$wikitext."\n\n".$text_info['text']."\n\n";     
+
+        } 
+        // не проходит тест с эпиграфом!!!   
+        //$text_info = TemplateExtractor::extractPoetry($text_info);
+
+        // remove another templates inside text
+        $text_info['text'] = trim(preg_replace("/(\{\{[^\}]+\}\})/s","",$text_info['text']));
         return $text_info;
     }
     /** Takes data from search form (title, language) and 

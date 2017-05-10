@@ -11,6 +11,8 @@ use Wcorpus\Models\Author;
 use Wcorpus\Models\Publication;
 use Wcorpus\Models\Text;
 
+use Wcorpus\Wikiparser\TemplateExtractor;
+
 class TextController extends Controller
 {
     public $url_args=[];
@@ -192,12 +194,19 @@ class TextController extends Controller
         $is_exist_not_parse_text = 1;
         
         while ($is_exist_not_parse_text) {
-            $texts=Text::whereNull('text')->orderBy('title')->take(10)->get();
+            $texts=Text::
+                    //where('id',381175)
+                    whereNull('text')
+                    ->orderBy('title')
+                    ->take(10)
+                    ->get();
 //dd($texts);            
             if ($texts) {
                 foreach ($texts as $text) {
 print "<p>".$text->id;           
                     $wikitext = TemplateExtractor::removeComments($text->wikitext); // remove comments
+
+                    $wikitext = TemplateExtractor::removeTale($text->wikitext); 
                     
                     $wikitext = TemplateExtractor::removeWikiLinks($wikitext); // remove wiki links
                     

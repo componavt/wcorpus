@@ -27,24 +27,24 @@ class TemplateExtractor
         
         $template = "{{".$template_name."|";
         
-        $pos = strpos($wikitext, $template);
+        $pos = mb_strpos($wikitext, $template);
         if ($pos===false) {
             return '';
         }
         
-        $start_pos = $pos + strlen($template);
+        $start_pos = $pos + mb_strlen($template);
         $found = false;
         $failed = false;
         $parameter_count = 1;
+        $is_end = false; // end is reached
         
         while (!$found && !$failed) {
-            $end_pos = strpos($wikitext, '|',$start_pos);
+            $end_pos = mb_strpos($wikitext, '|',$start_pos);
             if ($end_pos===false) { // нет больше |, остались только }}
-                $end_pos = strpos($wikitext, '}}',$start_pos);
+                $end_pos = mb_strpos($wikitext, '}}',$start_pos);
             }
-//print "\n\n$parameter_count. start: $start_pos, end: $end_pos\n";            
             if ($end_pos===false) { // нет ни |, ни }}, возьмем все до конца строки
-                $result = substr($wikitext, $start_pos);
+                $result = mb_substr($wikitext, $start_pos);
                 if ($parameter_number == $parameter_count) {
                     $found = true;
                 } else {
@@ -52,20 +52,21 @@ class TemplateExtractor
                 }
                 continue;
             } 
-            $result = substr($wikitext, $start_pos, $end_pos-$start_pos);
-            
+            $result = mb_substr($wikitext, $start_pos, $end_pos-$start_pos);
             
             // Looks for internal templates and deletes them
-            $template_inside_start_pos = strpos($wikitext, "{{",$start_pos);
+            $template_inside_start_pos = mb_strpos($wikitext, "{{",$start_pos);
             while ($template_inside_start_pos!==false && $template_inside_start_pos < $end_pos) {
-                $template_inside_end_pos = strpos($wikitext, "}}",$template_inside_start_pos);
+                $template_inside_end_pos = mb_strpos($wikitext, "}}",$template_inside_start_pos);
                 
-                $end_pos = strpos($wikitext, '|',$template_inside_end_pos);
+                $end_pos = mb_strpos($wikitext, '|',$template_inside_end_pos+2);
                 if ($end_pos===false) { // нет больше |, остались только }}
-                    $end_pos = strpos($wikitext, '}}',$template_inside_end_pos+2);
+                    $end_pos = mb_strpos($wikitext, '}}',$template_inside_end_pos+2);
+                    $is_end = true;
                 }
                 if ($end_pos===false) { // нет ни |, ни }}, возьмем все до конца строки
-                    $result = substr($wikitext, $start_pos);
+                    $is_end = true;
+                    $result = mb_substr($wikitext, $start_pos);
                     if ($parameter_number == $parameter_count) {
                         $found = true;
                     } else {
@@ -73,17 +74,22 @@ class TemplateExtractor
                     }
                     continue;
                 } else {
-                    $result = substr($wikitext, $start_pos, $end_pos-$start_pos);
+                    $result =mb_substr($wikitext, $start_pos, $end_pos-$start_pos);
                 }
                      
-                $template_inside_start_pos = strpos($wikitext, "{{",$template_inside_end_pos);
+                $template_inside_start_pos = mb_strpos($wikitext, "{{",$template_inside_end_pos);
             }
 
 //print "\nstart: $start_pos, end: $end_pos, result: $result\n";            
             if ($parameter_number == $parameter_count) {
                 $found = true;
+                
+            // The end is reached earlier than the parameter $parameter_number is found
+            } elseif ($is_end && $parameter_number > $parameter_count) { 
+                $found = true;
+                 $result = '';
             } else {
-                $start_pos = $end_pos+1;
+                $start_pos = $end_pos+1; // сдвиг на |
                 $parameter_count ++;
             }
         }
@@ -210,6 +216,7 @@ class TemplateExtractor
      * @param Array $text_info = ['text'=><wikitext>,
                                   'title' => null,
                                   'creation_date' => null
+        не проходит тест с эпиграфом!!!   
      * 
      * @return Array
      */
@@ -219,12 +226,16 @@ class TemplateExtractor
             return $text_info;
         }
         
-        if (preg_match("/\{\{Poemx?\|([^\|]*)\|(\<poem\>)*([^\|]+)(\<\/poem\>)*\|([^\}]*)\}\}/i",$text_info['text'],$regs)) {
+        while (preg_match("/^(.*\{\{poemx?\|[^\{]*)\{\{[^\}]*\}\}([^\}]*\}\}.*)$/i",$text_info['text'],$regs)) {
+            $text_info['text'] = $regs[1].$regs[2];
+        }
+        
+        if (preg_match("/\{\{poemx?\|([^\|]*)\|(\<poem\>)*([^\|]+)(\<\/poem\>)*\|([^\}]*)\}\}/i",$text_info['text'],$regs)) {
             $text_info['title'] = trim($regs[1]);
             $text_info['text'] = trim($regs[3]);
             $text_info['creation_date'] = trim($regs[5]);
             if (mb_strlen($text_info['creation_date'])>50) {
-                $text_info['creation_date'] = mb_substr($creation_date,0,50);
+                $text_info['creation_date'] = mb_substr($text_info['creation_date'],0,50);
             }
         } 
         
@@ -247,6 +258,27 @@ class TemplateExtractor
 
         while (preg_match("/^(.*)\{\{[^\}]*\}\}(.*)$/us",$wikitext,$regs)) {
             $wikitext = trim($regs[1].$regs[2]);
+        }
+        return $wikitext;
+    }
+    
+    /** Remove "tail" of text, beginning from phrase "== Примечания ==" 
+     * 
+     * @param String $wikitext
+     * 
+     * @return String
+     */
+    public static function removeTale(String $wikitext) : String
+    {
+        if( !$wikitext ) {
+            return '';
+        }
+        $search_str = '== Примечания ==';
+        
+        $pos = mb_strpos($wikitext, $search_str);
+        
+        if ($pos !== false) {
+            $wikitext = trim(mb_substr($wikitext, 0, $pos));
         }
         return $wikitext;
     }

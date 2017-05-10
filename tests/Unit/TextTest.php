@@ -40,9 +40,26 @@ class TextTest extends TestCase
         $array_result = $text->parseWikitext( $wikitext );
         $text_result  = $array_result['text'];
         
-// todo        $this->assertEquals($expected, $text_result);
+        $this->assertEquals($expected, $text_result);
     }
     
+    public function testParseWikitext_poemxWithEpigraph()
+    {
+        $wikitext = "{{Otekste
+| AVTOR = Nadezhda Grigor'yevna L'vova (1891—1913) 
+| NAZVANIYe = «…Ne tol'ko pred toboyu — i predo mnoy one…»
+}}{{poemx||{{epigraf||Vot oni — skorbnyye, gordyye teni…||Valeriy Yakovlevich Bryusov|V. Bryusov}}
+Ne tol'ko pred toboyu — i predo mnoy one:
+}}";
+        
+        $expected =
+                ['text'=>"Ne tol'ko pred toboyu — i predo mnoy one:",
+                 'title' => '',
+                 'creation_date' => ''];
+        $text = new Text();
+        $text_result = $text->parseWikitext( $wikitext );
+        $this->assertEquals($expected, $text_result);
+    }
     
     // -----------------------------------------------------------------
     

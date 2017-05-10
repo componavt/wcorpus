@@ -34,6 +34,8 @@ php artisan make:controller 'SentenceController' --resource
 php artisan migrate
 
 alter table texts add index text(`text`(100));
+alter table texts add index author_id(`author_id`);
+alter table texts add index publication_id(`publication_id`);
 
 
 

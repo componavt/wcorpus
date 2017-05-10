@@ -25,8 +25,8 @@ class CreateTextsTable extends Migration
             
             $table->index('title');
             $table->index('text',100);
-//            $table->index('author_id');
-//            $table->index('publication_id');
+            $table->index('author_id');
+            $table->index('publication_id');
 });
     }
 
