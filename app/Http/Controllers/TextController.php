@@ -186,7 +186,29 @@ class TextController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function parseWikitext()
+    public function parseWikitext($id)
+    {
+        $text=Text::find($id);                
+
+        if ($text->publication) {
+            if ($text->publication->author) {
+                $text->publication->author_id = null;
+                $text->author_id = null;
+                $text->publication->author()->delete();
+            }
+            $text->publication_id = null;
+            $text->publication()->delete();
+        }
+        $text->parseData();
+    }
+    
+    /**
+     * Parse wikitext,
+     * search author name, publication title, creation date, text of publication
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function parseAllWikitext()
     {
 //select substring(`wikitext`,1,10) as beg, count(*) as count from texts group by beg order by count desc limit 0,100;
         
@@ -195,38 +217,17 @@ class TextController extends Controller
         
         while ($is_exist_not_parse_text) {
             $texts=Text::
-                    //where('id',381175)
                     whereNull('text')
+                    //->orWhere('text','')
                     ->orderBy('title')
                     ->take(10)
                     ->get();
+            //$is_exist_not_parse_text = 0;     // когда оттестится, убрать           
 //dd($texts);            
             if ($texts) {
                 foreach ($texts as $text) {
-print "<p>".$text->id;           
-                    $wikitext = TemplateExtractor::removeComments($text->wikitext); // remove comments
-
-                    $wikitext = TemplateExtractor::removeTale($text->wikitext); 
-                    
-                    $wikitext = TemplateExtractor::removeWikiLinks($wikitext); // remove wiki links
-                    
-                    $wikitext = TemplateExtractor::removeLangTemplates($wikitext); // remove lang templates
-
-                    $text->author_id = Author::searchAuthorID($wikitext); // extract author
-                    
-                    $text_info = Text::parseWikitext($wikitext);
-                    $text->text = $text_info['text'];
-                    
-                    $text->publication_id = Publication::parseWikitext(
-                                                            $wikitext, 
-                                                            $text->author_id,
-                                                            $text_info['title'],
-                                                            $text_info['creation_date']
-                            );
-
-                    $text->push();
+                    $text->parseData();
                 }
-                $is_exist_not_parse_text = 0;                
             } else {
                 $is_exist_not_parse_text = 0;
             }

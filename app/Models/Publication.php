@@ -4,6 +4,8 @@ namespace Wcorpus\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use Wcorpus\Wikiparser\TemplateExtractor;
+
 class Publication extends Model
 {
     protected $fillable = ['author_id','title','creation_date'];
@@ -62,23 +64,19 @@ class Publication extends Model
             return null;
         }
         
-        if (preg_match("/\{\{О\s?тексте[^\}]+НАЗВАНИЕ\s*=\s*\[*([^\|\]\}]+)/",$wikitext,$regs)) {
-            $title = trim($regs[1]);
-            
-            if (preg_match("/^([^\[]*)\[\[([^\|\]]+\|?[^\]]*\]\](.*)$)/",$title,$regs1)) {
-                $title = $regs1[1].$regs1[2].$regs1[3];                
-            }
-            
-        }
-        
-        // тут нужно извлечь дату
-        // ...
+        $title = TemplateExtractor::extractTitle($wikitext);
         
         if (!$title && $text_title) {
             $title = $text_title;
         }
+
+        $creation_date = TemplateExtractor::extractDate($wikitext);
+        
         if (!$creation_date && $text_date) {
             $creation_date = $text_date;
+        }
+        if (mb_strlen($creation_date)>20) {
+            $creation_date = mb_substr($creation_date,0,20);
         }
         
         $publication = self::firstOrNew(['title'=>$title,'author_id'=>$author_id]);

@@ -61,6 +61,127 @@ Ne tol'ko pred toboyu — i predo mnoy one:
         $this->assertEquals($expected, $text_result);
     }
     
+    public function testParseWikitext_poemWithTag()
+    {
+        $wikitext = "{{Otekste
+| KACHESTVO = 3
+| NAZVANIYe = «Zachem vy, dni?» — skazal poet…
+| AVTOR = [[Potr Andreyevich Vyazemskiy]] (1792—1878)
+}}
+{{poem||<poem>
+«Zachem vy, dni?» — skazal poet.<ref>Boratynskiy. — ''Prim. avt.'' Netochnaya tsitata iz stikhotvoreniya Boratynskogo «Na chto vy, dni! Yudol'nyy mir yavlen'ya…» (1840?).</ref>
+A ya sproshu: «Zachem vy, nochi?»
+Zachem vash mrak sgonyayet svet</poem>|1863 ili 1864}}";
+        
+        $expected =
+                ['text'=>"«Zachem vy, dni?» — skazal poet.
+A ya sproshu: «Zachem vy, nochi?»
+Zachem vash mrak sgonyayet svet",
+                 'title' => '',
+                 'creation_date' => ''];
+        $text = new Text();
+        $text_result = $text->parseWikitext( $wikitext );
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testParseWikitext_poem_on()
+    {
+        $wikitext = "{{Otekste
+|KACHESTVO=75%
+|AVTOR=Mikhail Alekseyevich Kuzmin (1876—1936)
+|NAZVANIYe=«A eto — khuliganskaya», — skazala… 
+}}
+
+{{poem-on|* * *}}<poem>
+''O. A. Glebovoy-Sudeykinoy''
+
+«A eto — khuliganskaya», — skazala
+Priyatel'nitsa milaya, starayas'
+Oslablennomu golosu pridat'
+Ves' dikiy romantizm polnochnykh rek,
+{{nr|5}} Vso udal'stvo, lyubov' i beznadezhnost',
+Ves' gor'kiy khmel' tragicheskikh svidaniy.
+I dal'niy klokot slushali, potupyas',
+Tut romanist, poet i kompozitor,
+A tyulevaya noch' v okne dremala,
+</poem>{{poem-off|<iyun'> 1922}}";
+        
+        $expected =
+                ['text'=>"''O. A. Glebovoy-Sudeykinoy''
+
+«A eto — khuliganskaya», — skazala
+Priyatel'nitsa milaya, starayas'
+Oslablennomu golosu pridat'
+Ves' dikiy romantizm polnochnykh rek,
+ Vso udal'stvo, lyubov' i beznadezhnost',
+Ves' gor'kiy khmel' tragicheskikh svidaniy.
+I dal'niy klokot slushali, potupyas',
+Tut romanist, poet i kompozitor,
+A tyulevaya noch' v okne dremala,",
+                 'title' => '* * *',
+                 'creation_date' => "<iyun'> 1922"];
+        $text = new Text();
+        $text_result = $text->parseWikitext( $wikitext );
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testParseWikitext_nestedTemplates()
+    {
+        $wikitext = "{{Otekste
+| AVTOR = Vlas Mikhaylovich Doroshevich
+| NAZVANIYe = «25 let vladychestva nad mirom»
+| PODZAGOLOVOK = Yubiley papy
+| IZTSIKLA =
+| DATASOZDANIYA =
+| DATAPUBLIKATSII =
+| ISTOCHNIK = {{Sobraniye sochineniy. Tom V. Po Yevrope|197}}
+| DRUGOYe =
+| VIKIPEDIYA =
+| IZOBRAZHENIYe =
+| KACHESTVO =
+}}
+
+== I ==
+
+
+Nad Rimom navisli tomnyye tuchi.
+
+K Rimu eto ochen' idot.";
+        
+        $expected =
+                ['text'=>"Nad Rimom navisli tomnyye tuchi.
+
+K Rimu eto ochen' idot.",
+                 'title' => null,
+                 'creation_date' => null];
+        $text = new Text();
+        $text_result = $text->parseWikitext( $wikitext );
+        $this->assertEquals($expected, $text_result);
+    }
+
+    public function testParseWikitext_withMagicWords()
+    {
+        $wikitext = "{{Отексте
+|КАЧЕСТВО=75%
+| НАЗВАНИЕ=Я хочу рассказать вам
+| АВТОР =[[Михаил Юрьевич Лермонтов]], (1814 -1841)
+}}__NOTOC____NOEDITSECTION__
+
+
+== <«Я ХОЧУ РАССКАЗАТЬ ВАМ»> ==
+
+Я хочу рассказать вам историю женщины, которую вы все видали и которую никто из вас не знал. Вы ее встречали ежедневно на бале, в театре, на гулянье, у нее в кабинете. Теперь она уже сошла со сцены большого света; ей 30 лет, и она схоронила себя в деревне; но когда ей было только двадцать, весь Петербург шумно занимался ею в продолжение целой зимы. Об этом совершенно забыли, и слава богу! потому что иначе я бы не мог печатать своей повести. В обществе про нее было в то время много разногласных толков. Старушки говорили об ней, что она прехитрая и прелукавая, приятельницы - что она преглупенькая, соперницы - что она предобрая, молодые женщины - что она кокетка, а раздушенные старики значительно улыбались при ее имени и ничего не говорили. Еще прибавлю странность. Иные жалели, что такой правильной и свежей красоте недостает физиономии, тогда как другие утверждали, что хотя она вовсе не хороша, но неизъяснимая прелесть выраженья в ее лице заменяет все прочие недостатки. Притом муж ее, пятидесятилетний мужчина, имел графский титул и сомнительно-огромное состоянье. Всего этого, кажется, довольно, чтобы доставить молодой женщине ту соблазнительную, мимолетную славу, за которой они все так жадно гоняются и за которую некоторые из них так дорого платят.
+
+
+Категория:Проза Михаила Юрьевича Лермонтова
+";
+        
+        $expected ="Я хочу рассказать вам историю женщины, которую вы все видали и которую никто из вас не знал. Вы ее встречали ежедневно на бале, в театре, на гулянье, у нее в кабинете. Теперь она уже сошла со сцены большого света; ей 30 лет, и она схоронила себя в деревне; но когда ей было только двадцать, весь Петербург шумно занимался ею в продолжение целой зимы. Об этом совершенно забыли, и слава богу! потому что иначе я бы не мог печатать своей повести. В обществе про нее было в то время много разногласных толков. Старушки говорили об ней, что она прехитрая и прелукавая, приятельницы - что она преглупенькая, соперницы - что она предобрая, молодые женщины - что она кокетка, а раздушенные старики значительно улыбались при ее имени и ничего не говорили. Еще прибавлю странность. Иные жалели, что такой правильной и свежей красоте недостает физиономии, тогда как другие утверждали, что хотя она вовсе не хороша, но неизъяснимая прелесть выраженья в ее лице заменяет все прочие недостатки. Притом муж ее, пятидесятилетний мужчина, имел графский титул и сомнительно-огромное состоянье. Всего этого, кажется, довольно, чтобы доставить молодой женщине ту соблазнительную, мимолетную славу, за которой они все так жадно гоняются и за которую некоторые из них так дорого платят.";
+        $text = new Text();
+        $text_result = $text->parseWikitext( $wikitext );
+        $this->assertEquals($expected, $text_result['text']);
+    }
+
     // -----------------------------------------------------------------
     
     public function testsplitIntoSentences_empty()

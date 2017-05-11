@@ -12,6 +12,8 @@ Texts
 
         <h2>{{$text->title}}</h2>
         
+        <p><a href="/text/parseWikitext/{{$text->id}}">Re-parse wikitext</a></p>
+        
         @if($text->publication && $text->publication->title)
         <p><b>Publication title:</b> {{$text->publication->title}}    
         @endif
@@ -30,8 +32,8 @@ Texts
         @endif
 
         <h3>Text from wikisource:</h3>
-        <pre><?php print  str_replace('{','\{',$text->wikitext);
-        // print  str_replace('{','\{',str_replace('}','\}',$text->wikitext));
+        <pre>{{str_replace('{','\{',$text->wikitext)}}
+<?php   // print  str_replace('{','\{',str_replace('}','\}',$text->wikitext));
         // print  str_replace('{','&#'.ord('{').';',$text->wikitext);
         // print  str_replace('{','&#'.ord('{'),str_replace('}','&#'.ord('}'),$text->wikitext)); ?>
         </pre>

@@ -2,8 +2,11 @@
 
 namespace Wcorpus\Models;
 
-use Wcorpus\Wikiparser\TemplateExtractor;
 use Illuminate\Database\Eloquent\Model;
+
+use Wcorpus\Wikiparser\TemplateExtractor;
+use Wcorpus\Models\Author;
+use Wcorpus\Models\Publication;
 
 class Text extends Model
 {
@@ -22,6 +25,39 @@ class Text extends Model
         return $this->belongsTo(Publication::class);
     }
 
+    /** Get $text->wikitext and look for title, creation_date, text
+     * fill properties and save object
+     * 
+     * @param Text $text object of text
+     */
+    public function parseData() {
+        $text = $this;
+print "<p>".$text->id;           
+                    $wikitext = TemplateExtractor::removeComments($text->wikitext); // remove comments
+
+                    $wikitext = TemplateExtractor::removeTale($text->wikitext); 
+                    
+                    $wikitext = TemplateExtractor::removeWikiLinks($wikitext); // remove wiki links
+                    
+                    $wikitext = TemplateExtractor::removeLangTemplates($wikitext); // remove lang templates
+
+                    $text->author_id = Author::searchAuthorID($wikitext); // extract author
+                    
+                    $text_info = Text::parseWikitext($wikitext);
+                    $text->text = $text_info['text'];
+                    
+                    $text->publication_id = Publication::parseWikitext(
+                                                            $wikitext, 
+                                                            $text->author_id,
+                                                            $text_info['title'],
+                                                            $text_info['creation_date']
+                            );
+                    if ($text->publication && $text->publication->author_id) {
+                        $text->author_id = $text->publication->author_id;
+                    }
+                    $text->push();
+    }
+    
     /** Parse wikitext and extract text of publication
      * 
      * If this text is poetry, parse such template
@@ -61,20 +97,29 @@ class Text extends Model
             return $text_info;
         }
         
-        if (preg_match("/\{\{poem/",$wikitext)) {
+        $text_info['text'] = TemplateExtractor::parsePoetryLadder($wikitext);
+        
+        if (preg_match("/\{\{(poemx?)\|/",$text_info['text'],$regs)) {
             // extracts a text of second parameter from the template {{Poemx|1|2|3}}
-            $template_name = "poemx";
-            $text_info['title'] = TemplateExtractor::getParameterValueWithoutNames($template_name, 1, $wikitext); 
-            $text_info['text'] = TemplateExtractor::getParameterValueWithoutNames($template_name, 2, $wikitext); 
-            $text_info['creation_date'] = TemplateExtractor::getParameterValueWithoutNames($template_name, 3, $wikitext); 
+            $template_name = $regs[1];
+            $text_info['title'] = TemplateExtractor::getParameterValueWithoutNames($template_name, 1, $text_info['text']); 
+            $text_info['text'] = TemplateExtractor::getParameterValueWithoutNames($template_name, 2, $text_info['text']); 
+            $text_info['creation_date'] = TemplateExtractor::getParameterValueWithoutNames($template_name, 3, $text_info['text']); 
     //print "\n\n".$wikitext."\n\n".$text_info['text']."\n\n";     
-
         } 
         // не проходит тест с эпиграфом!!!   
         //$text_info = TemplateExtractor::extractPoetry($text_info);
-
-        // remove another templates inside text
-        $text_info['text'] = trim(preg_replace("/(\{\{[^\}]+\}\})/s","",$text_info['text']));
+        elseif (preg_match("/\{\{poem\-on\|/i",$text_info['text'])) {
+            $text_info = TemplateExtractor::extractPoem_on($text_info);
+        }
+        
+        if ($text_info['title']) {
+            $text_info['title'] = TemplateExtractor::clearText($text_info['title']);
+        }
+        $text_info['text'] = TemplateExtractor::clearText($text_info['text']);
+        if ($text_info['creation_date']) {
+            $text_info['creation_date'] = TemplateExtractor::clearDate($text_info['creation_date']);
+        }
         return $text_info;
     }
     /** Takes data from search form (title, language) and 

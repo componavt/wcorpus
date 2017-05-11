@@ -232,12 +232,46 @@ class TemplateExtractor
         
         if (preg_match("/\{\{poemx?\|([^\|]*)\|(\<poem\>)*([^\|]+)(\<\/poem\>)*\|([^\}]*)\}\}/i",$text_info['text'],$regs)) {
             $text_info['title'] = trim($regs[1]);
+/*            $new_title = trim($regs[1]);
+            if (!$text_info['title'] && $new_title || $text_info['title'] && $new_title!="?" && $new_title!="* * *") {
+                $text_info['title'] = $new_title;
+            }*/
+            
             $text_info['text'] = trim($regs[3]);
             $text_info['creation_date'] = trim($regs[5]);
-            if (mb_strlen($text_info['creation_date'])>50) {
-                $text_info['creation_date'] = mb_substr($text_info['creation_date'],0,50);
-            }
         } 
+        
+        return $text_info;
+    }    
+    
+    /** Replace wiki link to plain text
+     * 
+     * @param Array $text_info = ['text'=><wikitext>,
+                                  'title' => null,
+                                  'creation_date' => null
+        не проходит тест с эпиграфом!!!   
+     * 
+     * @return Array
+     */
+    public static function extractPoem_on(Array $text_info) : Array
+    {
+        if (!$text_info['text']) {
+            return $text_info;
+        }
+        
+        if (preg_match("/\{\{poem-on\|([^\}]*)\}\}(.+)\{\{poem-off\|([^\}]*)\}\}/is",$text_info['text'],$regs)) {
+//        if (preg_match("/\{\{poem-on\|([^\}]*)\}\}(.+)/is",$text_info['text'],$regs)) {
+//print_r($regs);            
+
+            $text_info['title'] = trim($regs[1]);
+/*          $new_title = trim($regs[1]);
+            if (!$text_info['title'] && $new_title || $text_info['title'] && $new_title!="?" && $new_title!="* * *") {
+                $text_info['title'] = $new_title;
+            } */
+            
+            $text_info['text'] = $regs[2];
+            $text_info['creation_date'] = trim($regs[3]);
+        }
         
         return $text_info;
     }    
@@ -273,14 +307,181 @@ class TemplateExtractor
         if( !$wikitext ) {
             return '';
         }
-        $search_str = '== Примечания ==';
+        $search_str = '== Примечани[яе] ==';
+        
+        if (preg_match("/^(.*)".$search_str."/siu",$wikitext,$regs)) {
+            $wikitext = trim($regs[1]);
+        }
+        
+/*        
+        $search_str = '== Примечание ==';
         
         $pos = mb_strpos($wikitext, $search_str);
         
         if ($pos !== false) {
             $wikitext = trim(mb_substr($wikitext, 0, $pos));
         }
+*/        
         return $wikitext;
     }
+    
+    /** Clear text from  templates, tags, title such as == ... ==, 
+     * magic words, such as __NOTC__, categories "Категория: .."; referances
+     * 
+     * @param String $wikitext
+     * 
+     * @return String
+     */
+    public static function clearText(String $wikitext) : String
+    {
+        if( !$wikitext ) {
+            return '';
+        }
+        // remove another templates inside text
+        while (preg_match("/^(.*)\{\{[^\}]+\}\}(.*)$/s",$wikitext,$regs)) {
+            $wikitext = $regs[1].$regs[2];
+        }
+        
+        //remove referances
+        $wikitext = preg_replace("/\<ref[^\<]+\<\/ref\>/","",$wikitext);
+
+        // titles
+        $wikitext = preg_replace("/(^={1,}.+$)/m","",$wikitext);
+
+        // categories
+        $wikitext = preg_replace("/(^Категория:.*$)/mu","",$wikitext);
+
+        // magic words
+        $wikitext = preg_replace("/(__[^_]+__)/","",$wikitext);
+
+        //tags
+        $wikitext = strip_tags($wikitext);
+        return trim($wikitext);
+    }
+    
+    /** Clear date from  templates, tags, referances
+     * 
+     * @param String $wikitext
+     * 
+     * @return String
+     */
+    public static function clearDate(String $wikitext) : String
+    {
+        if( !$wikitext ) {
+            return '';
+        }
+        // remove another templates inside text
+//print "\n$wikitext\n";        
+        while (preg_match("/^(.*)\{\{[^\}]+(\}\})?(.*)$/s",$wikitext,$regs)) {
+            $wikitext = $regs[1].$regs[3];
+//print "\n$wikitext\n";        
+        }
+        
+        //remove referances
+        $wikitext = preg_replace("/\<ref[^\<]+\<\/ref\>/","",$wikitext);
+
+        //tags
+        //$wikitext = strip_tags($wikitext);
+        return trim($wikitext);
+    }
+    
+    /** Extract title of publication 
+     * in template "{{Отексте"
+     * OR 
+     * in another template
+     * by searching string "| НАЗВАНИЕ"
+     * 
+     * @param String $wikitext
+     * 
+     * @return String
+     */
+    public static function extractTitle(String $wikitext) : String
+    {
+        if( !$wikitext ) {
+            return '';
+        }
+        
+        $title = '';
+        
+        if (preg_match("/\{\{О\s?тексте[^\}]+НАЗВАНИЕ\s*=\s*\[*([^\|\]\}]+)/",$wikitext,$regs)) {
+            $title = trim($regs[1]);
+            
+            if (preg_match("/^([^\[]*)\[\[([^\|\]]+\|?[^\]]*\]\](.*)$)/",$title,$regs1)) {
+                $title = $regs1[1].$regs1[2].$regs1[3];                
+            }
+            
+        } elseif (preg_match("/\|\s*НАЗВАНИЕ\s*=\s*\[*([^\|\]\}]+)/",$wikitext,$regs)) {
+            $title = trim($regs[1]);
+            
+            if (preg_match("/^([^\[]*)\[\[([^\|\]]+\|?[^\]]*\]\](.*)$)/",$title,$regs1)) {
+                $title = $regs1[1].$regs1[2].$regs1[3];                
+            }
+            
+        }
+        
+        $title = TemplateExtractor::clearText($title);
+
+        return $title;
+    }
+    
+    /** Extract date of publication 
+     * in template "{{Отексте"
+     * OR 
+     * in another template
+     * by searching string "| ДАТАСОЗДАНИЯ=" or "| ДАТАПУБЛИКАЦИИ="
+     * 
+     * @param String $wikitext
+     * 
+     * @return String
+     */
+    public static function extractDate(String $wikitext) : String
+    {
+        if( !$wikitext ) {
+            return '';
+        }
+        
+        $date = '';
+        
+        if (preg_match("/\{\{О\s?тексте[^\}]+ДАТАСОЗДАНИЯ\s*=(.+)$/m",$wikitext,$regs)) {
+            $date = trim($regs[1]);
+        } elseif (preg_match("/^\s*\|\s*ДАТАСОЗДАНИЯ\s*=(.+)$/m",$wikitext,$regs)) {
+            $date = trim($regs[1]);
+        }
+
+        if (!$date) {
+            if (preg_match("/\{\{О\s?тексте[^\}]+ДАТАПУБЛИКАЦИИ\s*=(.+)$/m",$wikitext,$regs)) {
+                $date = trim($regs[1]);
+            } elseif (preg_match("/\|\s*ДАТАПУБЛИКАЦИИ\s*=(.+)$/m",$wikitext,$regs)) {
+                $date = trim($regs[1]);
+            }
+        }
+        
+        $date = TemplateExtractor::clearDate($date);        
+        return $date;
+    }
+    
+    /** Replace temlates лесенка,лесенка2 to plain text
+     * 
+     * {{lang|he|והיה כי יארכו הימים}}
+     * {{lang-en|сезон}}
+     * {{lang-it|}}
+     * 
+     * @param String $wikitext
+     * 
+     * @return String
+     */
+    public static function parsePoetryLadder(String $wikitext) : String
+    {
+        if (!$wikitext) {
+            return '';
+        }
+        
+        //$wikitext = preg_replace("/\{\{лесенка2?\s*\|(.+)(|строка=\d+)?(|№=\d+)?\}\}/iu","\\1",$wikitext);
+
+        while (preg_match("/^(.*)\{\{лесенка2?\s*\|([^\}]+)(|строка=\d+)?(|№=\d+)?\}\}(.*)$/isu",$wikitext,$regs)) {
+            $wikitext = $regs[1].preg_replace("/\|/"," ",$regs[2]).$regs[5];
+        }
+        return $wikitext;
+    }    
     
 }

@@ -471,4 +471,165 @@ Ne tol'ko pred toboyu — i predo mnoy one:
         $this->assertEquals($expected, $text_result);
     }
     
+    // -----------------------------------------------------------------
+    
+    public function testClearText_empty()
+    {
+        $wikitext = "";
+        $text_result = TemplateExtractor::clearText($wikitext);
+        $this->assertEquals(0, strlen($text_result));
+    }
+    
+    public function testClearText_inTitle()
+    {
+        $wikitext = '«Tanglefoot»<ref name="ref1">«Tanglefoot» — Липкая лента от мух</ref>';
+        $expected = "«Tanglefoot»";
+        $text_result = TemplateExtractor::clearText($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testClearText_long()
+    {
+        $wikitext = 'Notre Dame («Где римский судия судил чужой народ…»)&lt;ref&gt; Notre Dame ([[w:Собор Парижской Богоматери|Собор Парижской Богоматери]]) — Аполлон, 1913, № 3, с. 38. К-13, с. 31. Избр. стихи, с. 246. К-16, с. 43. К-16(Ав.). К-23, с. 36, без загл. (отсутствует в оглавлении). С, с. 42. БП, № 35. В AM — автограф с датой «1912»; к нему на отдельном листке приложен вариант строфы 1:
+
+\{\{poemx1||Ажурных галерей заманчивый пролет —
+И, жилы вытянув и напрягая нервы,
+Как некогда Адам, таинственный и первый,
+Играет мышцами крестовый легкий свод.|}}
+
+Печ. по автографу.
+
+Это ст-ние — своего рода стихотворный манифест, перекликающийся с «Утром акмеизма» (II, 144). Как о декларации нового отношения к поэтическому слову о нем писал С. Городецкий (в статье «Музыка и архитектура в поэзии». — Речь, 1913, 17 июня) и др. критики. См. также: Завадская Е. Поэт и искусство. — Творчество, 1988, №6, с. 1 — 2). Контрфорсы — вертикальные выступы, укрепляющие несущую конструкцию. Где римский судия... — Имеется в виду римское владычество в Галлии; по традиции, высшие судебные органы Франции находятся на о. Ситэ вблизи Notre Dame. &lt;br/&gt; Комментарий: \{\{Не объект АП — факт}} &lt;/ref&gt;';
+        $expected = "«Tanglefoot»";
+        $text_result = TemplateExtractor::clearText($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    // -----------------------------------------------------------------
+    
+    public function testExtractTitle_empty()
+    {
+        $wikitext = "";
+        $text_result = TemplateExtractor::extractTitle($wikitext);
+        $this->assertEquals(0, strlen($text_result));
+    }
+    
+    public function testExtractTitle_inOtekste()
+    {
+        $wikitext = "{{Отексте
+| КАЧЕСТВО              = 75%
+| АВТОР                 = Антон Павлович Чехов (1860—1904)
+| НАЗВАНИЕ              = «Гамлет» на Пушкинской сцене 
+| ПОДЗАГОЛОВОК          = 
+| ДАТАСОЗДАНИЯ          = 1882
+| ДАТАПУБЛИКАЦИИ        = 1882<ref>«Москва», 1882, № 3 (ценз. разр. 19 января), стр. 18—19. Подпись: Человек без селезенки.</ref>
+}}
+== «Гамлет» на Пушкинской сцене ==";
+        $expected = "«Гамлет» на Пушкинской сцене";
+        $text_result = TemplateExtractor::extractTitle($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testExtractTitle_inAnotherTemplate()
+    {
+        $wikitext = "{{Собрание сочинений К. М. Станюковича (Изд. Карцева)
+| НАЗВАНИЕ = «Глупая» причина<br />
+| ПОДЗАГОЛОВОК = рассказ старого матроса
+| ТОМ = 1
+| СОДЕРЖАНИЕ =
+| ДАТАСОЗДАНИЯ =
+| ДАТАПУБЛИКАЦИИ =
+| ВИКИПЕДИЯ =
+| ВИКИДАННЫЕ = Q15892375
+| НЕОДНОЗНАЧНОСТЬ =
+| ДРУГОЕ =
+| КАЧЕСТВО = 75%
+}}
+<div class='text'>
+
+А где это вам ухо повредили, Тарасыч? На войне?";
+        $expected = "«Глупая» причина";
+        $text_result = TemplateExtractor::extractTitle($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    // -----------------------------------------------------------------
+    
+    public function testExtractDate_empty()
+    {
+        $wikitext = "";
+        $text_result = TemplateExtractor::extractDate($wikitext);
+        $this->assertEquals(0, strlen($text_result));
+    }
+    
+    public function testExtractDate_inOtekste()
+    {
+        $wikitext = "{{Отексте
+| КАЧЕСТВО              = 75%
+| АВТОР                 = Антон Павлович Чехов (1860—1904)
+| НАЗВАНИЕ              = «Гамлет» на Пушкинской сцене 
+| ПОДЗАГОЛОВОК          = 
+| ДАТАСОЗДАНИЯ          = 1882
+| ДАТАПУБЛИКАЦИИ        = 1882<ref>«Москва», 1882, № 3 (ценз. разр. 19 января), стр. 18—19. Подпись: Человек без селезенки.</ref>
+}}
+== «Гамлет» на Пушкинской сцене ==";
+        $expected = "1882";
+        $text_result = TemplateExtractor::extractDate($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testExtractDate_withRef()
+    {
+        $wikitext = "{{Отексте
+| НАЗВАНИЕ=?
+| ПОДЗАГОЛОВОК=«Пусть для ваших открытых сердец…»
+| АВТОР=Иннокентий Фёдорович Анненский (1856—1909)
+| ДАТАСОЗДАНИЯ=
+| ДАТАПУБЛИКАЦИИ = 1904<ref>Впервые — в книге {{Анненский:Тихие песни, 1904|страницы=29}}.</ref>
+}}
+
+{{poemx|?|
+По лицу его тяжко проходит
+Бороздой Вековая Мечта,
+И для мира немые уста
+Только бледной улыбкой поводит.|}}";
+        $expected = "1904";
+        $text_result = TemplateExtractor::extractDate($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    // -----------------------------------------------------------------
+    
+    public function testParsePoetryLadder_empty()
+    {
+        $wikitext = "";
+        $expected = "";
+        $text_result = TemplateExtractor::parsePoetryLadder($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testParsePoetryLadder_emptyParameters()
+    {
+        $wikitext = "{{лесенка2|Черт вас возьми,|черносотенная слизь,}}";
+        $expected = "Черт вас возьми, черносотенная слизь,";
+        $text_result = TemplateExtractor::parsePoetryLadder($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testParsePoetryLadder_manyLines()
+    {
+        $wikitext = "{{лесенка2|Черт вас возьми,|черносотенная слизь,}}
+{{лесенка2|вы|схоронились|от пуль,|от зимы}}
+{{лесенка2|и расхамились —|только спаслись.}}
+{{лесенка2|Черт вас возьми,}}
+{{лесенка2|тех,|кто —}}";
+        $expected = "Черт вас возьми, черносотенная слизь,
+вы схоронились от пуль, от зимы
+и расхамились — только спаслись.
+Черт вас возьми,
+тех, кто —";
+        $text_result = TemplateExtractor::parsePoetryLadder($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
 }

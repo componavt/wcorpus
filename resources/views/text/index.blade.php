@@ -51,6 +51,7 @@ List of texts
                 <th>Title</th>
                 <th>Author</th>
                 <th>Publication</th>
+                <th>Date</th>
                 <th>Wikitext length</th>
                 <th>Parsed text length</th>
                 @if (Auth::check())
@@ -71,6 +72,11 @@ List of texts
                 <td>
                     @if($text_obj->publication)
                         {{$text_obj->publication->title}}
+                    @endif
+                </td>
+                <td>
+                    @if($text_obj->publication)
+                        {{$text_obj->publication->creation_date}}
                     @endif
                 </td>
                 <td>
