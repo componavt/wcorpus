@@ -6,12 +6,12 @@
             <file>file:/E:/all/projects/git/wcorpus/tests/Unit/TextTest.php</file>
             <file>file:/E:/all/projects/git/wcorpus/app/Models/Text.php</file>
             <file>file:/E:/all/projects/git/wcorpus/app/Http/Controllers/TextController.php</file>
+            <file>file:/E:/all/projects/git/wcorpus/resources/views/text/show.blade.php</file>
             <file>file:/E:/all/projects/git/wcorpus/app/Wikiparser/TemplateExtractor.php</file>
             <file>file:/E:/all/projects/git/wcorpus/app/Models/Publication.php</file>
             <file>file:/E:/all/projects/git/wcorpus/tests/Unit/TemplateExtractorTest.php</file>
+            <file>file:/E:/all/projects/git/wcorpus/routes/web.php</file>
             <file>file:/E:/all/projects/git/wcorpus/resources/views/text/index.blade.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/database/migrations/2017_03_27_124647_create_texts_table.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/steps.text</file>
         </group>
     </open-files>
 </project-private>

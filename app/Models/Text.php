@@ -41,6 +41,8 @@ print "<p>".$text->id;
                     
                     $wikitext = TemplateExtractor::removeLangTemplates($wikitext); // remove lang templates
 
+                    $wikitext = TemplateExtractor::removeRefTags($wikitext); // remove tags <ref...>...</ref>
+
                     $text->author_id = Author::searchAuthorID($wikitext); // extract author
                     
                     $text_info = Text::parseWikitext($wikitext);
@@ -99,7 +101,7 @@ print "<p>".$text->id;
         
         $text_info['text'] = TemplateExtractor::parsePoetryLadder($wikitext);
         
-        if (preg_match("/\{\{(poemx?)\|/",$text_info['text'],$regs)) {
+        if (preg_match("/\{\{(poemx?1?)\|/",$text_info['text'],$regs)) {
             // extracts a text of second parameter from the template {{Poemx|1|2|3}}
             $template_name = $regs[1];
             $text_info['title'] = TemplateExtractor::getParameterValueWithoutNames($template_name, 1, $text_info['text']); 

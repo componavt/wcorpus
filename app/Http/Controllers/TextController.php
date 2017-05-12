@@ -154,7 +154,14 @@ class TextController extends Controller
      */
     public function edit($id)
     {
-        //
+        $text = Text::find($id); 
+        
+        return view('text.edit')
+                  ->with([
+                      'text'        => $text,
+                      'args_by_get' => $this->args_by_get,
+                      'url_args'    => $this->url_args,
+                      ]);
     }
 
     /**
@@ -166,7 +173,19 @@ class TextController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $text= Text::findOrFail($id);
+        
+        $this->validate($request, [
+            'wikitext'  => 'required',
+        ]);
+        
+        $request->wikitext = str_replace("\{","{",$request->wikitext);
+        
+        $text->wikitext = $request->wikitext;
+        $text->save();
+        
+        return Redirect::to('/text/'.($text->id).($this->args_by_get))
+                       ->withSuccess('Text is modified');
     }
 
     /**

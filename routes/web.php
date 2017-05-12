@@ -21,7 +21,7 @@ Auth::routes();
 Route::get('/home', 'HomeController@index');
 
 Route::get('/text/extractFromWikiSource','TextController@extractFromWikiSource');
-Route::get('/text/parseWikitext/{id}','TextController@parseWikitext');
+Route::get('/text/{id}/parseWikitext','TextController@parseWikitext');
 Route::get('/text/parseAllWikitext','TextController@parseAllWikitext');
 Route::get('/text/templateStats','TextController@templateStats');
 Route::get('/text/parse_text','TextController@parseText');

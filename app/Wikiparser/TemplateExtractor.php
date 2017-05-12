@@ -211,6 +211,22 @@ class TemplateExtractor
         return $wikitext;
     }    
     
+    /** Clear text from references <ref...>..</ref>
+     * 
+     * @param String $wikitext
+     * 
+     * @return String
+     */
+    public static function removeRefTags(String $wikitext) : String
+    {
+        if( !$wikitext ) {
+            return '';
+        }
+        $wikitext = preg_replace("/\<ref.+\<\/ref\>/sU","",$wikitext);
+
+        return trim($wikitext);
+    }
+    
     /** Replace wiki link to plain text
      * 
      * @param Array $text_info = ['text'=><wikitext>,
@@ -343,7 +359,8 @@ class TemplateExtractor
         }
         
         //remove referances
-        $wikitext = preg_replace("/\<ref[^\<]+\<\/ref\>/","",$wikitext);
+        $wikitext = preg_replace("/\<ref.+\<\/ref\>/sU","",$wikitext);
+//        $wikitext = preg_replace("/\<ref[^\<]+\<\/ref\>/","",$wikitext);
 
         // titles
         $wikitext = preg_replace("/(^={1,}.+$)/m","",$wikitext);
@@ -400,7 +417,7 @@ class TemplateExtractor
         if( !$wikitext ) {
             return '';
         }
-        
+//print ($wikitext);    
         $title = '';
         
         if (preg_match("/\{\{О\s?тексте[^\}]+НАЗВАНИЕ\s*=\s*\[*([^\|\]\}]+)/",$wikitext,$regs)) {

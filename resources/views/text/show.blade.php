@@ -12,7 +12,10 @@ Texts
 
         <h2>{{$text->title}}</h2>
         
-        <p><a href="/text/parseWikitext/{{$text->id}}">Re-parse wikitext</a></p>
+        <p>
+            <a href="/text/{{$text->id}}/parseWikitext">Re-parse wikitext</a>&nbsp;&nbsp;&nbsp;
+            <a href="/text/{{$text->id}}/edit">Edit</a>
+        </p>
         
         @if($text->publication && $text->publication->title)
         <p><b>Publication title:</b> {{$text->publication->title}}    

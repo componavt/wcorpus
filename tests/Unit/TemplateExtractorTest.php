@@ -490,17 +490,34 @@ Ne tol'ko pred toboyu — i predo mnoy one:
     
     public function testClearText_long()
     {
-        $wikitext = 'Notre Dame («Где римский судия судил чужой народ…»)&lt;ref&gt; Notre Dame ([[w:Собор Парижской Богоматери|Собор Парижской Богоматери]]) — Аполлон, 1913, № 3, с. 38. К-13, с. 31. Избр. стихи, с. 246. К-16, с. 43. К-16(Ав.). К-23, с. 36, без загл. (отсутствует в оглавлении). С, с. 42. БП, № 35. В AM — автограф с датой «1912»; к нему на отдельном листке приложен вариант строфы 1:
+        $wikitext = 'Notre Dame («Где римский судия судил чужой народ…»)<ref> Notre Dame (Собор Парижской Богоматери) — Аполлон, 1913, № 3, с. 38. К-13, с. 31. Избр. стихи, с. 246. К-16, с. 43. К-16(Ав.). К-23, с. 36, без загл. (отсутствует в оглавлении). С, с. 42. БП, № 35. В AM — автограф с датой «1912»; к нему на отдельном листке приложен вариант строфы 1:
 
-\{\{poemx1||Ажурных галерей заманчивый пролет —
+{{poemx1||Ажурных галерей заманчивый пролет —
 И, жилы вытянув и напрягая нервы,
 Как некогда Адам, таинственный и первый,
 Играет мышцами крестовый легкий свод.|}}
 
 Печ. по автографу.
 
-Это ст-ние — своего рода стихотворный манифест, перекликающийся с «Утром акмеизма» (II, 144). Как о декларации нового отношения к поэтическому слову о нем писал С. Городецкий (в статье «Музыка и архитектура в поэзии». — Речь, 1913, 17 июня) и др. критики. См. также: Завадская Е. Поэт и искусство. — Творчество, 1988, №6, с. 1 — 2). Контрфорсы — вертикальные выступы, укрепляющие несущую конструкцию. Где римский судия... — Имеется в виду римское владычество в Галлии; по традиции, высшие судебные органы Франции находятся на о. Ситэ вблизи Notre Dame. &lt;br/&gt; Комментарий: \{\{Не объект АП — факт}} &lt;/ref&gt;';
-        $expected = "«Tanglefoot»";
+Это ст-ние — своего рода стихотворный манифест, перекликающийся с «Утром акмеизма» (II, 144). Как о декларации нового отношения к поэтическому слову о нем писал С. Городецкий (в статье «Музыка и архитектура в поэзии». — Речь, 1913, 17 июня) и др. критики. См. также: Завадская Е. Поэт и искусство. — Творчество, 1988, №6, с. 1 — 2). Контрфорсы — вертикальные выступы, укрепляющие несущую конструкцию. Где римский судия... — Имеется в виду римское владычество в Галлии; по традиции, высшие судебные органы Франции находятся на о. Ситэ вблизи Notre Dame. <br> Комментарий: {{Не объект АП — факт}} </ref>';
+        $expected = "Notre Dame («Где римский судия судил чужой народ…»)";
+        $text_result = TemplateExtractor::clearText($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testClearText_manyRef()
+    {
+        $wikitext = 'Notre Dame («Где римский судия судил чужой народ…»)<ref> Notre Dame (Собор Парижской Богоматери)</ref> — Аполлон, <ref>1913, № 3, с. 38. К-13, с. 31. Избр. стихи, с. 246. К-16, с. 43. К-16(Ав.). К-23, с. 36, без загл. (отсутствует в оглавлении). С, с. 42. БП, № 35. В AM — автограф с датой «1912»; к нему на отдельном листке приложен вариант строфы 1:
+
+{{poemx1||Ажурных галерей заманчивый пролет —
+И, жилы вытянув и напрягая нервы,
+Как некогда Адам, таинственный и первый,
+Играет мышцами крестовый легкий свод.|}}
+
+Печ. по автографу.
+
+Это ст-ние — своего рода стихотворный манифест, перекликающийся с «Утром акмеизма» (II, 144). Как о декларации нового отношения к поэтическому слову о нем писал С. Городецкий (в статье «Музыка и архитектура в поэзии». — Речь, 1913, 17 июня) и др. критики. См. также: Завадская Е. Поэт и искусство. — Творчество, 1988, №6, с. 1 — 2). Контрфорсы — вертикальные выступы, укрепляющие несущую конструкцию. Где римский судия... — Имеется в виду римское владычество в Галлии; по традиции, высшие судебные органы Франции находятся на о. Ситэ вблизи Notre Dame. <br> Комментарий: {{Не объект АП — факт}} </ref>';
+        $expected = "Notre Dame («Где римский судия судил чужой народ…») — Аполлон,";
         $text_result = TemplateExtractor::clearText($wikitext);
         $this->assertEquals($expected, $text_result);
     }
@@ -552,7 +569,49 @@ Ne tol'ko pred toboyu — i predo mnoy one:
         $text_result = TemplateExtractor::extractTitle($wikitext);
         $this->assertEquals($expected, $text_result);
     }
-    
+ 
+    // не работает, потому что внутри названия шаблон, да еще и многострочный
+/*    
+    public function testExtractTitle_long()
+    {
+        $wikitext = "{{Отексте
+| НАЗВАНИЕ = Notre Dame («Где римский судия судил чужой народ…»)<ref> Notre Dame (Собор Парижской Богоматери) — Аполлон, 1913, № 3, с. 38. К-13, с. 31. Избр. стихи, с. 246. К-16, с. 43. К-16(Ав.). К-23, с. 36, без загл. (отсутствует в оглавлении). С, с. 42. БП, № 35. В AM — автограф с датой «1912»; к нему на отдельном листке приложен вариант строфы 1:
+
+{{poemx1||Ажурных галерей заманчивый пролет —
+И, жилы вытянув и напрягая нервы,
+Как некогда Адам, таинственный и первый,
+Играет мышцами крестовый легкий свод.|}}
+
+Печ. по автографу.
+
+Это ст-ние — своего рода стихотворный манифест, перекликающийся с «Утром акмеизма» (II, 144). Как о декларации нового отношения к поэтическому слову о нем писал С. Городецкий (в статье «Музыка и архитектура в поэзии». — Речь, 1913, 17 июня) и др. критики. См. также: Завадская Е. Поэт и искусство. — Творчество, 1988, №6, с. 1 — 2). Контрфорсы — вертикальные выступы, укрепляющие несущую конструкцию. Где римский судия... — Имеется в виду римское владычество в Галлии; по традиции, высшие судебные органы Франции находятся на о. Ситэ вблизи Notre Dame. <br/> Комментарий: {{Не объект АП — факт}} </ref>  
+| АВТОР = Осип Эмильевич Мандельштам (1891—1938)
+| ИЗСБОРНИКА = Камень
+| ОГЛАВЛЕНИЕ=Стихотворения Осипа Мандельштама
+| СОДЕРЖАНИЕ            =Стихотворения
+| ДАТАСОЗДАНИЯ          =1912 
+| ДАТАПУБЛИКАЦИИ        =1913 
+| ИСТОЧНИК              = [http://rvb.ru/mandelstam/dvuhtomnik/01text/vol_1/01versus/0038.htm rvb.ru]
+| ПРЕДЫДУЩИЙ            = Айя-София
+| СЛЕДУЮЩИЙ             = Развеселился, наконец…
+| КАЧЕСТВО              =4 
+| НЕОДНОЗНАЧНОСТЬ       = 
+}}
+
+==Редакции==
+* Камень (1-е издание) СПб: «Акмэ», 1913 (дореформенная орфография) 
+* Камень (1-е издание) СПб: «Акмэ», 1913 (современная орфография)
+* Камень  (2-е издание) Пг: «Гиперборей»,  1916 (дореформенная орфография)
+* Камень  (2-е издание) Пг: «Гиперборей»,  1916 (современная орфография)
+* Сочинения в 2 т. М.: Художественная литература, 1990. Т. 1 
+* Собрание сочинений в 4 т. М.: Арт-Бизнес-Центр, 1993. Т. 1 
+<br />
+center|thumb|300px|<center>Собор Парижской Богоматери</center>";
+        $expected = "Notre Dame («Где римский судия судил чужой народ…»)";
+        $text_result = TemplateExtractor::extractTitle($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+*/    
     // -----------------------------------------------------------------
     
     public function testExtractDate_empty()
@@ -629,6 +688,68 @@ Ne tol'ko pred toboyu — i predo mnoy one:
 Черт вас возьми,
 тех, кто —";
         $text_result = TemplateExtractor::parsePoetryLadder($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    // -----------------------------------------------------------------
+    
+    public function testRemoveRefTags_empty()
+    {
+        $wikitext = "";
+        $expected = "";
+        $text_result = TemplateExtractor::removeRefTags($wikitext);
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testRemoveRefTags_manyLines()
+    {
+        $wikitext = "{{Otekste
+| NAZVANIYe = 23. Notre Dame («Gde rimskiy sudiya sudil chuzhoy narod…»)<ref> Notre Dame (Sobor Parizhskoy Bogomateri) — Apollon, 1913, № 3, s. 38. K-13, s. 31. Izbr. stikhi, s. 246. K-16, s. 43. K-16(Av.). K-23, s. 36, bez zagl. (otsutstvuyet v oglavlenii). S, s. 42. BP, № 35. V AM — avtograf s datoy «1912»; k nemu na otdel'nom listke prilozhen variant strofy 1:</ref> 
+| AVTOR = Osip Emil'yevich Mandel'shtam (1891—1938)
+| OGLAVLENIYe = 4
+| IZSBORNIKA= Kamen' 1913
+|SODERZHANIYe = Stikhotvoreniya
+| DRUGOYe = 
+| DATASOZDANIYA =1912 
+| DATAPUBLIKATSII =1913
+| ISTOCHNIK=[http://dlib.rsl.ru/viewer/01003805814#?page=36 Kamen' 1913]<ref> {{kniga|avtor=O.&nbsp;Mandel'shtam.|chast'=|zaglaviye=Kamen'. Stikhi|otvetstvennyy= |original=|ssylka=http://dlib.rsl.ru/viewer/01003805814#?page|izdaniye=1-ye izd|mesto=S.-Peterburg |izdatel'stvo=AKME|god=1913|stranitsy=31|stranits=90|isbn=|tirazh=300 ekz.}} </ref>
+| KACHESTVO = 3
+}}
+
+{{poemx1|NOTRE DAME.|
+
+<center>1.</center>
+Gde rimskiy sudiya sudil chuzhoy narod —
+Stoit bazilika, — i radostnyy i pervyy,
+Kak nekogda Adam, rasplastyvaya nervy,
+Igrayet myshtsami krestovyy legkiy svod.
+
+{{right|1912.}}
+|}}";
+        $expected = "{{Otekste
+| NAZVANIYe = 23. Notre Dame («Gde rimskiy sudiya sudil chuzhoy narod…») 
+| AVTOR = Osip Emil'yevich Mandel'shtam (1891—1938)
+| OGLAVLENIYe = 4
+| IZSBORNIKA= Kamen' 1913
+|SODERZHANIYe = Stikhotvoreniya
+| DRUGOYe = 
+| DATASOZDANIYA =1912 
+| DATAPUBLIKATSII =1913
+| ISTOCHNIK=[http://dlib.rsl.ru/viewer/01003805814#?page=36 Kamen' 1913]
+| KACHESTVO = 3
+}}
+
+{{poemx1|NOTRE DAME.|
+
+<center>1.</center>
+Gde rimskiy sudiya sudil chuzhoy narod —
+Stoit bazilika, — i radostnyy i pervyy,
+Kak nekogda Adam, rasplastyvaya nervy,
+Igrayet myshtsami krestovyy legkiy svod.
+
+{{right|1912.}}
+|}}";
+        $text_result = TemplateExtractor::removeRefTags($wikitext);
         $this->assertEquals($expected, $text_result);
     }
     
