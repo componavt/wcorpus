@@ -23,7 +23,7 @@ class CreatePublicationsTable extends Migration
             $table->string('creation_date',20)->nullable();
             //$table->timestamps();
             
-            $table->index('title');
+            $table->index('title',255);
             $table->index('creation_date');
         });
     }

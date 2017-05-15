@@ -25,6 +25,12 @@ class Text extends Model
         return $this->belongsTo(Publication::class);
     }
 
+    // Text __has_many__ Sentences
+    public function sentences()
+    {
+        return $this->hasMany(Sentence::class);
+    }
+
     /** Get $text->wikitext and look for title, creation_date, text
      * fill properties and save object
      * 
@@ -60,6 +66,32 @@ print "<p>".$text->id;
                     $text->push();
     }
     
+    /** Get $text->wikitext and look for title, creation_date, text
+     * fill properties and save object
+     * 
+     * @param Text $text object of text
+     */
+    public function breakIntoSentences() {
+        $text = $this;
+        
+        $text->sentence_total = 0;
+                
+        $paragraphs = Text::splitIntoParagraphs($text->text);
+//dd($paragraphs);        
+        
+        foreach($paragraphs as $par) {
+            $sentences = Text::splitIntoSentences($par);
+            foreach ($sentences as $sen) {
+print "<p>$sen</p>\n";                
+                $sen_obj = Sentence::create([
+                    'text_id' => $text->id,
+                    'sentence' => $sen
+                        ]);
+            }
+            $text->sentence_total = $text->sentence_total + sizeof($sentences);
+        }
+    }
+        
     /** Parse wikitext and extract text of publication
      * 
      * If this text is poetry, parse such template

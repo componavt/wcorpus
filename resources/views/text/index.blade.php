@@ -54,6 +54,7 @@ List of texts
                 <th>Date</th>
                 <th>Wikitext length</th>
                 <th>Parsed text length</th>
+                <th>Sentences</th>
                 @if (Auth::check())
                 <th></th>
                 @endif
@@ -87,6 +88,11 @@ List of texts
                 <td>
                     @if($text_obj->text)
                         {{strlen($text_obj->text)}}
+                    @endif
+                </td>
+                <td>
+                    @if($text_obj->sentence_total)
+                        {{$text_obj->sentence_total}}
                     @endif
                 </td>
                 @if (Auth::check())

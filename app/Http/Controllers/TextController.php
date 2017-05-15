@@ -9,6 +9,7 @@ use DB;
 
 use Wcorpus\Models\Author;
 use Wcorpus\Models\Publication;
+use Wcorpus\Models\Sentence;
 use Wcorpus\Models\Text;
 
 use Wcorpus\Wikiparser\TemplateExtractor;
@@ -19,7 +20,7 @@ class TextController extends Controller
     public $args_by_get='';
     
      /**
-     * Instantiate a new new controller instance.
+     * Instantiate a new controller instance.
      *
      * @return void
      */
@@ -28,6 +29,8 @@ class TextController extends Controller
         // permission= dict.edit, redirect failed users to /dict/lemma/, authorized actions list:
         $this->middleware('auth', 
                           ['only' => ['create','store','edit','update','destroy',
+                                      'parseWikitext','parseAllWikitext',
+                                      'breakText','breakAllText',
                                       'extractFromWikiSource']]);
         
         $this->url_args = [
@@ -100,7 +103,7 @@ class TextController extends Controller
                                'url_args'       => $this->url_args,
                               )
                         );
-}
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -203,6 +206,7 @@ class TextController extends Controller
      * Parse wikitext,
      * search author name, publication title, creation date, text of publication
      *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function parseWikitext($id)
@@ -239,7 +243,7 @@ class TextController extends Controller
                     whereNull('text')
                     //->orWhere('text','')
                     ->orderBy('title')
-                    ->take(10)
+                    ->take(100)
                     ->get();
             //$is_exist_not_parse_text = 0;     // когда оттестится, убрать           
 //dd($texts);            
@@ -249,6 +253,50 @@ class TextController extends Controller
                 }
             } else {
                 $is_exist_not_parse_text = 0;
+            }
+        }
+    }
+    
+    /**
+     * Break a text into sentences
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function breakText($id)
+    {
+        $text=Text::find($id);                
+
+        if ($text->sentences()->count()) {
+            $text->sentences()->delete();
+        }
+        
+        $text->breakIntoSentences();
+    }
+    
+    /**
+     * Break all texts into sentences
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function breakAllText()
+    {
+        // stop when there is no texts with sentence_total=NULL
+        $is_exist_not_broken_text = 1;
+        
+        while ($is_exist_not_broken_text) {
+            $texts=Text::
+                    whereNull('sentence_total')
+                    ->orderBy('title')
+                    ->take(100)
+                    ->get();
+//dd($texts);            
+            if ($texts) {
+                foreach ($texts as $text) {
+                    $text->breakIntoSentences();
+                }
+            } else {
+                $is_exist_not_broken_text = 0;
             }
         }
     }
