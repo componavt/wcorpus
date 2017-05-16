@@ -21,11 +21,13 @@ class CreateTextsTable extends Migration
             $table->string('title',255);
             $table->mediumText('wikitext')->collate('utf8_bin');
             $table->mediumText('text')->nullable()->collate('utf8_bin');
+            $table->smallInteger('sentence_total')->unsigned()->nullable();
             //$table->timestamps();
             
-//            $table->index('title');
-//            $table->index('author_id');
-//            $table->index('publication_id');
+            $table->index('title');
+            $table->index('text',100);
+            $table->index('author_id');
+            $table->index('publication_id');
 });
     }
 

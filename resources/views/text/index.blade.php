@@ -20,6 +20,12 @@ List of texts
                 'attributes'=>['size' => 15,
                                'placeholder'=>'Title']])
                                
+        @include('widgets.form._formitem_text',
+                ['name' => 'search_wikitext',
+                'value' => $url_args['search_wikitext'],
+                'attributes'=>['size' => 15,
+                               'placeholder'=>'Wikitext']])
+                               
         @include('widgets.form._formitem_select',
                 ['name' => 'search_author',
                  'values' =>$author_values,
@@ -37,7 +43,6 @@ List of texts
         {!! Form::close() !!}
 
         <p>Founded records: {{$numAll}}</p>
-
         @if ($texts)
         <table class="table">
         <thead>
@@ -46,23 +51,48 @@ List of texts
                 <th>Title</th>
                 <th>Author</th>
                 <th>Publication</th>
+                <th>Date</th>
+                <th>Wikitext length</th>
+                <th>Parsed text length</th>
+                <th>Sentences</th>
                 @if (Auth::check())
                 <th></th>
                 @endif
             </tr>
         </thead>
             @foreach($texts as $text)
+            <?php $text_obj = \Wcorpus\Models\Text::find($text->id); ?>
             <tr>
                 <td>{{ $list_count++ }}</td>
-                <td><a href="text/{{$text->id}}{{$args_by_get}}">{{$text->title}}</a></td>
+                <td><a href="text/{{$text->id}}{{$args_by_get}}">{{$text_obj->title}}</a></td>
                 <td>
-                    @if($text->author)
-                        {{$text->author->name}}
+                    @if($text_obj->author)
+                        {{$text_obj->author->name}}
                     @endif
                 </td>
                 <td>
-                    @if($text->publication)
-                        {{$text->publication->title}}
+                    @if($text_obj->publication)
+                        {{$text_obj->publication->title}}
+                    @endif
+                </td>
+                <td>
+                    @if($text_obj->publication)
+                        {{$text_obj->publication->creation_date}}
+                    @endif
+                </td>
+                <td>
+                    @if($text_obj->wikitext)
+                        {{strlen($text_obj->wikitext)}}
+                    @endif
+                </td>
+                <td>
+                    @if($text_obj->text)
+                        {{strlen($text_obj->text)}}
+                    @endif
+                </td>
+                <td>
+                    @if($text_obj->sentence_total)
+                        {{$text_obj->sentence_total}}
                     @endif
                 </td>
                 @if (Auth::check())

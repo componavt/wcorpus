@@ -9,7 +9,10 @@ use DB;
 
 use Wcorpus\Models\Author;
 use Wcorpus\Models\Publication;
+use Wcorpus\Models\Sentence;
 use Wcorpus\Models\Text;
+
+use Wcorpus\Wikiparser\TemplateExtractor;
 
 class TextController extends Controller
 {
@@ -17,7 +20,7 @@ class TextController extends Controller
     public $args_by_get='';
     
      /**
-     * Instantiate a new new controller instance.
+     * Instantiate a new controller instance.
      *
      * @return void
      */
@@ -26,12 +29,15 @@ class TextController extends Controller
         // permission= dict.edit, redirect failed users to /dict/lemma/, authorized actions list:
         $this->middleware('auth', 
                           ['only' => ['create','store','edit','update','destroy',
+                                      'parseWikitext','parseAllWikitext',
+                                      'breakText','breakAllText',
                                       'extractFromWikiSource']]);
         
         $this->url_args = [
                     'limit_num'       => (int)$request->input('limit_num'),
                     'page'            => (int)$request->input('page'),
                     'search_title'  => $request->input('search_title'),
+                    'search_wikitext'  => $request->input('search_wikitext'),
                     'search_author'  => (int)$request->input('search_author'),
 //                    'search_id'       => (int)$request->input('search_id'),
                 ];
@@ -61,11 +67,18 @@ class TextController extends Controller
     public function index()
     {
         $texts = Text::
-                select('id', 'title','author_id','publication_id')->
+//                select('id', 'title','author_id','publication_id')->
+                select('id')->
+//                where('id','<',2000)->
+                whereNotNull('text')->
                 orderBy('title');
 
         if ($this->url_args['search_title']) {
             $texts = $texts->where('title','like', $this->url_args['search_title']);
+        } 
+
+        if ($this->url_args['search_wikitext']) {
+            $texts = $texts->where('wikitext','like', $this->url_args['search_wikitext']);
         } 
 
         if ($this->url_args['search_author']) {
@@ -74,10 +87,12 @@ class TextController extends Controller
         
         $numAll = $texts->get()->count();
 
-        $texts = $texts->with('author')
+        $texts = $texts
+                //->with('author')
                 ->paginate($this->url_args['limit_num']);         
         
         $author_values = Author::getListWithQuantity('texts');        
+//dd($texts);
         
             return view('text.index')
                   ->with(array(
@@ -88,7 +103,7 @@ class TextController extends Controller
                                'url_args'       => $this->url_args,
                               )
                         );
-}
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -142,7 +157,14 @@ class TextController extends Controller
      */
     public function edit($id)
     {
-        //
+        $text = Text::find($id); 
+        
+        return view('text.edit')
+                  ->with([
+                      'text'        => $text,
+                      'args_by_get' => $this->args_by_get,
+                      'url_args'    => $this->url_args,
+                      ]);
     }
 
     /**
@@ -154,7 +176,19 @@ class TextController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $text= Text::findOrFail($id);
+        
+        $this->validate($request, [
+            'wikitext'  => 'required',
+        ]);
+        
+        $request->wikitext = str_replace("\{","{",$request->wikitext);
+        
+        $text->wikitext = $request->wikitext;
+        $text->save();
+        
+        return Redirect::to('/text/'.($text->id).($this->args_by_get))
+                       ->withSuccess('Text is modified');
     }
 
     /**
@@ -172,9 +206,32 @@ class TextController extends Controller
      * Parse wikitext,
      * search author name, publication title, creation date, text of publication
      *
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function parseWikitext()
+    public function parseWikitext($id)
+    {
+        $text=Text::find($id);                
+
+        if ($text->publication) {
+            if ($text->publication->author) {
+                $text->publication->author_id = null;
+                $text->author_id = null;
+                $text->publication->author()->delete();
+            }
+            $text->publication_id = null;
+            $text->publication()->delete();
+        }
+        $text->parseData();
+    }
+    
+    /**
+     * Parse wikitext,
+     * search author name, publication title, creation date, text of publication
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function parseAllWikitext()
     {
 //select substring(`wikitext`,1,10) as beg, count(*) as count from texts group by beg order by count desc limit 0,100;
         
@@ -182,28 +239,64 @@ class TextController extends Controller
         $is_exist_not_parse_text = 1;
         
         while ($is_exist_not_parse_text) {
-            $texts=Text::whereNull('text')->orderBy('title')->take(100)->get();
+            $texts=Text::
+                    whereNull('text')
+                    //->orWhere('text','')
+                    ->orderBy('title')
+                    ->take(100)
+                    ->get();
+            //$is_exist_not_parse_text = 0;     // когда оттестится, убрать           
 //dd($texts);            
             if ($texts) {
                 foreach ($texts as $text) {
-print "<p>".$text->id;                    
-                    $text->author_id = Author::parseWikitext($text->wikitext);
-                    
-                    $text_info = Text::parseWikitext($text->wikitext);
-                    $text->text = $text_info['text'];
-                    
-                    $text->publication_id = Publication::parseWikitext(
-                                                            $text->wikitext, 
-                                                            $text->author_id,
-                                                            $text_info['title'],
-                                                            $text_info['creation_date']
-                            );
-
-                    $text->push();
+                    $text->parseData();
                 }
-                $is_exist_not_parse_text = 0;                
             } else {
                 $is_exist_not_parse_text = 0;
+            }
+        }
+    }
+    
+    /**
+     * Break a text into sentences
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function breakText($id)
+    {
+        $text=Text::find($id);                
+
+        if ($text->sentences()->count()) {
+            $text->sentences()->delete();
+        }
+        
+        $text->breakIntoSentences();
+    }
+    
+    /**
+     * Break all texts into sentences
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function breakAllText()
+    {
+        // stop when there is no texts with sentence_total=NULL
+        $is_exist_not_broken_text = 1;
+        
+        while ($is_exist_not_broken_text) {
+            $texts=Text::
+                    whereNull('sentence_total')
+                    ->orderBy('title')
+                    ->take(100)
+                    ->get();
+//dd($texts);            
+            if ($texts) {
+                foreach ($texts as $text) {
+                    $text->breakIntoSentences();
+                }
+            } else {
+                $is_exist_not_broken_text = 0;
             }
         }
     }
@@ -281,4 +374,63 @@ print "<p>".$text->id;
         }
         print 'done.';
     }
+    
+    /**
+     * Collect statistics about which templates are contained in the wiki texts
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function templateStats()
+    {
+        $templates=[];
+        // обойти все wikitext и посчитать сколько и каких шаблонов есть
+        $texts = Text::select('wikitext')->where('wikitext','like','%{{%')->orderBy('id')
+                //->take(10)
+                ->get();
+print sizeof($texts);
+        foreach ($texts as $text) {
+            if (preg_match_all("/\{\{([^\|\}]+)[\|\}]/",$text->wikitext, $regs, PREG_PATTERN_ORDER)) {
+                foreach ($regs[1] as $temp_name) {
+                    $temp_name = trim($temp_name);
+                    if (isset($templates[$temp_name])) {
+                        $templates[$temp_name] ++;
+                    } else {
+                        $templates[$temp_name] = 1;
+                    }
+                }
+            }
+        }
+
+        arsort($templates);
+//dd($templates);        
+        print "<table border=\"1\">";
+        $i=1;
+        foreach ($templates as $temp=>$count) {
+            print "<tr><td>$i</td><td>".str_replace("<","&lt;",$temp)."</td><td>$count</td></tr>\n";            
+            $i++;
+        }
+        print "</table>";
+    }
+    
+    /**
+     * Gets list of titles for drop down list in JSON format
+     * Test url: /text/title_list
+     * 
+     * @return JSON response
+     */
+    public function titlesList(Request $request)
+    {
+        $search_title = '%'.$request->input('q').'%';
+
+        $all_meanings = [];
+        $texts = Text::where('title','like', $search_title)
+                       ->orderBy('title')->get();
+        foreach ($texts as $text) {
+            $all_titles[]=['id'  => $text->id, 
+                           'text'=> $text->title];
+        }  
+
+        return Response::json($all_meanings);
+    }
+
 }

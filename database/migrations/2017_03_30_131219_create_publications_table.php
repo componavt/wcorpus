@@ -19,11 +19,11 @@ class CreatePublicationsTable extends Migration
             $table->integer('author_id')->unsigned()->nullable();
             $table->     foreign('author_id')->references('id')->on('authors');
 
-            $table->string('title',255);
+            $table->string('title',450);
             $table->string('creation_date',20)->nullable();
             //$table->timestamps();
             
-            $table->index('title');
+            $table->index('title',255);
             $table->index('creation_date');
         });
     }
