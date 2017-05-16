@@ -4,6 +4,9 @@ namespace Wcorpus\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Wcorpus\Models\Sentence;
+use Wcorpus\Models\Text;
+
 class SentenceController extends Controller
 {
     public $url_args=[];
@@ -23,7 +26,7 @@ class SentenceController extends Controller
         $this->url_args = [
                     'limit_num'       => (int)$request->input('limit_num'),
                     'page'            => (int)$request->input('page'),
-                    'search_text'  => (int)$request->input('search_author'),
+                    'search_text'  => (int)$request->input('search_text'),
                 ];
         
         if (!$this->url_args['page']) {
@@ -65,7 +68,7 @@ class SentenceController extends Controller
                 ->paginate($this->url_args['limit_num']);         
         
         
-            return view('text.index')
+            return view('sentence.index')
                   ->with(array(
                                'numAll'        => $numAll,
                                'sentences'     => $sentences,

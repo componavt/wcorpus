@@ -38,10 +38,11 @@ alter table texts add index author_id(`author_id`);
 alter table texts add index publication_id(`publication_id`);
 
 alter table publications drop index `publications_title_index`;
-alter table publications change `title` `title` varchar(360);
+alter table publications change `title` `title` varchar(450);
 alter table publications add index `publications_title_index`(`title`(255));
 
 alter table texts add `is_broken` smallint(4) unsigned default null;
+alter table texts change `is_broken` `sentence_total` smallint(4) unsigned default null;
 
 
 

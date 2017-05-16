@@ -90,6 +90,8 @@ print "<p>$sen</p>\n";
             }
             $text->sentence_total = $text->sentence_total + sizeof($sentences);
         }
+        
+        $text->save();
     }
         
     /** Parse wikitext and extract text of publication

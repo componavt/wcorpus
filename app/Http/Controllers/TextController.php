@@ -411,4 +411,26 @@ print sizeof($texts);
         }
         print "</table>";
     }
+    
+    /**
+     * Gets list of titles for drop down list in JSON format
+     * Test url: /text/title_list
+     * 
+     * @return JSON response
+     */
+    public function titlesList(Request $request)
+    {
+        $search_title = '%'.$request->input('q').'%';
+
+        $all_meanings = [];
+        $texts = Text::where('title','like', $search_title)
+                       ->orderBy('title')->get();
+        foreach ($texts as $text) {
+            $all_titles[]=['id'  => $text->id, 
+                           'text'=> $text->title];
+        }  
+
+        return Response::json($all_meanings);
+    }
+
 }

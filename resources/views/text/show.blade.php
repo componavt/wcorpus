@@ -15,8 +15,11 @@ Texts
         <p>
             <a href="/text/{{$text->id}}/edit">Edit</a>&nbsp;&nbsp;|&nbsp;
             <a href="/text/{{$text->id}}/parseWikitext">Re-parse wikitext</a>&nbsp;&nbsp;|&nbsp;
-            <a href="/text/{{$text->id}}/break_into_sentences">Break the text into sentences</a>
-            
+            <a href="/text/{{$text->id}}/break_into_sentences">Break the text into sentences</a>            
+        </p>
+        
+        <p>
+            <a href="/sentence/?search_text={{$text->id}}">Sentences</a> ({{$text->sentence_total}})
         </p>
         
         @if($text->publication && $text->publication->title)
