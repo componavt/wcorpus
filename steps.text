@@ -60,9 +60,3 @@ alter table texts change `is_broken` `sentence_total` smallint(4) unsigned defau
 
 
 
--- LEMMA ---------------------------------------
-php artisan make:model 'Models\Lemma' --migration
-php artisan make:controller 'LemmaController' --resource
-php artisan migrate
-
-

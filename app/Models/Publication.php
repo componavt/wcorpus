@@ -69,6 +69,9 @@ class Publication extends Model
         if (!$title && $text_title) {
             $title = $text_title;
         }
+        if (mb_strlen($title)>450) {
+            $title = mb_substr($title,0,447).'...';
+        }
 
         $creation_date = TemplateExtractor::extractDate($wikitext);
         
@@ -76,7 +79,7 @@ class Publication extends Model
             $creation_date = $text_date;
         }
         if (mb_strlen($creation_date)>20) {
-            $creation_date = mb_substr($creation_date,0,20);
+            $creation_date = mb_substr($creation_date,0,17).'...';
         }
         
         $publication = self::firstOrNew(['title'=>$title,'author_id'=>$author_id]);

@@ -7,7 +7,7 @@
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="/text">List of texts</a></li>
                                 <li><a href="/text/extractFromWikiSource">Extraction texts from wikisource</a></li>
-                                <li><a href="/text/parseWikitext">Parse wikitext</a></li>
+                                <li><a href="/text/parseAllWikitext">Parse wikitext</a></li>
                                 <li><a href="/text/break_texts">Break texts into sentences</a></li>
                             </ul>
                         </li>

@@ -25,6 +25,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home')->with(['text'=>$page->page_content_model]);
+        return view('home'); //->with(['text'=>$page->page_content_model])
     }
 }
