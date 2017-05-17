@@ -82,7 +82,15 @@ print "<p>".$text->id;
         foreach($paragraphs as $par) {
             $sentences = Text::splitIntoSentences($par);
             foreach ($sentences as $sen) {
-print "<p>$sen</p>\n";                
+/*
+ * id=26189
+                print "<p>$sen</p>\n"; 
+print "<p>".mb_strlen($sen)."</p>";
+print 16^4;
+*/              if (mb_strlen($sen)>35003) {
+                    $sen = mb_substr($sen,0,35000).'...';
+                }
+                
                 $sen_obj = Sentence::create([
                     'text_id' => $text->id,
                     'sentence' => $sen

@@ -287,12 +287,14 @@ class TextController extends Controller
         while ($is_exist_not_broken_text) {
             $texts=Text::
                     whereNull('sentence_total')
+                    ->whereNotIn('id',[21530,402631,125263,125413])
                     ->orderBy('title')
                     ->take(100)
                     ->get();
 //dd($texts);            
             if ($texts) {
                 foreach ($texts as $text) {
+print "<p>".$text->id."</p>\n";                    
                     $text->breakIntoSentences();
                 }
             } else {
