@@ -44,6 +44,11 @@ alter table publications add index `publications_title_index`(`title`(255));
 alter table texts add `is_broken` smallint(4) unsigned default null;
 alter table texts change `is_broken` `sentence_total` smallint(4) unsigned default null;
 
+--------------------------------------18.05
+delete from migrations where id=6;
+php artisan migrate
+
+
 
 
 

@@ -13,8 +13,15 @@ class CreateLemmasTable extends Migration
      */
     public function up()
     {
-        //
-    }
+        Schema::create('lemmas', function (Blueprint $table) {
+            $table->increments('id');
+
+            $table->string('lemma', 50);
+            $table->integer('freq')->unsigned()->nullable();
+            
+            $table->index('lemma');
+        });
+}
 
     /**
      * Reverse the migrations.
@@ -23,6 +30,6 @@ class CreateLemmasTable extends Migration
      */
     public function down()
     {
-        //
+        Schema::drop('lemmas');
     }
 }
