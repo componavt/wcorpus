@@ -247,7 +247,7 @@ class TextController extends Controller
                     ->get();
             //$is_exist_not_parse_text = 0;     // когда оттестится, убрать           
 //dd($texts);            
-            if ($texts) {
+            if ($texts->count()) {
                 foreach ($texts as $text) {
                     $text->parseData();
                 }
@@ -292,7 +292,7 @@ class TextController extends Controller
                     ->take(100)
                     ->get();
 //dd($texts);            
-            if ($texts) {
+            if ($texts->count()) {
                 foreach ($texts as $text) {
 print "<p>".$text->id."</p>\n";                    
                     $text->breakIntoSentences();
