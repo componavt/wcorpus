@@ -3,6 +3,9 @@
 namespace Wcorpus\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Response;
+
+use Wcorpus\Models\Author;
 
 class AuthorController extends Controller
 {
@@ -81,4 +84,26 @@ class AuthorController extends Controller
     {
         //
     }
+    
+    /**
+     * Gets list of authors for drop down list in JSON format
+     * Test url: /author/name_list
+     * 
+     * @return JSON response
+     */
+    public function namesList(Request $request)
+    {
+        $search_name = '%'.$request->input('q').'%';
+
+        $list = [];
+        $texts = Author::where('name','like', $search_name)
+                       ->orderBy('name')->get();
+        foreach ($texts as $text) {
+            $list[]=['id'  => $text->id, 
+                           'text'=> $text->name];
+        }  
+
+        return Response::json($list);
+    }
+
 }

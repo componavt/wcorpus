@@ -1,3 +1,7 @@
+<?php
+        list($usec, $sec) = explode(" ", microtime());
+        $start_time = (float)$usec + (float)$sec; // set start time of execution
+?>
 @extends('layouts.master')
 
 @section('content')
@@ -10,6 +14,11 @@
 
                 <div class="panel-body">
 @yield('panel-body')
+<?php
+        list($usec, $sec) = explode(" ", microtime());
+        $execution_time = (float)$usec + (float)$sec - $start_time;
+?>
+                <p style="text-align:right; font-style: italic">Page generated in {{$execution_time}} seconds.</p>
             </div>
         </div>
     </div>

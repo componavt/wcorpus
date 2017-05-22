@@ -20,6 +20,8 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index');
 
+Route::get('/author/name_list', 'AuthorController@namesList');
+
 Route::get('/text/extractFromWikiSource','TextController@extractFromWikiSource');
 Route::get('/text/{id}/parseWikitext','TextController@parseWikitext');
 Route::get('/text/parseAllWikitext','TextController@parseAllWikitext');
@@ -28,6 +30,8 @@ Route::get('/text/parse_text','TextController@parseText');
 
 Route::get('/text/{id}/break_into_sentences','TextController@breakText');
 Route::get('/text/break_texts','TextController@breakAllText');
+
+Route::get('/text/title_list', 'TextController@titlesList');
 
 Route::resource('/text', 'TextController',
                 ['names' => ['update' => 'text.update',

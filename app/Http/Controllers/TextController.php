@@ -68,11 +68,11 @@ class TextController extends Controller
     {
         $texts = Text::
 //                select('id', 'title','author_id','publication_id')->
-                select('id')->
+                select('id');
 //                where('id','<',2000)->
-                whereNotNull('text')->
-                orderBy('title');
-
+//                whereNotNull('text');
+//                ->orderBy('title');
+//dd($texts->get()->count());
         if ($this->url_args['search_title']) {
             $texts = $texts->where('title','like', $this->url_args['search_title']);
         } 
@@ -424,15 +424,15 @@ print sizeof($texts);
     {
         $search_title = '%'.$request->input('q').'%';
 
-        $all_meanings = [];
+        $list = [];
         $texts = Text::where('title','like', $search_title)
                        ->orderBy('title')->get();
         foreach ($texts as $text) {
-            $all_titles[]=['id'  => $text->id, 
+            $list[]=['id'  => $text->id, 
                            'text'=> $text->title];
         }  
 
-        return Response::json($all_meanings);
+        return Response::json($list);
     }
 
 }

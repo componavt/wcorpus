@@ -9,6 +9,10 @@ List of texts
 List of texts
 @stop
 
+@section('headExtra')
+    {!!Html::style('css/select2.min.css')!!}
+@stop
+
 @section('panel-body')
         {!! Form::open(['url' => '/text/',
                              'method' => 'get',
@@ -25,13 +29,13 @@ List of texts
                 'value' => $url_args['search_wikitext'],
                 'attributes'=>['size' => 15,
                                'placeholder'=>'Wikitext']])
-                               
-        @include('widgets.form._formitem_select',
+                   
+        @include('widgets.form._formitem_select2',
                 ['name' => 'search_author',
-                 'values' =>$author_values,
+                 'class'=>'multiple-select-author form-control',
                  'value' =>$url_args['search_author'],
                  'attributes'=>['placeholder' => 'Author' ]])
-        
+                 
         @include('widgets.form._formitem_btn_submit', ['title' => 'View'])
 
         show by
@@ -111,3 +115,29 @@ List of texts
 
 @stop
 
+@section('footScriptExtra')
+    {!!Html::script('js/select2.min.js')!!}
+@stop
+
+@section('jqueryFunc')
+    $(".multiple-select-author").select2({
+        width: 'resolve',
+        ajax: {
+          url: "/author/name_list",
+          dataType: 'json',
+          delay: 250,
+          data: function (params) {
+            return {
+              q: params.term // search term
+            };
+          },
+          processResults: function (data) {
+            return {
+              results: data
+            };
+          },          
+          cache: true
+        }
+    });
+    
+@stop

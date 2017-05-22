@@ -11,7 +11,6 @@ List of sentences
 
 @section('headExtra')
     {!!Html::style('css/select2.min.css')!!}
-    {!!Html::style('css/lemma.css')!!}
 @stop
 
 @section('panel-body')
