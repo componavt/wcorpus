@@ -55,8 +55,8 @@ class SentenceController extends Controller
     {
         $sentences = Sentence::
                 select('id')->
-                orderBy('text_id')->
-                orderBy('id');
+                orderBy('text_id');
+                //->orderBy('id');
 
         if ($this->url_args['search_text']) {
             $sentences = $sentences->where('text_id',$this->url_args['search_text']);

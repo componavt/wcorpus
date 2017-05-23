@@ -1,3 +1,12 @@
+.search-author::parent {
+    width: 300px;
+}
+
+
+
+
+
+
 s {
 /*    display: block;
     margin-bottom: 20px;*/

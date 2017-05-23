@@ -38,7 +38,7 @@ class TextController extends Controller
                     'page'            => (int)$request->input('page'),
                     'search_title'  => $request->input('search_title'),
                     'search_wikitext'  => $request->input('search_wikitext'),
-                    'search_author'  => (int)$request->input('search_author'),
+                    'search_author'  => (array)$request->input('search_author'),
 //                    'search_id'       => (int)$request->input('search_id'),
                 ];
         
@@ -66,12 +66,14 @@ class TextController extends Controller
      */
     public function index()
     {
+//dd($this->url_args['search_author']);
+
         $texts = Text::
 //                select('id', 'title','author_id','publication_id')->
-                select('id');
+                select('id')
 //                where('id','<',2000)->
 //                whereNotNull('text');
-//                ->orderBy('title');
+                ->orderBy('title');
 //dd($texts->get()->count());
         if ($this->url_args['search_title']) {
             $texts = $texts->where('title','like', $this->url_args['search_title']);
@@ -82,7 +84,7 @@ class TextController extends Controller
         } 
 
         if ($this->url_args['search_author']) {
-            $texts = $texts->where('author_id',$this->url_args['search_author']);
+            $texts = $texts->whereIn('author_id',$this->url_args['search_author']);
         } 
         
         $numAll = $texts->get()->count();

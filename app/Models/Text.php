@@ -176,7 +176,7 @@ print 16^4;
      */
     public static function searchValuesByURL(Array $url_args=NULL) : String
     {
-        $url = '';
+/*        $url = '';
         if (isset($url_args) && sizeof($url_args)) {
             $tmp=[];
             foreach ($url_args as $a=>$v) {
@@ -189,7 +189,8 @@ print 16^4;
             }
         }
         
-        return $url;
+        return $url; */
+        return http_build_query($url_args);
     }
     
     /**

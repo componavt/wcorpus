@@ -11,6 +11,7 @@ List of texts
 
 @section('headExtra')
     {!!Html::style('css/select2.min.css')!!}
+    {!!Html::style('css/text.css')!!}
 @stop
 
 @section('panel-body')
@@ -32,7 +33,7 @@ List of texts
                    
         @include('widgets.form._formitem_select2',
                 ['name' => 'search_author',
-                 'class'=>'multiple-select-author form-control',
+                 'class'=>'multiple-select-author form-control search-author',
                  'value' =>$url_args['search_author'],
                  'attributes'=>['placeholder' => 'Author' ]])
                  
@@ -45,7 +46,7 @@ List of texts
                 'attributes'=>['size' => 5,
                                'placeholder' => 'Number of records' ]]) records
         {!! Form::close() !!}
-
+<?php print_r($url_args['search_author']); ?>
         <p>Founded records: {{$numAll}}</p>
         @if ($texts)
         <table class="table">
@@ -121,7 +122,7 @@ List of texts
 
 @section('jqueryFunc')
     $(".multiple-select-author").select2({
-        width: 'resolve',
+        width: '300px',
         ajax: {
           url: "/author/name_list",
           dataType: 'json',
