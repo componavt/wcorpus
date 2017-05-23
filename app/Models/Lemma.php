@@ -33,46 +33,33 @@ class Lemma extends Model
         'graminfo_as_text' => true,
     );
  */
-    // Path to directory where dictionaries located
-    #$dir = dirname(__FILE__) . '/../dicts';
-    $dir = dirname(__FILE__) . '/vendor/componavt/phpmorphy/libs/phpmorphy/dicts';
-    $lang = 'ru_RU';
+        // Path to directory where dictionaries located
+        #$dir = dirname(__FILE__) . '/../dicts';
+        $dir = dirname(__FILE__) . '/vendor/componavt/phpmorphy/libs/phpmorphy/dicts';
+        $lang = 'ru_RU';
 
-    // Create phpMorphy instance
-    try {
-        // $morphy = new phpMorphy($dir, $lang, $opts);
+        // Create phpMorphy instance
+        try {
+            // $morphy = new phpMorphy($dir, $lang, $opts);
 
-        //$morphy = new componavt\phpMorphy\Morphy('en');
-        $morphy = new Morphy('en');
-        //echo $morphy->getPseudoRoot('FIGHTY');
+            //$morphy = new componavt\phpMorphy\Morphy('en');
+            $morphy = new Morphy('ru');
+            //echo $morphy->getPseudoRoot('FIGHTY');
 
-    } catch(phpMorphy_Exception $e) {
-        die('Error occured while creating phpMorphy instance: ' . PHP_EOL . $e);
-    }
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+        } catch(phpMorphy_Exception $e) {
+            die('Error occured while creating phpMorphy instance: ' . PHP_EOL . $e);
+        }
+            
         if (!$word) {
             return '';
         }
-        
-/*        $morphy = new Morphy('ru');
-        $lemma = $morphy->getPseudoRoot($word);*/
-        
-        $lemma = "some text";
-        //$lemma=Morphy::getPseudoRoot($word);
-        
+            
+        // $morphy = new Morphy('ru');
+        $lemma = $morphy->getPseudoRoot($word);
+            
+        // $lemma = "some text";
+            //$lemma=Morphy::getPseudoRoot($word);
+            
         return $lemma;
     }
 }

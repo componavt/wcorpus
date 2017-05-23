@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7ad426432de14ab7560707b202e7717d",
-    "content-hash": "b37b9f8cb7dad924a27e0f311a887a39",
+    "hash": "f20f10c6e77f1db2654803c97b3fde62",
+    "content-hash": "1163c39513e7cef325fa0e6725ecdffe",
     "packages": [
         {
             "name": "componavt/phpmorphy",
-            "version": "v0.3.1",
+            "version": "v0.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/componavt/phpmorphy.git",
-                "reference": "36e587ca6088c9fdc2a9b222b0daa4bb4c8e4747"
+                "reference": "3a81f8c337f8a45bc748b91f7cddfb43f9dd8ca9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/componavt/phpmorphy/zipball/36e587ca6088c9fdc2a9b222b0daa4bb4c8e4747",
-                "reference": "36e587ca6088c9fdc2a9b222b0daa4bb4c8e4747",
+                "url": "https://api.github.com/repos/componavt/phpmorphy/zipball/3a81f8c337f8a45bc748b91f7cddfb43f9dd8ca9",
+                "reference": "3a81f8c337f8a45bc748b91f7cddfb43f9dd8ca9",
                 "shasum": ""
             },
             "require": {
@@ -50,7 +50,7 @@
             "keywords": [
                 "phpmorphy"
             ],
-            "time": "2017-05-23 11:25:06"
+            "time": "2017-05-23 12:29:48"
         },
         {
             "name": "dnoegel/php-xdg-base-dir",
