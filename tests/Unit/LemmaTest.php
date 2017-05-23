@@ -23,8 +23,8 @@ class LemmaTest extends TestCase
 
     public function testLemmatize_simple()
     {
-        $word = "ЯБЛОКИ";    // жуков
-        $expected = "ЯБЛОКО"; // жук
+        $word = "ДУХОВ";    // жуков
+        $expected = "ДУХИ"; // жук
         $text_result = Lemma::lemmatize($word);
 
         print_r($text_result);

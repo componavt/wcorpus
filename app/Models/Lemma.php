@@ -55,7 +55,8 @@ class Lemma extends Model
         }
             
         // $morphy = new Morphy('ru');
-        $lemma = $morphy->getPseudoRoot($word);
+        // $lemma = $morphy->getPseudoRoot($word);
+        $lemma = $morphy->lemmatize($word);
             
         // $lemma = "some text";
             //$lemma=Morphy::getPseudoRoot($word);
