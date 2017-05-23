@@ -3,8 +3,8 @@ error_reporting(E_ALL | E_STRICT);
 
 // first we include phpmorphy library
 #require_once(dirname(__FILE__) . '/../src/common.php');
-require_once(dirname(__FILE__) . '/../vendor/cijic/phpmorphy/libs/phpmorphy/src/common.php');
-# ./vendor/cijic/phpmorphy/libs/phpmorphy/
+require_once(dirname(__FILE__) . '/../vendor/componavt/phpmorphy/libs/phpmorphy/src/common.php');
+# ./vendor/componavt/phpmorphy/libs/phpmorphy/
 
 // set some options
 $opts = array(
@@ -23,7 +23,7 @@ $opts = array(
 
 // Path to directory where dictionaries located
 #$dir = dirname(__FILE__) . '/../dicts';
-$dir = dirname(__FILE__) . '/../vendor/cijic/phpmorphy/libs/phpmorphy/dicts';
+$dir = dirname(__FILE__) . '/../vendor/componavt/phpmorphy/libs/phpmorphy/dicts';
 $lang = 'ru_RU';
 
 // Create phpMorphy instance
@@ -38,8 +38,8 @@ try {
 // $morphy->getEncoding() returns dictionary encoding
 
 #$words = array('������������', '�����', '����', '�', '����', 'abc');
-// $words = array('КРАКОЗЯБЛИКИ', 'СТАЛИ', 'ВИНА', 'ВБРОД', 'БАНЯ', 'ДУХИ', 'abc');
-$words = array('яблоки');
+$words = array('КРАКОЗЯБЛИКИ', 'СТАЛИ', 'ВИНА', 'ВБРОД', 'БАНЯ', 'ДУХИ', 'abc');
+//$words = array('яблоки');
 /*
 if(function_exists('iconv')) {
     /*foreach($words as &$word) {
