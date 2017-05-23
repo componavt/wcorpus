@@ -171,7 +171,7 @@ return [
         // Html & Forms
         Collective\Html\HtmlServiceProvider::class,
 
-        cijic\phpMorphy\MorphyServiceProvider::class,
+        componavt\phpMorphy\MorphyServiceProvider::class,
         
         /*
          * Application Service Providers...
@@ -233,7 +233,7 @@ return [
         
         'Form' => Collective\Html\FormFacade::class,
         'Html' => Collective\Html\HtmlFacade::class,
-        'Morphy' => cijic\phpMorphy\Facade\Morphy::class,
+        'Morphy' => componavt\phpMorphy\Facade\Morphy::class,
 
     ],
 
