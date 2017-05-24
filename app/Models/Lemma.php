@@ -4,8 +4,6 @@ namespace Wcorpus\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-//use Morphy;
-//use componavt\phpMorphy\Morphy;
 use componavt\phpMorphy\Morphy;
 //require_once(dirname(__FILE__) . '/../../vendor/componavt/phpmorphy/libs/phpmorphy/src/common.php');
 
@@ -56,6 +54,7 @@ class Lemma extends Model
             
         // $morphy = new Morphy('ru');
         // $lemma = $morphy->getPseudoRoot($word);
+        $word = mb_strtoupper($word);
         $lemma = $morphy->lemmatize($word);
             
         // $lemma = "some text";

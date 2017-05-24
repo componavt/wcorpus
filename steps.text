@@ -48,6 +48,22 @@ alter table texts change `is_broken` `sentence_total` smallint(4) unsigned defau
 delete from migrations where id=6;
 php artisan migrate
 
+--------------------------------------24.05
+php artisan make:model 'Models\Wordform' --migration
+php artisan make:controller 'WordformController' --resource
+
+php artisan make:migration create_sentence_wordform_table 
+php artisan make:migration create_lemma_wordform_table 
+
+php artisan make:model 'Models\POS' --migration
+php artisan make:controller 'POSController' --resource
+
+delete from migrations where id=17; //lemmas
+alter table lemmas add index `lemmas_pos_id_index` (`pos_id`);
+alter table lemmas add constraint `lemmas_pos_id_foreign` foreign key (`pos_id`) references `pos`(`id`);
+ALTER TABLE lemmas ADD FOREIGN KEY (`pos_id`) REFERENCES pos.id;
+SET foreign_key_checks=0;
+php artisan migrate
 
 
 

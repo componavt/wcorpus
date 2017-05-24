@@ -17,6 +17,12 @@ class CreateLemmasTable extends Migration
             $table->increments('id');
 
             $table->string('lemma', 50);
+            $table->boolean('dictionary');
+            
+            $table->tinyInteger('pos_id')->unsigned();
+            $table->index('pos_id');
+            //$table->foreign('pos_id')->references('id')->on('pos');
+            
             $table->integer('freq')->unsigned()->nullable();
             
             $table->index('lemma');

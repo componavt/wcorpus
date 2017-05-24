@@ -23,13 +23,20 @@ class LemmaTest extends TestCase
 
     public function testLemmatize_simple()
     {
-        $word = "ДУХОВ";    // жуков
-        $expected = "ДУХИ"; // жук
+        $word = "духов";    // жуков
+        $expected = ["ДУХ","ДУХОВ","ДУХИ"]; // жук
         $text_result = Lemma::lemmatize($word);
 
-        print_r($text_result);
+        $this->assertEquals($expected, $text_result);
+    }
 
-        $this->assertEquals($expected, $text_result[0]);
+    public function testLemmatize_nonExistingWord()
+    {
+        $word = "капустача";    // жуков
+        $expected = ["КАПУСТАЧА"]; // жук
+        $text_result = Lemma::lemmatize($word);
+//print_r($text_result);
+        $this->assertEquals($expected, $text_result);
     }
 
     // -----------------------------------------------------------------
