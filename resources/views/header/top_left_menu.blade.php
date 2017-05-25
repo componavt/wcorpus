@@ -19,6 +19,7 @@
                             
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="/sentence">List of sentences</a></li>
+                                <li><a href="/sentence/break_sentences">Break sentences into words</a></li>
                             </ul>
                         </li>
                     </ul>

@@ -21,7 +21,9 @@ class SentenceController extends Controller
     {
         // permission= dict.edit, redirect failed users to /dict/lemma/, authorized actions list:
         $this->middleware('auth', 
-                          ['only' => ['create','store','edit','update','destroy']]);
+                          ['only' => ['create','store','edit','update','destroy',
+                                      'breakSentence','breakAllSentences'
+                                     ]]);
         
         $this->url_args = [
                     'limit_num'       => (int)$request->input('limit_num'),
@@ -143,4 +145,51 @@ class SentenceController extends Controller
     {
         //
     }
+    
+    /**
+     * Break a sentence into words
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function breakSentence($id)
+    {
+        $sentence=Sentence::find($id);                
+
+        if ($sentence->wordforms()->count()) {
+            $sentence->wordforms()->delete();
+        }
+        
+        $sentence->breakIntoWords();
+    }
+    
+    /**
+     * Break all sentences into words
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function breakAllSentences()
+    {
+        // stop when there is no sentences with wordform_total=NULL
+        $is_exist_not_broken_sentence = 1;
+        
+        while ($is_exist_not_broken_sentence) {
+            $sentences=Sentence::
+                    whereNull('wordform_total')
+                    //->whereNotIn('id',[21530,402631,125263,125413])
+                    ->orderBy('text_id')
+                    ->take(10)
+                    ->get();
+//dd($sentences);            
+            if ($sentences->count()) {
+                foreach ($sentences as $sentence) {
+print "<p>".$sentence->id."</p>\n";                    
+                    $sentence->breakIntoWords();
+                }
+            } else {
+                $is_exist_not_broken_text = 0;
+            }
+        }
+    }
+    
 }

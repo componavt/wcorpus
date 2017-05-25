@@ -42,8 +42,9 @@ List of sentences
                 <th>No</th>
                 <th>Sentence</th>
                 <th>Text</th>
+                <th>Wordforms</th>
                 @if (Auth::check())
-                <th></th>
+                <th colspan='2'></th>
                 @endif
             </tr>
         </thead>
@@ -57,6 +58,24 @@ List of sentences
                         <a href="text/{{$sentence_obj->text_id}}">{{$sentence_obj->text->title}}</a>
                     @endif
                 </td>
+                <td style='text-align:center'>
+                    @if($sentence->wordforms())
+                        <a href="/wordform/?search_sentence={{$sentence_obj->id}}">{{$sentence->wordforms()->count()}}</a><br>
+                    @endif
+                </td>
+                @if (Auth::check())
+                <td>
+                    @include('widgets.form._button', 
+                                 ['is_button'=>true, 
+                                  'route' => '/sentence/'.$sentence_obj->id.'/break_into_words',
+                                  'title' => 'split',
+                                  'with_args' => false
+                                 ])
+                </td>
+                <td>
+                    @include('widgets.form._button_delete', ['is_button'=>true, $route = 'sentence.destroy', 'id' => $sentence_obj->id])                                 
+                </td>
+                @endif
             </tr>
             @endforeach
         </table>
@@ -71,7 +90,7 @@ List of sentences
 
 @section('jqueryFunc')
     $(".multiple-select-text").select2({
-        width: 'resolve',
+        width: '300px',
         ajax: {
           url: "/text/title_list",
           dataType: 'json',

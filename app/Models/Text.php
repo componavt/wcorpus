@@ -66,10 +66,8 @@ print "<p>".$text->id;
                     $text->push();
     }
     
-    /** Get $text->wikitext and look for title, creation_date, text
-     * fill properties and save object
-     * 
-     * @param Text $text object of text
+    /** Get $text->text and break it into paragraphs,
+     * and paragraphs split into sentences
      */
     public function breakIntoSentences() {
         $text = $this;
@@ -292,29 +290,5 @@ print 16^4;
 */
         return $sentences;
     }    
-    
-    /**
-     * Split a sentence into words without punctuation marks
-     *
-     * @param $text String text 
-     * @return Array collection of words
-     */
-    public static function splitIntoWords($text): Array
-    {
-        $words = [];
-        $text = trim($text);
-
-        if (!$text) {
-            return $words;
-        }
         
-        if (preg_match_all("/(([[:alpha:]]+['-])*[[:alpha:]]+'?)/u",$text,$regs, PREG_PATTERN_ORDER)) {
-            $words = $regs[0];
-        } else {
-            $words[] = $text;
-        }
-
-        return $words;
-    }
-    
 }

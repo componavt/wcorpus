@@ -97,7 +97,7 @@ List of texts
                 </td>
                 <td>
                     @if($text_obj->sentence_total)
-                        {{$text_obj->sentence_total}}
+                    <a href="/sentence/?search_text={{$text_obj->id}}">{{$text_obj->sentence_total}}</a>
                     @endif
                 </td>
                 @if (Auth::check())

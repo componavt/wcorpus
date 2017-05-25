@@ -18,10 +18,10 @@ class CreateTextsTable extends Migration
             $table->integer('page_latest')->unsigned();
             
             $table->integer('author_id')->unsigned()->nullable();
-            $table->foreign('author_id')->references('id')->on('authors');
+            //$table->foreign('author_id')->references('id')->on('authors');
 
             $table->integer('publication_id')->unsigned()->nullable();
-            $table->foreign('publication_id')->references('id')->on('publications');
+            //$table->foreign('publication_id')->references('id')->on('publications');
 
             $table->string('title',255);
             $table->mediumText('wikitext')->collate('utf8_bin');
@@ -31,8 +31,8 @@ class CreateTextsTable extends Migration
             
             $table->index('title');
             $table->index('text',100);
-            //$table->index('author_id');
-            //$table->index('publication_id');
+            $table->index('author_id');
+            $table->index('publication_id');
 });
     }
 

@@ -4,6 +4,8 @@ namespace Wcorpus\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+use Wcorpus\Models\Wordform;
+
 class Sentence extends Model
 {
     protected $fillable = ['text_id','sentence'];
@@ -15,6 +17,54 @@ class Sentence extends Model
         return $this->belongsTo(Text::class);
     }
 
+    //  Sentence __has_many__ Wordforms
+    public function wordforms(){
+        $builder = $this->belongsToMany(Wordform::class,'sentence_wordform');
+        return $builder;
+    }
+
+    /** Get $sentence->sentence and break it into words,
+     * and write words into wordforms table
+     */
+    public function breakIntoWords() {
+        $sentence = $this;
+        
+        $sentence->wordform_total = 0;
+                
+        $wordforms = self::splitIntoWords($sentence->sentence);
+        foreach ($wordforms as $wordform_count => $wordform) {
+print "<p>$wordform</p>";            
+            $wordform_obj = Wordform::firstOrCreate(['wordform' => $wordform]);
+            $wordform_obj->sentences()->attach($sentence->id,['word_number' => $wordform_count]);            
+        }
+        $sentence->wordform_total = sizeof($wordforms);
+        
+        $sentence->save();
+    }
+        
+    /**
+     * Split a sentence into words without punctuation marks
+     *
+     * @param $text String text 
+     * @return Array collection of words
+     */
+    public static function splitIntoWords($text): Array
+    {
+        $words = [];
+        $text = trim($text);
+
+        if (!$text) {
+            return $words;
+        }
+        
+        if (preg_match_all("/(([[:alpha:]]+['-])*[[:alpha:]]+'?)/u",$text,$regs, PREG_PATTERN_ORDER)) {
+            $words = $regs[0];
+        } else {
+            $words[] = $text;
+        }
+
+        return $words;
+    }
 
     
 }

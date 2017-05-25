@@ -30,7 +30,7 @@ class TextController extends Controller
         $this->middleware('auth', 
                           ['only' => ['create','store','edit','update','destroy',
                                       'parseWikitext','parseAllWikitext',
-                                      'breakText','breakAllText',
+                                      'breakText','breakAllTexts',
                                       'extractFromWikiSource']]);
         
         $this->url_args = [
@@ -281,7 +281,7 @@ class TextController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function breakAllText()
+    public function breakAllTexts()
     {
         // stop when there is no texts with sentence_total=NULL
         $is_exist_not_broken_text = 1;

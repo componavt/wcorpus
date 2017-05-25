@@ -350,33 +350,7 @@ Spat' ne dayet mne vsyu noch'.";
         $text_result = Text::splitIntoParagraphs($text);
         $this->assertEquals($expected, $text_result);
     }
-    
-    // -----------------------------------------------------------------
-    
-    public function testsplitIntoWords_empty()
-    {
-        $text = "";
-        $expected = [];
-        $text_result = Text::splitIntoParagraphs($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
-    public function testsplitIntoWords_simple()
-    {
-        $text = "Это было в Черном море в ноябре месяце.";
-        $expected = ["Это",
-                     "было",
-                     "в",
-                     "Черном",
-                     "море",
-                     "в",
-                     "ноябре",
-                     "месяце"
-                    ];
-        $text_result = Text::splitIntoWords($text);
-        $this->assertEquals($expected, $text_result);
-    }
-    
+/*    
     public function testsplitIntoWords_withDash()
     {
         $text = "И всякую ночь,  около  полуночи,  я  поднимал щеколду и приотворял его дверь - тихо-тихо!";
@@ -397,24 +371,7 @@ Spat' ne dayet mne vsyu noch'.";
         $text_result = Text::splitIntoWords($text);
         $this->assertEquals($expected, $text_result);
     }
-    
-    public function testsplitIntoWords_withApostrophe()
-    {
-        $text = "A watch's minute hand moves more quickly than did mine.";
-        $expected = ["A",
-            "watch's",
-            "minute",
-            "hand",
-            "moves",
-            "more",
-            "quickly",
-            "than",
-            "did",
-            "mine"
-                    ];
-        $text_result = Text::splitIntoWords($text);
-        $this->assertEquals($expected, $text_result);
-    }
+*/    
     
     
 }

@@ -17,9 +17,10 @@ class CreateSentencesTable extends Migration
             $table->increments('id');
 
             $table->integer('text_id')->unsigned();
-            $table->     foreign('text_id')->references('id')->on('texts');
+            //$table->     foreign('text_id')->references('id')->on('texts');
             
             $table->text('sentence')->collate('utf8_bin');
+            $table->smallInteger('wordform_total')->unsigned()->nullable();
             //$table->timestamps();
         });
     }

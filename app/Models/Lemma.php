@@ -9,6 +9,16 @@ use componavt\phpMorphy\Morphy;
 
 class Lemma extends Model
 {
+    protected $fillable = ['lemma','pos_id','dictionary','freq'];
+
+    // Lemma __belongs_to__ PartOfSpeech
+    // $pos_name = PartOfSpeech::find(9)->name_ru;
+    public function pos()
+    {
+        return $this->belongsTo(POS::class,'pos_id');
+    }
+    
+
     public static function lemmatize($word)
     {
         
