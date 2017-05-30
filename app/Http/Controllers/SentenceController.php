@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use Wcorpus\Models\Sentence;
 use Wcorpus\Models\Text;
+use Wcorpus\Wcorpus;
 
 class SentenceController extends Controller
 {
@@ -45,7 +46,7 @@ class SentenceController extends Controller
             $this->url_args['limit_num'] = 1000;
         }   
         
-        $this->args_by_get = Text::searchValuesByURL($this->url_args);
+        $this->args_by_get = Wcorpus::searchValuesByURL($this->url_args);
     }
 
     /**
@@ -157,7 +158,7 @@ class SentenceController extends Controller
         $sentence=Sentence::find($id);                
 
         if ($sentence->wordforms()->count()) {
-            $sentence->wordforms()->delete();
+            $sentence->wordforms()->detach();
         }
         
         $sentence->breakIntoWords();
@@ -176,9 +177,8 @@ class SentenceController extends Controller
         while ($is_exist_not_broken_sentence) {
             $sentences=Sentence::
                     whereNull('wordform_total')
-                    //->whereNotIn('id',[21530,402631,125263,125413])
-                    ->orderBy('text_id')
-                    ->take(10)
+                    //->orderBy('text_id')
+                    ->take(100)
                     ->get();
 //dd($sentences);            
             if ($sentences->count()) {

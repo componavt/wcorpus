@@ -58,6 +58,16 @@ class SentenceTest extends TestCase
         $text_result = Sentence::splitIntoWords($text);
         $this->assertEquals($expected, $text_result);
     }
+
+    public function testSplitIntoWords_noWords()
+    {
+        $text = "— 14… 15… 16…";    
+        $expected = []; 
+        $text_result = Sentence::SplitIntoWords($text);
+
+        $this->assertEquals($expected, $text_result);
+    }
+
 /*   
  * цифры удаляются
  *  

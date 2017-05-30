@@ -45,3 +45,8 @@ Route::resource('/sentence', 'SentenceController',
                 ['names' => ['update' => 'sentence.update',
                              'store' => 'sentence.store',
                              'destroy' => 'sentence.destroy']]);
+
+Route::resource('/wordform', 'WordformController',
+                ['names' => ['update' => 'wordform.update',
+                             'store' => 'wordform.store',
+                             'destroy' => 'wordform.destroy']]);

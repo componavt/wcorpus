@@ -69,7 +69,7 @@ List of texts
             <?php $text_obj = \Wcorpus\Models\Text::find($text->id); ?>
             <tr>
                 <td>{{ $list_count++ }}</td>
-                <td><a href="text/{{$text->id}}{{$args_by_get}}">{{$text_obj->title}}</a></td>
+                <td><a href="text/{{$text->id}}{{$args_by_get}}">{{str_replace('_',' ',$text_obj->title)}}</a></td>
                 <td>
                     @if($text_obj->author)
                         {{$text_obj->author->name}}

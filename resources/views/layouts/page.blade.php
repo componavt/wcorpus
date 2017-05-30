@@ -18,7 +18,7 @@
         list($usec, $sec) = explode(" ", microtime());
         $execution_time = (float)$usec + (float)$sec - $start_time;
 ?>
-                <p style="text-align:right; font-style: italic">Page generated in {{$execution_time}} seconds.</p>
+                <p style="text-align:right; font-style: italic">{{sprintf('Page generated in %f seconds.',$execution_time)}}</p>
             </div>
         </div>
     </div>

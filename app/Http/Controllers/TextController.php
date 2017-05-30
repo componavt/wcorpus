@@ -11,6 +11,7 @@ use Wcorpus\Models\Author;
 use Wcorpus\Models\Publication;
 use Wcorpus\Models\Sentence;
 use Wcorpus\Models\Text;
+use Wcorpus\Wcorpus;
 
 use Wcorpus\Wikiparser\TemplateExtractor;
 
@@ -56,7 +57,7 @@ class TextController extends Controller
             $this->url_args['limit_num'] = 1000;
         }   
         
-        $this->args_by_get = Text::searchValuesByURL($this->url_args);
+        $this->args_by_get = Wcorpus::searchValuesByURL($this->url_args);
     }
 
     /**

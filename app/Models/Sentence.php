@@ -33,7 +33,10 @@ class Sentence extends Model
                 
         $wordforms = self::splitIntoWords($sentence->sentence);
         foreach ($wordforms as $wordform_count => $wordform) {
-print "<p>$wordform</p>";            
+              if (mb_strlen($wordform)>45) {
+                    $wordform = mb_substr($wordform,0,42).'...';
+                }
+//print "<p>$wordform</p>";            
             $wordform_obj = Wordform::firstOrCreate(['wordform' => $wordform]);
             $wordform_obj->sentences()->attach($sentence->id,['word_number' => $wordform_count]);            
         }
@@ -59,8 +62,6 @@ print "<p>$wordform</p>";
         
         if (preg_match_all("/(([[:alpha:]]+['-])*[[:alpha:]]+'?)/u",$text,$regs, PREG_PATTERN_ORDER)) {
             $words = $regs[0];
-        } else {
-            $words[] = $text;
         }
 
         return $words;

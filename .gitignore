@@ -8,7 +8,7 @@
 Homestead.json
 Homestead.yaml
 .env
-.bak
+*.bak
 
 node_modules/
 bootstrap/cache/
