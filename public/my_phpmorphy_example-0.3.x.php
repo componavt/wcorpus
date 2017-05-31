@@ -38,7 +38,7 @@ try {
 // $morphy->getEncoding() returns dictionary encoding
 
 #$words = array('������������', '�����', '����', '�', '����', 'abc');
-$words = array('КРАКОЗЯБЛИКИ', 'СТАЛИ', 'ВИНА', 'ВБРОД', 'БАНЯ', 'ДУХИ', 'abc');
+$words = array('КРАКОЗЯБЛИКИ', 'СТАЛИ', 'ВИНА', 'ВБРОД', 'БАНЯ', 'ДУХИ', 'abc','ДУХОВ');
 //$words = array('яблоки');
 /*
 if(function_exists('iconv')) {

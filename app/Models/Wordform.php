@@ -37,7 +37,7 @@ class Wordform extends Model
         $lemmas = [];
         
         $collection = $morphy->findWord($word);
-print_r($collection);
+//print_r($collection);
 
         $dictionary = (int)!($morphy->isLastPredicted());
 //        $lemma = $morphy->lemmatize($word);
