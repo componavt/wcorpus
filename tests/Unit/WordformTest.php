@@ -27,9 +27,11 @@ class WordformTest extends TestCase
         $wordform = new Wordform();
         $wordform->wordform = "духов";
         $expected = [
-            ['lemma'=>"ДУХ",'pos'=>'С','dictionary'=>'1'],
-            ['lemma'=>"ДУХОВ",'pos'=>'С','dictionary'=>'1'],
-            ['lemma'=>"ДУХИ",'pos'=>'С','dictionary'=>'1']
+            ['lemma'=>"ДУХ", 'pos'=>'С', 'animative'=>1, 'name'=>NULL, 'dictionary'=>1],
+            ['lemma'=>"ДУХ", 'pos'=>'С', 'animative'=>0, 'name'=>NULL, 'dictionary'=>1],
+            ['lemma'=>"ДУХОВ", 'pos'=>'П', 'animative'=>0, 'name'=>NULL, 'dictionary'=>1],
+            ['lemma'=>"ДУХОВ", 'pos'=>'С', 'animative'=>1, 'name'=>'ФАМ', 'dictionary'=>1],
+            ['lemma'=>"ДУХИ",'pos'=>'С', 'animative'=>0, 'name'=>NULL, 'dictionary'=>1]
         ];
         $text_result = $wordform->lemmatize();
 print_r($text_result);

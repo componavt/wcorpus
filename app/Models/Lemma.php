@@ -8,7 +8,7 @@ use Wcorpus\Wcorpus;
 
 class Lemma extends Model
 {
-    protected $fillable = ['lemma','pos_id','dictionary','freq'];
+    protected $fillable = ['lemma','pos_id','dictionary','freq','animative','name_id'];
 
     // Lemma __belongs_to__ PartOfSpeech
     // $pos_name = PartOfSpeech::find(9)->name_ru;

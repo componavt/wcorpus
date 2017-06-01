@@ -43,8 +43,23 @@ class Wordform extends Model
 //        $lemma = $morphy->lemmatize($word);
             
         foreach($collection as $paradigm) {
+            $animative = $name = NULL; 
+            if ($paradigm[0]->hasGrammems('ОД')) {
+                $animative = 1;
+            } elseif ($paradigm[0]->hasGrammems('НО')) {
+                $animative = 0;
+            }
+
+            if ($paradigm[0]->hasGrammems('ФАМ')) {
+                $name = 'ФАМ';
+            } elseif ($paradigm[0]->hasGrammems('ИМ')) {
+                $name = 'ИМ';
+            }
+
             $lemmas[] = ['lemma' => $paradigm[0]->getWord(),
                          'pos' => $paradigm[0]->getPartOfSpeech(),
+                         'animative' => $animative,
+                         'name' => $name,
                          'dictionary' => $dictionary];
         }
         
