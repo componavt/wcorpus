@@ -7,4 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class Gram extends Model
 {
     protected $fillable = ['name','aot_name'];
+    public $timestamps = false;
 }
