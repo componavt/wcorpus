@@ -36,15 +36,23 @@ Route::get('/text/break_texts','TextController@breakAllTexts');
 
 Route::get('/text/title_list', 'TextController@titlesList');
 
-Route::resource('/text', 'TextController',
-                ['names' => ['update' => 'text.update',
-                             'store' => 'text.store',
-                             'destroy' => 'text.destroy']]);
+Route::get('/wordform/{id}/lemmatize','SentenceController@lemmatize');
+Route::get('/wordform/lemmatize_all','SentenceController@lemmatizeAll');
+
+Route::resource('/lemma', 'LemmaController',
+                ['names' => ['update' => 'lemma.update',
+                             'store' => 'lemma.store',
+                             'destroy' => 'lemma.destroy']]);
 
 Route::resource('/sentence', 'SentenceController',
                 ['names' => ['update' => 'sentence.update',
                              'store' => 'sentence.store',
                              'destroy' => 'sentence.destroy']]);
+
+Route::resource('/text', 'TextController',
+                ['names' => ['update' => 'text.update',
+                             'store' => 'text.store',
+                             'destroy' => 'text.destroy']]);
 
 Route::resource('/wordform', 'WordformController',
                 ['names' => ['update' => 'wordform.update',

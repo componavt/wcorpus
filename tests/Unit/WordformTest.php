@@ -27,12 +27,14 @@ class WordformTest extends TestCase
         $wordform = new Wordform();
         $wordform->wordform = "духов";
         $expected = [
-            ['lemma'=>"ДУХ",'pos'=>'С','dictionary'=>'1'],
-            ['lemma'=>"ДУХОВ",'pos'=>'С','dictionary'=>'1'],
-            ['lemma'=>"ДУХИ",'pos'=>'С','dictionary'=>'1']
+            ['lemma'=>"ДУХ", 'pos_id'=>1, 'animative'=>1, 'name'=>NULL, 'dictionary'=>1],
+            ['lemma'=>"ДУХ", 'pos_id'=>1, 'animative'=>0, 'name'=>NULL, 'dictionary'=>1],
+            ['lemma'=>"ДУХОВ", 'pos_id'=>1, 'animative'=>1, 'name'=>1, 'dictionary'=>1],
+            ['lemma'=>"ДУХОВ", 'pos_id'=>2, 'animative'=>1, 'name'=>NULL, 'dictionary'=>1],
+            ['lemma'=>"ДУХИ",'pos_id'=>1, 'animative'=>0, 'name'=>NULL, 'dictionary'=>1]
         ];
         $text_result = $wordform->lemmatize();
-print_r($text_result);
+//print_r($text_result);
         $this->assertEquals($expected, $text_result);
     }
 

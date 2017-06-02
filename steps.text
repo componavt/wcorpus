@@ -63,8 +63,16 @@ php artisan migrate
 
 alter table sentences add `wordform_total` smallint(4) unsigned default null;
 
+--------------------------------------1.06
+alter table lemmas add animative tinyint(1) default NULL;
+alter table lemmas add name_id tinyint default NULL;
 
+php artisan make:model 'Models\Gram' --migration
+php artisan make:controller 'GramController' --resource
+php artisan migrate
 
+alter table pos change `name` `name` varchar(20) COLLATE utf8_unicode_ci default NULL;
+alter table wordforms add lemma_total tinyint default NULL;
 
 
 

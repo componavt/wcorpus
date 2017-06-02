@@ -4,10 +4,8 @@ namespace Wcorpus\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class POS extends Model
+class Gram extends Model
 {
-    protected $table = 'pos';
-    protected $fillable = ['name', 'aot_name'];
-  
+    protected $fillable = ['name','aot_name'];
     public $timestamps = false;
 }
