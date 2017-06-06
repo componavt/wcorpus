@@ -11,6 +11,7 @@ List of sentences
 
 @section('headExtra')
     {!!Html::style('css/select2.min.css')!!}
+    {!!Html::style('css/sentence.css')!!}
 @stop
 
 @section('panel-body')
@@ -34,6 +35,10 @@ List of sentences
                                'placeholder' => 'Number of records' ]]) records
         {!! Form::close() !!}
 
+        @if ($wordform)
+        <p><b>Wordform:</b> <i style='color:#bf5329; font-size: 18px'>{{$wordform}}</i></p>
+        @endif
+        
         <p>Founded records: {{$numAll}}</p>
         @if ($sentences)
         <table class="table">
@@ -52,7 +57,7 @@ List of sentences
             <?php $sentence_obj = \Wcorpus\Models\Sentence::find($sentence->id); ?>
             <tr>
                 <td>{{ $list_count++ }}</td>
-                <td>{{$sentence_obj->sentence}}</td>
+                <td>{!!$sentence_obj->highlightSentence($wordform)!!}</td>
                 <td>
                     @if($sentence_obj->text)
                         <a href="text/{{$sentence_obj->text_id}}">{{$sentence_obj->text->title}}</a>

@@ -32,17 +32,23 @@ class Sentence extends Model
         $sentence->wordform_total = 0;
                 
         $wordforms = self::splitIntoWords($sentence->sentence);
-        foreach ($wordforms as $wordform_count => $wordform) {
-              if (mb_strlen($wordform)>45) {
-                    $wordform = mb_substr($wordform,0,42).'...';
-                }
-//print "<p>$wordform</p>";            
-            $wordform_obj = Wordform::firstOrCreate(['wordform' => $wordform]);
-            $wordform_obj->sentences()->attach($sentence->id,['word_number' => $wordform_count]);            
+        $total = sizeof($wordforms);
+        if ($total<3) {
+            foreach ($wordforms as $wordform_count => $wordform) {
+                  if (mb_strlen($wordform)>45) {
+                        $wordform = mb_substr($wordform,0,42).'...';
+                    }
+    //print "<p>$wordform</p>";            
+                $wordform_obj = Wordform::firstOrCreate(['wordform' => $wordform]);
+                $wordform_obj->sentences()->attach($sentence->id,['word_number' => $wordform_count]);            
+            }
+            $sentence->wordform_total = $total;
+
+            $sentence->save();
+        } else {
+            $sentence->texts()->detach();
+            $sentence->delete();
         }
-        $sentence->wordform_total = sizeof($wordforms);
-        
-        $sentence->save();
     }
         
     /**
@@ -59,13 +65,32 @@ class Sentence extends Model
         if (!$text) {
             return $words;
         }
-        
-        if (preg_match_all("/(([[:alpha:]]+['-])*[[:alpha:]]+'?)/u",$text,$regs, PREG_PATTERN_ORDER)) {
+        // apostroph is needed in English only
+//        if (preg_match_all("/(([[:alpha:]]+['-])*[[:alpha:]]+'?)/u",$text,$regs, PREG_PATTERN_ORDER)) {
+        if (preg_match_all("/(([[:alpha:]]+[-])*[[:alpha:]]+?)/u",$text,$regs, PREG_PATTERN_ORDER)) {
             $words = $regs[0];
         }
 
         return $words;
     }
 
+    /**
+     * Highlight a word
+     *
+     * @param String $wordform_id  
+     * @return String sentence with highlighted words
+     */
+    public function highlightSentence(String $wordform): String
+    {
+        $sentence = $this->sentence;
+        //$wordform_obj = Wordform::find($wordform_id);
+        //$wordform = $wordform_obj->wordform;
+        
+        if ($wordform) {
+            $sentence = preg_replace("/\b(".$wordform.")\b/ui","<span class=\"highlighted\">\\1</span>",$sentence);
+        }
+            
+        return $sentence;
+    }
     
 }

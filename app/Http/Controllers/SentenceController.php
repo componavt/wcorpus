@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use Wcorpus\Models\Sentence;
 use Wcorpus\Models\Text;
+use Wcorpus\Models\Wordform;
 use Wcorpus\Wcorpus;
 
 class SentenceController extends Controller
@@ -30,6 +31,7 @@ class SentenceController extends Controller
                     'limit_num'       => (int)$request->input('limit_num'),
                     'page'            => (int)$request->input('page'),
                     'search_text'  => (int)$request->input('search_text'),
+                    'search_wordform'  => (int)$request->input('search_wordform'),
                 ];
         
         if (!$this->url_args['page']) {
@@ -65,6 +67,18 @@ class SentenceController extends Controller
             $sentences = $sentences->where('text_id',$this->url_args['search_text']);
         } 
         
+        if ($this->url_args['search_wordform']) {
+            $wordform_id = $this->url_args['search_wordform'];
+            $sentences = $sentences->whereIn('id',function($query) use ($wordform_id){
+                                $query->select('sentence_id')
+                                ->from('sentence_wordform')
+                                ->where('wordform_id', $wordform_id);
+                            });
+            $wordform = Wordform::find($wordform_id)->wordform;
+        } else {
+            $wordform = '';
+        }
+        
         $numAll = $sentences->get()->count();
 
         $sentences = $sentences
@@ -73,10 +87,11 @@ class SentenceController extends Controller
         
             return view('sentence.index')
                   ->with(array(
-                               'numAll'        => $numAll,
-                               'sentences'     => $sentences,
-                               'args_by_get'   => $this->args_by_get,
-                               'url_args'      => $this->url_args,
+                               'numAll'          => $numAll,
+                               'sentences'       => $sentences,
+                               'wordform'        => $wordform,
+                               'args_by_get'     => $this->args_by_get,
+                               'url_args'        => $this->url_args,
                               )
                         );
     }

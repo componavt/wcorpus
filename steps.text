@@ -74,17 +74,59 @@ php artisan migrate
 alter table pos change `name` `name` varchar(20) COLLATE utf8_unicode_ci default NULL;
 alter table wordforms add lemma_total tinyint default NULL;
 
+----------------------------------- 4.06
+alter table sentence_wordform add index `sentence_index`(`sentence_id`);
+alter table sentence_wordform add index `wordform_index`(`wordform_id`);
+alter table sentences add index `wordform_total_index`(`wordform_total`);
+alter table sentences add index `is_checked_index`(`is_checked`);
 
+alter table wordforms drop index `wordforms_wordform_unique`;
+alter table wordforms  add UNIQUE KEY `wordforms_wordform_unique` (`wordform`);
 
+alter table wordforms add sentence_total int unsigned default null;
+alter table wordforms add index `lemma_total_index`(`lemma_total`);
+alter table wordforms add index `sentence_total_index`(`sentence_total`);
 
+alter table lemma_wordform drop primary key;
+alter table lemma_wordform add index `lemma_id_index` (`lemma_id`);
+alter table lemma_wordform add index `wordform_id_index` (`wordform_id`);
+alter table lemma_wordform add index `lemma_wordform_index` (`lemma_id`,`wordform_id`);
 
+alter table lemmas add wordform_total tinyint unsigned default null;
+alter table lemmas add index `wordform_total_index`(`wordform_total`);
 
+_______________
+После разбивки предложений на слова, удалить предложения с количеством слов <3;
+delete from sentences where wordform_total<3;
+delete from sentence_wordform where sentence_id not in (select id from sentences);
 
+recountinting sentence_total in wordforms: /wordform/count_sentences
+delete from wordforms where sentence_total=0;
+delete from lemma_wordform where wordform_id not in (select id from wordforms);
+________________
 
+количество словоформ, ненайденных и непредсказанных (580 218)
+select count(*) from wordforms where lemma_total=0;
 
+количество словоформ, с предсказанными леммами (917 296)
+select count(*) from wordforms where id in (select wordform_id from lemma_wordform,lemmas where lemma_id=lemmas.id and dictionary=0);
 
+количество словоформ из русского словаря (695 560)
+select count(*) from wordforms where lemma_total>0 and id not in (select wordform_id from lemma_wordform,lemmas where lemma_id=lemmas.id and dictionary=0);
 
+количество предсказанных лемм (891 425)
+select count(*) from lemmas where dictionary=0;
 
+php artisan make:model 'Models\Piwidict\RelationType' 
+php artisan make:controller 'Piwidict\RelationTypeController'
+php artisan make:model 'Models\Piwidict\Page' 
+php artisan make:model 'Models\Piwidict\LangPOS' 
+php artisan make:model 'Models\Piwidict\PartOfSpeech' 
+php artisan make:model 'Models\Piwidict\Piwidict' 
 
+alter table lemmas add `in_wiktionary` tinyint unsigned default null;
 
+php artisan make:migration create_lang_pos_lemma_table 
 
+GRANT SELECT ON ruwikt20160210_parsed.* TO wcorpus@'localhost';
+FLUSH PRIVILEGES;

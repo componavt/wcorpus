@@ -13,7 +13,7 @@
         @if ($message = $errors->first(0, ':message'))
             {{ $message }}
         @else
-            {{ trans('error.check_form') }}
+            Please check the form filling
         @endif
     </div>
 @endif

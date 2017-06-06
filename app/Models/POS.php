@@ -10,4 +10,11 @@ class POS extends Model
     protected $fillable = ['name', 'aot_name'];
   
     public $timestamps = false;
+    
+    // POS __has_many__ Lemmas
+    public function lemmas()
+    {
+        return $this->hasMany(Lemma::class,'pos_id');
+    }
+    
 }

@@ -15,7 +15,7 @@ class CreatePOSTable extends Migration
     {
         Schema::create('pos', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name',20)->unique();
+            $table->string('name',20)->unique()->nullable();
             $table->string('aot_name',20)->unique();
             //$table->timestamps();
         });

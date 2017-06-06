@@ -79,22 +79,27 @@ print "<p>".$text->id;
         
         foreach($paragraphs as $par) {
             $sentences = Text::splitIntoSentences($par);
-            foreach ($sentences as $sen) {
+            foreach ($sentences as $sen) {                
+                // if any words exists in this sentence
+                if (preg_match("/(([[:alpha:]]+[-])*[[:alpha:]]+?)/u",$sen)) { 
+                
 /*
  * id=26189
                 print "<p>$sen</p>\n"; 
 print "<p>".mb_strlen($sen)."</p>";
 print 16^4;
-*/              if (mb_strlen($sen)>35003) {
-                    $sen = mb_substr($sen,0,35000).'...';
+*/
+                    if (mb_strlen($sen)>35003) {
+                        $sen = mb_substr($sen,0,35000).'...';
+                    }
+
+                    $sen_obj = Sentence::create([
+                        'text_id' => $text->id,
+                        'sentence' => $sen
+                            ]);
+                    $text->sentence_total +=1;
                 }
-                
-                $sen_obj = Sentence::create([
-                    'text_id' => $text->id,
-                    'sentence' => $sen
-                        ]);
             }
-            $text->sentence_total = $text->sentence_total + sizeof($sentences);
         }
         
         $text->save();

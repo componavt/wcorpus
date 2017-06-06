@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use Wcorpus\Models\Lemma;
 use Wcorpus\Wcorpus;
+use Wcorpus\Models\Piwidict\LangPOS;
 
 class LemmaController extends Controller
 {
@@ -77,6 +78,7 @@ class LemmaController extends Controller
         
         $numAll = $lemmas->get()->count();
 
+
         $lemmas = $lemmas
                 ->paginate($this->url_args['limit_num']);         
         
@@ -120,7 +122,25 @@ class LemmaController extends Controller
      */
     public function show($id)
     {
-        //
+        $lemma = Lemma::find($id);
+       
+        if (!$lemma) {
+            return Redirect::to('/lemma/')
+                           ->withErrors("Lemma ID=$id is not found");            
+        }
+        
+        $grams = [];
+        if ($lemma->animative_name) {
+            $grams[]= $lemma->animative_name;
+        }
+        if ($lemma->named) {
+            $grams[]= $lemma->named->name;
+        }        
+        
+        return view('lemma.show')
+                  ->with(['lemma'=>$lemma,
+                          'grams'=>$grams
+                         ]);
     }
 
     /**
@@ -156,4 +176,66 @@ class LemmaController extends Controller
     {
         //
     }
+    
+    /**
+     * Count wordforms linked with lemmas,
+     * fill in wordform_total
+     */
+    public function countWordforms() {
+        $is_all_checked = false;
+        while (!$is_all_checked) {
+            $lemmas = Lemma::whereNull('wordform_total')
+                    ->take(1000)
+                    ->get();
+            if (!sizeof($lemmas)) {
+                $is_all_checked = true;
+            }
+
+            foreach ($lemmas as $lemma) {
+    print "<p>".$lemma->lemma;  
+                $wordform_count = $lemma->wordforms()->count();
+print " = $wordform_count";
+                $lemma->wordform_total = $wordform_count;
+                $lemma->save();
+            }            
+        }
+    }
+    
+    /**
+     * Check all lemmas
+     * if exists such lemma in Russian Wiktionary,
+     * fill lang_pos_id = ID of lang_pos entry in Russian Wiktionary
+     * OR = 0 if doesn't exist lemma in Russian Wiktionary
+     */
+    public function linkRuWikt() {
+        $is_all_checked = false;
+        while (!$is_all_checked) {
+            $lemmas=Lemma::whereNull('in_wiktionary')
+                    ->take(10)
+                    ->get();
+            //if (!sizeof($lemmas)) {
+                $is_all_checked = true;
+            //}
+
+            foreach ($lemmas as $lemma) {
+    print "<p>".$lemma->lemma." = ";  
+                $lang_poses = LangPOS::getByLemma($lemma);
+                if ($lang_poses) {
+                    $in_wiktionary = 1;
+                    $lemma
+                            //->setConnection('mysql')
+                            ->lang_poses()->detach();
+                    foreach ($lang_poses as $lang_pos) {
+                        $lemma->lang_poses()->attach($lang_pos->id);
+print $lang_pos->id .", ";                
+                    }
+                } else {
+                    $in_wiktionary = 0;
+                }
+                $lemma->in_wiktionary = $in_wiktionary;
+                //$lemma->save();
+            }            
+        }
+    }
+    
 }

@@ -3,9 +3,18 @@
 namespace Wcorpus\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redirect;
+
+use Wcorpus\Models\POS;
 
 class POSController extends Controller
 {
+    public function __construct(Request $request)
+    {
+        $this->middleware('auth', 
+                          ['only' => ['create','store','edit','update','destroy']]);
+    }
+    
     /**
      * Display a listing of the resource.
      *
@@ -13,7 +22,9 @@ class POSController extends Controller
      */
     public function index()
     {
-        //
+        $poses = POS::orderBy('name')->get();
+        return view('pos.index')
+                  ->with(['poses' => $poses]);
     }
 
     /**
@@ -23,7 +34,7 @@ class POSController extends Controller
      */
     public function create()
     {
-        //
+        return Redirect::to('/pos/');
     }
 
     /**
@@ -34,7 +45,7 @@ class POSController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return Redirect::to('/pos/');
     }
 
     /**
@@ -45,7 +56,7 @@ class POSController extends Controller
      */
     public function show($id)
     {
-        //
+        return Redirect::to('/pos/');
     }
 
     /**
@@ -56,7 +67,10 @@ class POSController extends Controller
      */
     public function edit($id)
     {
-        //
+        $pos = POS::find($id); 
+        
+        return view('pos.edit')
+                  ->with(['pos' => $pos]);
     }
 
     /**
@@ -68,7 +82,17 @@ class POSController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $this->validate($request, [
+            'name'  => 'required|max:20',
+            'aot_name'  => 'required|max:20',
+        ]);
+        
+        $pos = POS::find($id);
+//dd($request);       
+        $pos->fill($request->all())->save();
+        
+        return Redirect::to('/pos/')
+            ->withSuccess('Successfully updated');        
     }
 
     /**

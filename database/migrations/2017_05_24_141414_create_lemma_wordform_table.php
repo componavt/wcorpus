@@ -18,7 +18,9 @@ class CreateLemmaWordformTable extends Migration
             $table->integer('wordform_id')->unsigned();
             //$table->timestamps();
             
-            $table->primary(['lemma_id','wordform_id']);
+            $table->index('lemma_id');
+            $table->index('wordform_id');
+            $table->index(['lemma_id','wordform_id']);
         });
     }
 

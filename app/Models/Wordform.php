@@ -20,7 +20,8 @@ class Wordform extends Model
     
     // Wordforms __has_many__ Sentences
     public function sentences(){
-        $builder = $this->belongsToMany(Sentence::class,'sentence_wordform');
+        $builder = $this->belongsToMany(Sentence::class,'sentence_wordform')
+                ->withPivot('word_number');
         return $builder;
     }
     
@@ -37,11 +38,15 @@ class Wordform extends Model
         $lemmas = [];
         
         $collection = $morphy->findWord($word);
-//print_r($collection);
-
+//dd($collection);
+//dd($morphy->isLastPredicted());
         $dictionary = (int)!($morphy->isLastPredicted());
 //        $lemma = $morphy->lemmatize($word);
-            
+
+        if (!$collection) {
+            return $lemmas;
+        }
+        
         foreach($collection as $paradigm) {
             $pos = $paradigm[0]->getPartOfSpeech();
             $pos_obj = POS::firstOrCreate(['aot_name'=>$pos]);
@@ -76,10 +81,27 @@ class Wordform extends Model
             $lemmas[] = ['lemma' => $paradigm[0]->getWord(),
                          'pos_id' => $pos_obj->id,
                          'animative' => $animative,
-                         'name' => $name,
+                         'name_id' => $name,
                          'dictionary' => $dictionary];
         }
         
         return $lemmas;
+    }
+    
+    public function update_lemmas()
+    {
+        if ($this->lemmas()->count()) {
+            $this->lemmas()->detach();
+        }
+        
+        $lemmas = $this->lemmatize();
+        
+        foreach ($lemmas as $lemma) {
+print "<br>".$lemma['lemma']." (dictionary:".$lemma['dictionary'].", pos_id:".$lemma['pos_id'].", animative:".$lemma['animative'].", named: ". $lemma['name_id']. ")\n";            
+            $lemma_obj = Lemma::firstOrCreate($lemma);
+            $this->lemmas()->attach($lemma_obj);
+        }
+        $this->lemma_total = $this->lemmas()->count();
+        $this->push();
     }
 }

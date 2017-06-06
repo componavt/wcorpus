@@ -19,8 +19,12 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index');
+Route::get('/stats', 'HomeController@stats');
 
 Route::get('/author/name_list', 'AuthorController@namesList');
+
+Route::get('/lemma/count_wordforms','LemmaController@countWordforms');
+Route::get('/lemma/link_ruwikt','LemmaController@linkRuWikt');
 
 Route::get('/sentence/{id}/break_into_words','SentenceController@breakSentence');
 Route::get('/sentence/break_sentences','SentenceController@breakAllSentences');
@@ -36,13 +40,21 @@ Route::get('/text/break_texts','TextController@breakAllTexts');
 
 Route::get('/text/title_list', 'TextController@titlesList');
 
-Route::get('/wordform/{id}/lemmatize','SentenceController@lemmatize');
-Route::get('/wordform/lemmatize_all','SentenceController@lemmatizeAll');
+Route::get('/wordform/{id}/lemmatize','WordformController@lemmatize');
+Route::get('/wordform/lemmatize_all','WordformController@lemmatizeAll');
+Route::get('/wordform/delete_bad_wordforms','WordformController@deleteBadWordforms');
+Route::get('/wordform/delete_apostrophs','WordformController@deleteWordsWithApostroph');
+Route::get('/wordform/count_sentences','WordformController@countSentences');
 
 Route::resource('/lemma', 'LemmaController',
                 ['names' => ['update' => 'lemma.update',
                              'store' => 'lemma.store',
                              'destroy' => 'lemma.destroy']]);
+
+Route::resource('/pos', 'POSController',
+                ['names' => ['update' => 'pos.update',
+                             'store' => 'pos.store',
+                             'destroy' => 'pos.destroy']]);
 
 Route::resource('/sentence', 'SentenceController',
                 ['names' => ['update' => 'sentence.update',
@@ -58,3 +70,5 @@ Route::resource('/wordform', 'WordformController',
                 ['names' => ['update' => 'wordform.update',
                              'store' => 'wordform.store',
                              'destroy' => 'wordform.destroy']]);
+
+Route::get('/piwidict/relation_type', 'Piwidict\RelationTypeController@index');

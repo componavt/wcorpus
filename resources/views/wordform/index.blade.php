@@ -32,6 +32,10 @@ List of wordforms
                 'value' => $url_args['search_sentence']]) 
         {!! Form::close() !!}
 
+        @if ($sentence)
+        <p><b>Sentence:</b> <i style='color:#bf5329; font-size: 18px'>{{$sentence}}</i></p>
+        @endif
+        
         <p>Founded records: {{$numAll}}</p>
         @if ($wordforms)
         <table class="table">
@@ -54,13 +58,14 @@ List of wordforms
                 <td>
                     @if($wordform->lemmas())
                         @foreach ($wordform->lemmas as $lemma)
-                            {{$lemma->lemma}}
+                        <a href='/lemma/{{$lemma->id}}'>{{$lemma->lemma}}</a>
+                        <span style='font-size:11px; font-style:italic'>({{$lemma->pos->name}})</span><br>
                         @endforeach
                     @endif
                 </td>
                 <td style='text-align:center'>
-                    @if($wordform->sentences())
-                        <a href="/sentence/?search_wordform={{$wordform_obj->id}}">{{$wordform->sentences()->count()}}</a><br>
+                    @if($wordform_obj->sentence_total)
+                        <a href="/sentence/?search_wordform={{$wordform_obj->id}}">{{$wordform_obj->sentence_total}}</a><br>
                     @endif
                 </td>
                 @if (Auth::check())
