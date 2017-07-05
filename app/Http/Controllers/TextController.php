@@ -438,4 +438,28 @@ print sizeof($texts);
         return Response::json($list);
     }
 
+    /**
+     * Get sentences and output into files
+     * <id text>.txt 
+     * A new sentences (without \r\n) begins in a new line
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function sentencesToFile()
+    {
+        $dirname = "/data/all/projects/git/wcorpus.addon/sentences/";
+        $texts = Text::select('id')->orderBy('id')->get();
+        foreach ($texts as $text) {
+            $sentences = Sentence::where('text_id',$text->id)->orderBy('id');
+            if ($sentences->count()) {
+                $fh = fopen($dirname.$text->id.".txt",'w');
+                foreach ($sentences->get() as $sentence) {
+                    fwrite($fh,$sentence->sentence."\n");
+                }
+                fclose($fh);   
+            }
+            print "<p>".$text->id.".txt записан.</p>\n";
+        }
+    }
+    
 }

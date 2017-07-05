@@ -34,6 +34,7 @@ Route::get('/text/{id}/parseWikitext','TextController@parseWikitext');
 Route::get('/text/parseAllWikitext','TextController@parseAllWikitext');
 Route::get('/text/templateStats','TextController@templateStats');
 Route::get('/text/parse_text','TextController@parseText');
+Route::get('/text/sentences_to_file','TextController@sentencesToFile');
 
 Route::get('/text/{id}/break_into_sentences','TextController@breakText');
 Route::get('/text/break_texts','TextController@breakAllTexts');
