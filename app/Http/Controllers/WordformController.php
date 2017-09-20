@@ -350,4 +350,46 @@ print "<p><b>".$wordform->wordform."</b> (".$wordform->id.")\n";
             }
         }
     }
+    
+    /**
+     * Processing after lemmatizing
+     * Select wordforms with only one lemma (lemma_total=1)
+     * fill in sentence_wordform.lemma_id by lemma_wordform.lemma_id
+     * and sentence_wordform.lemma_found=1
+     * 
+     * select * from sentence_wordform where lemma_found=1
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function processWordformWithOneLemma()
+    {
+        $wordforms = Wordform::where('lemma_total',1)->take(1)->get();
+        foreach ($wordforms as $wordform) {
+            $query = "UPDATE sentence_wordform SET lemma_id=".$wordform->lemmas()->first()->id.
+                          ", lemma_found=1 WHERE wordform_id=".$wordform->id;
+print "<P>$query";            
+            DB::statement($query);
+        }
+    }
+    
+    /**
+     * Processing after lemmatizing
+     * Select wordforms without lemmas (lemma_total=0)
+     * fill in sentence_wordform.lemma_found=0
+     * 
+     * select * from sentence_wordform where lemma_found=0
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function processWordformWithoutLemmas()
+    {
+        $wordforms = Wordform::where('lemma_total',0)->take(1)->get();
+        foreach ($wordforms as $wordform) {
+            $query = "UPDATE sentence_wordform SET lemma_found=1 "
+                   . "WHERE wordform_id=".$wordform->id;
+print "<P>$query";            
+            DB::statement($query);
+        }
+    }
+    
 }

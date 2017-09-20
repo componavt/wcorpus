@@ -221,7 +221,7 @@ print 16^4;
      * Split a paragraph into sentences
      * Punctuation marks are discarded
      *
-     * @param $text String text 
+     * @param $text String text of paragraph
      * @return Array collection of sentences
      */
     public static function splitIntoSentences($text): Array
