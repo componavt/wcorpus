@@ -33,7 +33,7 @@ class Sentence extends Model
                 
         $wordforms = self::splitIntoWords($sentence->sentence);
         $total = sizeof($wordforms);
-        if ($total<3) {
+        if ($total>2) {
             foreach ($wordforms as $wordform_count => $wordform) {
                   if (mb_strlen($wordform)>45) {
                         $wordform = mb_substr($wordform,0,42).'...';
