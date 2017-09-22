@@ -8,11 +8,12 @@
             <file>file:/data/all/projects/git/wcorpus/steps.text</file>
             <file>file:/data/all/projects/git/wcorpus/resources/views/stats.blade.php</file>
             <file>file:/data/all/projects/git/wcorpus/app/Models/Text.php</file>
+            <file>file:/data/all/projects/git/wcorpus/app/Http/Controllers/SentenceController.php</file>
+            <file>file:/data/all/projects/git/wcorpus/tests/Unit/SentenceTest.php</file>
             <file>file:/data/all/projects/git/wcorpus/app/Http/Controllers/WordformController.php</file>
             <file>file:/data/all/projects/git/wcorpus/app/Models/Wordform.php</file>
             <file>file:/data/all/projects/git/wcorpus/app/Models/Sentence.php</file>
             <file>file:/data/all/projects/git/wcorpus/routes/web.php</file>
-            <file>file:/data/all/projects/git/wcorpus/database/migrations/2017_09_20_115232_change_table_sentence_wordform.php</file>
         </group>
     </open-files>
 </project-private>

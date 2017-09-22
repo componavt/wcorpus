@@ -47,7 +47,7 @@ Route::get('/wordform/delete_bad_wordforms','WordformController@deleteBadWordfor
 Route::get('/wordform/delete_apostrophs','WordformController@deleteWordsWithApostroph');
 Route::get('/wordform/count_sentences','WordformController@countSentences');
 Route::get('/wordform/process_with_one_lemma','WordformController@processWordformWithOneLemma');
-Route::get('/wordform/process_without_lemmas','WordformController@processWordformWithoutLemmas');
+Route::get('/wordform/delete_without_lemmas','WordformController@deleteWordformWithoutLemmas');
 
 Route::resource('/lemma', 'LemmaController',
                 ['names' => ['update' => 'lemma.update',
