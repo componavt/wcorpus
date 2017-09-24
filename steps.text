@@ -130,3 +130,7 @@ php artisan make:migration create_lang_pos_lemma_table
 
 GRANT SELECT ON ruwikt20160210_parsed.* TO wcorpus@'localhost';
 FLUSH PRIVILEGES;
+
+php artisan make:migration change_table_sentence_wordform --table="sentence_wordform"
+php artisan make:migration add_lemma_id_into_sentence_wordform --table="sentence_wordform"
+php artisan make:migration add_indexes_into_sentence_wordform --table="sentence_wordform"

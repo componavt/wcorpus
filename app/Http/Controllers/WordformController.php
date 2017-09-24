@@ -350,4 +350,107 @@ print "<p><b>".$wordform->wordform."</b> (".$wordform->id.")\n";
             }
         }
     }
+    
+    /**
+     * Processing after lemmatizing
+     * Select wordforms with only one lemma (lemma_total=1)
+     * fill in sentence_wordform.lemma_id by lemma_wordform.lemma_id
+     * and sentence_wordform.lemma_found=1
+     * 
+     * select * from sentence_wordform where lemma_found=1
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function processWordformWithOneLemma()
+    {
+        // stop when there is no wordforms with one lemmas not processed
+        $is_exist_not_processed = 1;
+/*        $wordforms = Wordform::where('lemma_total',1)
+                   ->take(1)->get();*/
+        while ($is_exist_not_processed) {
+            $wordforms = Wordform::where('lemma_total',1)
+                    ->whereHas('sentences', function ($query) {
+                        $query->whereNull('lemma_found');
+                    })
+                    ->take(1)->get();
+        
+            if ($wordforms->count()) {
+                foreach ($wordforms as $wordform) {
+                    $query = "UPDATE sentence_wordform SET lemma_id=".$wordform->lemmas()->first()->id.
+                             ", lemma_found=1 WHERE wordform_id=".$wordform->id;
+        //print "<P>$query";            
+                    $res = DB::statement($query);
+//dd($res);                    
+                }
+                $is_exist_not_processed = 0;
+            } else {
+                $is_exist_not_processed = 0;
+            }
+        }
+    }
+    
+    /**
+     * Processing after lemmatizing
+     * Select wordforms without lemmas (lemma_total=0)
+     * fill in sentence_wordform.lemma_found=0
+     * 
+     * select count(*) from sentence_wordform,wordforms where lemma_found is null and sentence_wordform.wordform_id=wordforms.id and lemma_total=0
+     *
+     * @return \Illuminate\Http\Response
+     */
+    /*
+    public function processWordformWithoutLemmas()
+    {
+        // stop when there is no wordforms without lemmas
+        $is_exist_without_lemmas = 1;
+
+        while ($is_exist_without_lemmas) {
+            $wordforms = Wordform::where('lemma_total',0)
+                    ->whereHas('sentences', function ($query) {
+                        $query->whereNull('lemma_found');
+                    })
+                    ->take(100)->get();
+        
+            if ($wordforms->count()) {
+                foreach ($wordforms as $wordform) {
+                    $query = "UPDATE sentence_wordform SET lemma_found=0 "
+                           . "WHERE wordform_id=".$wordform->id;
+        //print "<P>$query";            
+                    DB::statement($query);
+                }
+            } else {
+                $is_exist_without_lemmas = 0;
+            }
+        }
+    }*/
+    
+    /**
+     * Processing after lemmatizing
+     * Select wordforms without lemmas (lemma_total=0)
+     * delete them and their links with sentences
+     * 
+     * select * from sentence_wordform where lemma_found=0
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteWordformWithoutLemmas()
+    {
+        // stop when there is no wordforms without lemmas
+        $is_exist_without_lemmas = 1;
+
+        while ($is_exist_without_lemmas) {
+            $wordforms = Wordform::where('lemma_total',0)
+                ->take(100)->get();
+            if ($wordforms->count()) {
+                foreach ($wordforms as $wordform) {
+    print $wordform->id;
+    print "<br>";
+                    $wordform->sentences()->detach();
+                    $wordform->delete();
+                }
+            } else {
+                $is_exist_without_lemmas = 0;
+            }
+        }
+    }
 }
