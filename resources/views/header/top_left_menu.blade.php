@@ -32,6 +32,7 @@
                                 <li><a href="/wordform">List of wordforms</a></li>
                                 <li><a href="/wordform/count_sentences">Recounting sentence links</a></li>
                                 <li><a href="/wordform/lemmatize_all">Lemmatize all wordforms</a></li>
+                                <li><a href="/wordform/delete_without_lemmas">Remove all wordforms without lemmas</a></li>
                             </ul>
                         </li>
                         

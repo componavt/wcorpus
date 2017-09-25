@@ -357,34 +357,75 @@ print "<p><b>".$wordform->wordform."</b> (".$wordform->id.")\n";
      * fill in sentence_wordform.lemma_id by lemma_wordform.lemma_id
      * and sentence_wordform.lemma_found=1
      * 
-     * select * from sentence_wordform where lemma_found=1
+     * select count(*) from sentence_wordform where lemma_found=1
+     * select count(*) from wordforms where lemma_total=1
+     * select sum(sentence_total) from wordforms where lemma_total=1
+     * select count(*) from sentence_wordform, wordforms where sentence_wordform.wordform_id=wordforms.id and lemma_total=1 and lemma_found is null;
      *
      * @return \Illuminate\Http\Response
      */
     public function processWordformWithOneLemma()
     {
-        // stop when there is no wordforms with one lemmas not processed
+/*        // stop when there is no wordforms with one lemmas not processed
         $is_exist_not_processed = 1;
-/*        $wordforms = Wordform::where('lemma_total',1)
-                   ->take(1)->get();*/
         while ($is_exist_not_processed) {
             $wordforms = Wordform::where('lemma_total',1)
                     ->whereHas('sentences', function ($query) {
                         $query->whereNull('lemma_found');
                     })
-                    ->take(1)->get();
+                    ->take(100)->get();
         
             if ($wordforms->count()) {
                 foreach ($wordforms as $wordform) {
+    print $wordform->id;
+    print "<br>";
                     $query = "UPDATE sentence_wordform SET lemma_id=".$wordform->lemmas()->first()->id.
                              ", lemma_found=1 WHERE wordform_id=".$wordform->id;
         //print "<P>$query";            
                     $res = DB::statement($query);
 //dd($res);                    
                 }
-                $is_exist_not_processed = 0;
+                //$is_exist_not_processed = 0;
             } else {
                 $is_exist_not_processed = 0;
+            }
+        }*/
+        
+        // stop when there is no wordforms with one lemmas not processed
+        $is_exist_word_not_processed = 1;
+        while ($is_exist_word_not_processed) {
+            $wordforms = Wordform::where('lemma_total',1)
+                    ->take(100)->get();
+        
+            if ($wordforms->count()) {
+                foreach ($wordforms as $wordform) {
+    print $wordform->id;
+    print "<br>";
+                    $is_exist_sent_not_processed = 1;
+                    while ($is_exist_sent_not_processed) {
+                        $sentences = DB::table('sentence_wordform')
+                                ->select('sentence_id')
+                                ->where('wordform_id',$wordform->id)
+                                ->take(100)->get();
+                        
+                        if ($sentences->count()) {
+                            foreach($sentences as $sentence) {
+                                $query = "UPDATE sentence_wordform SET "
+                                       . "lemma_id=".$wordform->lemmas()->first()->id
+                                       . ", lemma_found=1 WHERE "
+                                       . "wordform_id=".(int)$wordform->id
+                                       . " and sentence_id=".(int)$sentence->sentence_id;
+        //dd( "<P>$query");
+                                $res = DB::statement($query);
+                            }
+                        } else {
+                            $is_exist_sent_not_processed = 0;
+                        }
+                    }
+                }
+                //$is_exist_word_not_processed = 0;
+            } else {
+                $is_exist_word_not_processed = 0;
             }
         }
     }
@@ -429,7 +470,7 @@ print "<p><b>".$wordform->wordform."</b> (".$wordform->id.")\n";
      * Select wordforms without lemmas (lemma_total=0)
      * delete them and their links with sentences
      * 
-     * select * from sentence_wordform where lemma_found=0
+     * select count(*) from wordforms where lemma_total=0
      *
      * @return \Illuminate\Http\Response
      */
