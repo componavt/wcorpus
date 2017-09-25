@@ -53,6 +53,7 @@ class Sentence extends Model
         
     /**
      * Split a sentence into words without punctuation marks
+     * extract only cyrillic letters and dash 
      *
      * @param $text String text 
      * @return Array collection of words
@@ -67,8 +68,14 @@ class Sentence extends Model
         }
         // apostroph is needed in English only
 //        if (preg_match_all("/(([[:alpha:]]+['-])*[[:alpha:]]+'?)/u",$text,$regs, PREG_PATTERN_ORDER)) {
-        if (preg_match_all("/(([[:alpha:]]+[-])*[[:alpha:]]+?)/u",$text,$regs, PREG_PATTERN_ORDER)) {
-            $words = $regs[0];
+//        if (preg_match_all("/(([[:alpha:]]+[-])*[[:alpha:]]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
+        if (preg_match_all("/(([А-Яа-я]+[-])*[А-Яа-я]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
+            foreach ($regs[0] as $word) {
+               if (mb_strlen($word)>1) {
+                   $words[] = $word;
+               } 
+            }
+//var_dump($regs);            
         }
 
         return $words;

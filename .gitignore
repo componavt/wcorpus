@@ -12,3 +12,4 @@ Homestead.yaml
 
 node_modules/
 bootstrap/cache/
+/nbproject/

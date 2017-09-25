@@ -21,7 +21,7 @@ class WordformTest extends TestCase
         $text_result = $wordform->lemmatize();
         $this->assertEquals($expected, $text_result);
     }
-/*
+
     public function testLemmatize_simple()
     {
         $wordform = new Wordform();
@@ -34,19 +34,21 @@ class WordformTest extends TestCase
             ['lemma'=>"ДУХИ",'pos_id'=>1, 'animative'=>0, 'name_id'=>NULL, 'dictionary'=>1]
         ];
         $text_result = $wordform->lemmatize();
-print_r($text_result);
-        $this->assertEquals($expected, $text_result);
-    }
-*/
-/*    public function testLemmatize_nonExistingWord()
-    {
-        $word = "капустача";    // жуков
-        $expected = ["КАПУСТАЧА"]; // жук
-        $text_result = Lemma::lemmatize($word);
 //print_r($text_result);
         $this->assertEquals($expected, $text_result);
     }
-*/
+
+    public function testLemmatize_nonExistingWord()
+    {
+        $wordform = new Wordform();
+        $wordform->wordform = "капустача";
+
+        $expected = [['lemma'=>"КАПУСТАЧА", 'pos_id'=>1, 'animative'=>0, 'name_id'=>NULL, 'dictionary'=>0]]; // жук
+        $text_result = $wordform->lemmatize();
+//print_r($text_result);
+        $this->assertEquals($expected, $text_result);
+    }
+
     // -----------------------------------------------------------------
     
 
