@@ -33,6 +33,7 @@ class Sentence extends Model
                 
         $wordforms = self::splitIntoWords($sentence->sentence);
         $total = sizeof($wordforms);
+        $count=0;
         if ($total>2) {
             foreach ($wordforms as $wordform_count => $wordform) {
                 if (mb_strlen($wordform)>45) {
@@ -46,10 +47,12 @@ class Sentence extends Model
                 }
                 
                 if ($worform_obj->lemma_total) {
-                    $wordform_obj->sentences()->attach($sentence->id,['word_number' => $wordform_count]);   
+                    $wordform_obj->sentences()->attach($sentence->id,['word_number' => $wordform_count]); 
+                    $count++;
+                    
                 }
             }
-            $sentence->wordform_total = $total;
+            $sentence->wordform_total = $count;
 
             $sentence->save();
         } else {
@@ -76,7 +79,7 @@ class Sentence extends Model
         // apostroph is needed in English only
 //        if (preg_match_all("/(([[:alpha:]]+['-])*[[:alpha:]]+'?)/u",$text,$regs, PREG_PATTERN_ORDER)) {
 //        if (preg_match_all("/(([[:alpha:]]+[-])*[[:alpha:]]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
-        if (preg_match_all("/(([А-Яа-я]+[-])*[А-Яа-я]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
+        if (preg_match_all("/(([А-Яа-яѢѣѲѳIiѴѵ]+[-])*[А-Яа-яѢѣѲѳIiѴѵ]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
             foreach ($regs[0] as $word) {
                if (mb_strlen($word)>1) { // skip one-letter words
                    $words[] = $word;
