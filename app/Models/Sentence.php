@@ -35,12 +35,19 @@ class Sentence extends Model
         $total = sizeof($wordforms);
         if ($total>2) {
             foreach ($wordforms as $wordform_count => $wordform) {
-                  if (mb_strlen($wordform)>45) {
+                if (mb_strlen($wordform)>45) {
                         $wordform = mb_substr($wordform,0,42).'...';
-                    }
-    //print "<p>$wordform</p>";            
+                }
+    //print "<p>$wordform</p>";    
+                // save the wordform even without a lemma, so as not to re-lemmatize
                 $wordform_obj = Wordform::firstOrCreate(['wordform' => $wordform]);
-                $wordform_obj->sentences()->attach($sentence->id,['word_number' => $wordform_count]);            
+                if ($worform_obj->lemma_total == null) {
+                    $wordform_obj->update_lemmas();
+                }
+                
+                if ($worform_obj->lemma_total) {
+                    $wordform_obj->sentences()->attach($sentence->id,['word_number' => $wordform_count]);   
+                }
             }
             $sentence->wordform_total = $total;
 
@@ -71,7 +78,7 @@ class Sentence extends Model
 //        if (preg_match_all("/(([[:alpha:]]+[-])*[[:alpha:]]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
         if (preg_match_all("/(([А-Яа-я]+[-])*[А-Яа-я]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
             foreach ($regs[0] as $word) {
-               if (mb_strlen($word)>1) {
+               if (mb_strlen($word)>1) { // skip one-letter words
                    $words[] = $word;
                } 
             }
