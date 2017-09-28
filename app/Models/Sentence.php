@@ -8,7 +8,7 @@ use Wcorpus\Models\Wordform;
 
 class Sentence extends Model
 {
-    protected $fillable = ['text_id','sentence'];
+    protected $fillable = ['text_id','sentence','lemma_found','lemma_id'];
     public $timestamps = false;
     
     // Sentence __belongs_to__ Text
@@ -28,6 +28,7 @@ class Sentence extends Model
      */
     public function breakIntoWords() {
         $sentence = $this;
+        $sentence -> wordforms()->detach();
         
         $sentence->wordform_total = 0;
                 
@@ -42,12 +43,23 @@ class Sentence extends Model
     //print "<p>$wordform</p>";    
                 // save the wordform even without a lemma, so as not to re-lemmatize
                 $wordform_obj = Wordform::firstOrCreate(['wordform' => $wordform]);
-                if ($worform_obj->lemma_total == null) {
+                if ($wordform_obj->lemma_total == null) {
                     $wordform_obj->update_lemmas();
                 }
                 
-                if ($worform_obj->lemma_total) {
-                    $wordform_obj->sentences()->attach($sentence->id,['word_number' => $wordform_count]); 
+                if ($wordform_obj->lemma_total) {
+                    if ($wordform_obj->lemma_total == 1) {
+                        $lemma_found = 1;
+                        $lemma_id = $wordform_obj-> lemmas() -> first() -> id;
+                    } else {
+                        $lemma_found = 
+                        $lemma_id = NULL;        
+                    }
+                    $wordform_obj->sentences()->attach($sentence->id,
+                            ['word_number' => $wordform_count,
+                             'lemma_found' => $lemma_found,
+                             'lemma_id' => $lemma_id  
+                            ]); 
                     $count++;
                     
                 }
@@ -56,7 +68,6 @@ class Sentence extends Model
 
             $sentence->save();
         } else {
-            $sentence->texts()->detach();
             $sentence->delete();
         }
     }

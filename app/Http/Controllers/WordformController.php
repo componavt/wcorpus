@@ -390,28 +390,33 @@ print "<p><b>".$wordform->wordform."</b> (".$wordform->id.")\n";
                 $is_exist_not_processed = 0;
             }
         }*/
-        
-        // stop when there is no wordforms with one lemmas not processed
+/*        
+        // stop when there is no wordforms with one lemmas not processed        
         $is_exist_word_not_processed = 1;
         while ($is_exist_word_not_processed) {
             $wordforms = Wordform::where('lemma_total',1)
+                    ->where('processed',0)
                     ->take(100)->get();
-        
+            
             if ($wordforms->count()) {
                 foreach ($wordforms as $wordform) {
     print $wordform->id;
-    print "<br>";
+    print ", ";
+                    $lemma_id = $wordform->lemmas()->first()->id;                    
+    print "$lemma_id<br>";
+    //exit(0);
                     $is_exist_sent_not_processed = 1;
                     while ($is_exist_sent_not_processed) {
                         $sentences = DB::table('sentence_wordform')
                                 ->select('sentence_id')
                                 ->where('wordform_id',$wordform->id)
-                                ->take(100)->get();
+                                ->whereNull('lemma_id')
+                                ->take(10000)->get();
                         
                         if ($sentences->count()) {
                             foreach($sentences as $sentence) {
                                 $query = "UPDATE sentence_wordform SET "
-                                       . "lemma_id=".$wordform->lemmas()->first()->id
+                                       . "lemma_id=".$lemma_id
                                        . ", lemma_found=1 WHERE "
                                        . "wordform_id=".(int)$wordform->id
                                        . " and sentence_id=".(int)$sentence->sentence_id;
@@ -420,6 +425,8 @@ print "<p><b>".$wordform->wordform."</b> (".$wordform->id.")\n";
                             }
                         } else {
                             $is_exist_sent_not_processed = 0;
+                            $wordform->processed = 1;
+                            $wordform->save();
                         }
                     }
                 }
@@ -428,6 +435,87 @@ print "<p><b>".$wordform->wordform."</b> (".$wordform->id.")\n";
                 $is_exist_word_not_processed = 0;
             }
         }
+*/  
+        // stop when there is no wordforms with one lemmas not processed        
+        $is_exist_word_not_processed = 1;
+        while ($is_exist_word_not_processed) {
+            $wordforms = Wordform::where('lemma_total',1)
+                    ->where('processed',0)
+                    ->take(100)->get();
+            
+            if ($wordforms->count()) {
+                foreach ($wordforms as $wordform) {
+    print $wordform->id;
+    print ", ";
+                    $lemma_id = $wordform->lemmas()->first()->id;                    
+    print "$lemma_id<br>";
+    //exit(0);
+                    $is_exist_sent_not_processed = 1;
+                    while ($is_exist_sent_not_processed) {
+                        $query = "UPDATE sentence_wordform SET "
+                               . "lemma_found=1, lemma_id=".$lemma_id
+                               . " WHERE wordform_id=".(int)$wordform->id
+                               . " and (lemma_found is null or lemma_id is null)";
+            //dd( "<P>$query");
+                        $res = DB::statement($query);
+                        $sentences_count = DB::table('sentence_wordform')
+                                   ->select('sentence_id')
+                                   ->where('wordform_id',$wordform->id)
+                                   ->whereNull('lemma_id')->count();
+                        if (!$sentences_count) {
+                            $wordform->processed = 1;
+                            $wordform->save();
+                            $is_exist_sent_not_processed = 0;
+                        }
+                    }
+                }
+            } else {
+                $is_exist_word_not_processed = 0;
+            }
+        }
+  
+ /*
+        $is_exist_word_not_processed = 1;
+        while ($is_exist_word_not_processed) {
+            $wordforms = mysql_query("select id from wordforms where lemma_total=1 and processed=0 LIMIT 0,100") 
+                    or die('error 1');
+        
+            if (mysql_num_rows($wordforms)) {
+                while($wordform = mysql_fetch_assoc($wordforms)) {
+    print $wordform['id'];
+    print "<br>";
+                    $lemma = mysql_fetch_assoc(mysql_query("select lemma_id as id from lemma_wordform"
+                            . " where wordform_id=".$wordform['id']));
+                    $is_exist_sent_not_processed = 1;
+                    while ($is_exist_sent_not_processed) {
+                        $sentences = mysql_query("select sentence_id as id from sentence_wordform"
+                                . " where wordform_id=".$wordform['id']
+                                . " and (lemma_found is null or lemma_id is null) LIMIT 0,100") 
+                                or die('error 2');
+                        
+                        if (mysql_num_rows($sentences)) {
+                            while($sentence = mysql_fetch_assoc($sentence)) {                                
+                                $query = "UPDATE sentence_wordform SET "
+                                       . "lemma_found=1, lemma_id=".$lemma['id']
+                                       . " WHERE wordform_id=".(int)$wordform['id']
+                                       . " and sentence_id=".(int)$sentence['id'];
+        //dd( "<P>$query");
+                                mysql_query($query) or die('error 3');
+                            }
+                        } else {
+                            $is_exist_sent_not_processed = 0;
+                            $query = "UPDATE wordforms SET processed=1"
+                                   . " WHERE id=".(int)$wordform['id'];
+                            mysql_query($query) or die('error 4');
+                        }
+                    }
+                }
+                //$is_exist_word_not_processed = 0;
+            } else {
+                $is_exist_word_not_processed = 0;
+            }
+        }
+ */       
     }
     
     /**
