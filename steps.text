@@ -134,3 +134,6 @@ FLUSH PRIVILEGES;
 php artisan make:migration change_table_sentence_wordform --table="sentence_wordform"
 php artisan make:migration add_lemma_id_into_sentence_wordform --table="sentence_wordform"
 php artisan make:migration add_indexes_into_sentence_wordform --table="sentence_wordform"
+
+29.09.17
+php artisan make:migration create_table_lemma_matrix --table="lemma_matrix"
