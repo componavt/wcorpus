@@ -45,6 +45,7 @@
                                 <li><a href="/lemma">List of lemmas</a></li>
                                 <li><a href="/lemma/count_wordforms">Recounting wordform links</a></li>
                                 <li><a href="/lemma/link_ruwikt">Link with Russian wiktionary entries</a></li>
+                                <li><a href="/lemma/create_lemma_matrix">Create lemma matrix</a></li>
                             </ul>
                         </li>
                         

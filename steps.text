@@ -137,3 +137,6 @@ php artisan make:migration add_indexes_into_sentence_wordform --table="sentence_
 
 29.09.17
 php artisan make:migration create_table_lemma_matrix --table="lemma_matrix"
+
+1.10.17
+alter table sentence_wordform add `processed` tinyint(1) DEFAULT '0';

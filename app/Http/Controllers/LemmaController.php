@@ -3,8 +3,10 @@
 namespace Wcorpus\Http\Controllers;
 
 use Illuminate\Http\Request;
+use DB;
 
 use Wcorpus\Models\Lemma;
+use Wcorpus\Models\LemmaMatrix;
 use Wcorpus\Wcorpus;
 use Wcorpus\Models\Piwidict\LangPOS;
 
@@ -235,6 +237,96 @@ print $lang_pos->id .", ";
                 $lemma->in_wiktionary = $in_wiktionary;
                 //$lemma->save();
             }            
+        }
+    }
+    
+    /**
+     * Go around each sentence, consider word forms in pairs, which have lemmas. 
+     * Record unique pairs in the database
+     * select distinct sentence_id  from sentence_wordform order by sentence_id limit 1;
+     * select * from sentence_wordform where sentence_id=46 order by word_number;
+     * select lemma_id from lemma_wordform where wordform_id=1;
+     * 
+     * select l1.lemma,l2.lemma, freq_12, freq_21 from lemmas as l1, lemmas as l2, lemma_matrix where lemma_matrix.lemma1=l1.id and lemma_matrix.lemma2=l2.id order by freq_21 desc limit 50;
+     */
+    public function createLemmaMatrix() {
+        $is_all_checked = false;
+        while (!$is_all_checked) {
+            $sentences = DB::table('sentence_wordform')
+                           ->select('sentence_id')
+                           ->where('processed',0)
+                           ->groupBy('sentence_id')
+                           ->orderBy('sentence_id')
+                           ->take(10)->get();
+            if ($sentences->count()) {
+                foreach($sentences as $sentence) {
+                    $wordforms = DB::table('sentence_wordform')
+                           ->where('sentence_id', $sentence->sentence_id)
+                           ->orderBy('word_number')
+                           ->get();
+    //print "<pre>";                
+    //print_r($wordforms);   
+                    if ($wordforms->count()>1) {
+                        for ($i=1; $i<$wordforms->count(); $i++) {
+                            $left_wordform_id = $wordforms[$i-1]->wordform_id;
+                            $right_wordform_id = $wordforms[$i]->wordform_id;
+    //print "<P>".$left_wordform_id.' - '.$right_wordform_id; 
+
+                            $left_lemmas = DB::table('lemma_wordform')
+                                   ->select('lemma_id')
+                                   ->where('wordform_id', $left_wordform_id)
+                                   ->orderBy('lemma_id')
+                                   ->get();
+
+                            $right_lemmas = DB::table('lemma_wordform')
+                                   ->select('lemma_id')
+                                   ->where('wordform_id', $right_wordform_id)
+                                   ->orderBy('lemma_id')
+                                   ->get();
+
+                            foreach ($left_lemmas as $left_lemma) {
+                                $left_lemma_id = $left_lemma->lemma_id;
+                                foreach ($right_lemmas as $right_lemma) {
+                                    $right_lemma_id = $right_lemma->lemma_id;
+                                    if ($left_lemma_id != $right_lemma_id) {
+                                        if ($left_lemma_id<$right_lemma_id) {
+                                            $count12=1;
+                                            $count21=0;
+                                            $lemma1 = $left_lemma_id;
+                                            $lemma2 = $right_lemma_id;
+                                        } else {
+                                            $count12=0;
+                                            $count21=1;
+                                            $lemma1 = $right_lemma_id;
+                                            $lemma2 = $left_lemma_id;
+                                        }
+      print "<P>$left_wordform_id - $right_wordform_id = $lemma1 - $lemma2 = $count12 - $count21"; 
+    /*                                    $pair = DB::table('lemma_matrix')
+                                               ->where('lemma1', $lemma1)
+                                               ->where('lemma2', $lemma2)
+                                               ->first();*/
+                                        $pair = LemmaMatrix::firstOrCreate([
+                                                'lemma1'=>$lemma1, 
+                                                'lemma2'=>$lemma2 
+                                            ]);
+                                        $pair->freq_12 += $count12;
+                                        $pair->freq_21 += $count21;
+                                        $pair->save();
+                                    }
+                                }                            
+                            }
+                        }
+                    }
+                    $query = "UPDATE sentence_wordform SET "
+                           . "processed=1 WHERE sentence_id=".$sentence->sentence_id;
+        //dd( "<P>$query");
+                    $res = DB::statement($query);
+
+                }
+            }
+            else {
+                $is_all_checked = true;
+            }
         }
     }
     
