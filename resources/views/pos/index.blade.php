@@ -16,7 +16,8 @@ List of parts of speech
             <tr>
                 <th>No</th>
                 <th>Name</th>
-                <th>AOT name</th>
+                <th><a href="http://aot.ru/docs/rusmorph.html">AOT name</a></th>
+                <th><a href="http://universaldependencies.org/u/pos/all.html">Universal POS tags</a></th>
                 <th style='text-align:center'>Number of lemmas</th>
                 @if (Auth::check())
                 <th></th>
@@ -28,6 +29,7 @@ List of parts of speech
                 <td>{{ $list_count++ }}</td>
                 <td>{{$pos->name}}</td>
                 <td>{{$pos->aot_name}}</td>
+                <td>{{$pos->universal}}</td>
                 <td style='text-align:center'>{{$pos->lemmas()->count()}}</td>
                 @if (Auth::check())
                 <td>
