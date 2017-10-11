@@ -37,6 +37,18 @@ List of texts
                  'value' =>$url_args['search_author'],
                  'attributes'=>['placeholder' => 'Author' ]])
                  
+        @include('widgets.form._formitem_text',
+                ['name' => 'search_sentence',
+                'value' => $url_args['search_sentence'],
+                'attributes'=>['size' => 15,
+                               'placeholder'=>'Sentence total']])
+                               
+        @include('widgets.form._formitem_radio',
+                ['name' => 'search_included',
+                'value' => $url_args['search_included'],
+                'values' => [1=>'yes',0=>'no'],
+                'title' => 'Is included in research?'])
+                               
         @include('widgets.form._formitem_btn_submit', ['title' => 'View'])
 
         show by
@@ -46,7 +58,7 @@ List of texts
                 'attributes'=>['size' => 5,
                                'placeholder' => 'Number of records' ]]) records
         {!! Form::close() !!}
-<?php print_r($url_args['search_author']); ?>
+<?php /*print_r($url_args['search_author']);*/ ?>
         <p>Founded records: {{$numAll}}</p>
         @if ($texts)
         <table class="table">

@@ -38,7 +38,7 @@ class Wcorpus
         }
         
         return $url; */
-        return http_build_query($url_args);
+        return "?".http_build_query($url_args);
     }
     
     /** Разбивает длинную строку без пробелов на равные отрезки, 

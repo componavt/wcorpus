@@ -140,3 +140,60 @@ php artisan make:migration create_table_lemma_matrix --table="lemma_matrix"
 
 1.10.17
 alter table sentence_wordform add `processed` tinyint(1) DEFAULT '0';
+
+4.10
+php artisan make:migration change_table_pos --table="pos"
+
+10.10
+php artisan make:migration change_table_texts --table="texts"
+
+select count(*) from texts where text like '%ѣ%' or text like '%ѳ%' or text like '%i%' or text like '%ѵ%'; 
+
+Statistics 
+Number of texts: 377 032 (из них 147 969 старорусских)
+
+Number of sentences: 6 750 377.
+The sentences with less than 3 words were deleted
+
+Number of wordforms (W): 1 780 306
+Number of wordforms without lemmas (Wo): 181 851
+Number of wordforms with predicted lemmas (Wp): 907 872
+W - Wo - Wp = 690 583
+
+Number of lemmas (L): 981 026
+Number of predicted lemmas (Lp): 865 051
+L - Lp = 115 975
+
+mysql> delete from lemma_matrix;
+Query OK, 9 178 078 rows affected (11 min 2.68 sec)
+mysql> delete from lemma_wordform;
+Query OK, 1 911 959 rows affected (2 min 12.21 sec)
+mysql> delete from lemmas;
+Query OK, 981 026 rows affected (1 min 19.46 sec)
+mysql> delete from sentence_wordform;
+Query OK, 85 674 365 rows affected (2 hours 14 min 13.88 sec)
+mysql> delete from wordforms;
+Query OK, 1 780 306 rows affected (2 min 24.95 sec)
+mysql> delete from sentences;
+Query OK, 6 750 377 rows affected (10 min 40.32 sec)
+
+alter table lemma_matrix AUTO_INCREMENT = 1;
+alter table lemma_wordform AUTO_INCREMENT = 1;
+alter table lemmas AUTO_INCREMENT = 1;
+alter table sentence_wordform AUTO_INCREMENT = 1;
+alter table wordforms AUTO_INCREMENT = 1;
+alter table sentences AUTO_INCREMENT = 1;
+UPDATE texts SET sentence_total=NULL;
+
+php artisan make:migration add_char_total_to_table_texts --table="texts"
+php artisan make:migration add_included_to_table_texts --table="texts"
+
+update texts set included=0 where old_letter_total>0;
+Query OK, 12566 rows affected (6.14 sec)
+update texts set included=0 where included=1 and text is null;
+Query OK, 75752 rows affected (0.33 sec)
+
+update texts set sentence_total=null where included=1;
+Query OK, 288689 rows affected (17.42 sec)
+
+

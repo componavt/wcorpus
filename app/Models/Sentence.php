@@ -68,6 +68,9 @@ class Sentence extends Model
 
             $sentence->save();
         } else {
+            $text = Text::find($sentence->text_id);
+            $text->sentence_total -=1;
+            $text->save();
             $sentence->delete();
         }
     }
@@ -90,7 +93,8 @@ class Sentence extends Model
         // apostroph is needed in English only
 //        if (preg_match_all("/(([[:alpha:]]+['-])*[[:alpha:]]+'?)/u",$text,$regs, PREG_PATTERN_ORDER)) {
 //        if (preg_match_all("/(([[:alpha:]]+[-])*[[:alpha:]]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
-        if (preg_match_all("/(([А-Яа-яѢѣѲѳIiѴѵ]+[-])*[А-Яа-яѢѣѲѳIiѴѵ]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
+//        if (preg_match_all("/(([А-Яа-яѢѣѲѳIiѴѵ]+[-])*[А-Яа-яѢѣѲѳIiѴѵ]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
+        if (preg_match_all("/(([А-Яа-я]+[-])*[А-Яа-я]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
             foreach ($regs[0] as $word) {
                if (mb_strlen($word)>1) { // skip one-letter words
                    $words[] = $word;

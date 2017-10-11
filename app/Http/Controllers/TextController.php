@@ -40,8 +40,11 @@ class TextController extends Controller
                     'search_title'  => $request->input('search_title'),
                     'search_wikitext'  => $request->input('search_wikitext'),
                     'search_author'  => (array)$request->input('search_author'),
+                    'search_sentence'  => $request->input('search_sentence'),
+                    'search_included'  => $request->input('search_included'),
 //                    'search_id'       => (int)$request->input('search_id'),
                 ];
+       
         
         if (!$this->url_args['page']) {
             $this->url_args['page'] = 1;
@@ -88,6 +91,14 @@ class TextController extends Controller
             $texts = $texts->whereIn('author_id',$this->url_args['search_author']);
         } 
         
+        if ($this->url_args['search_sentence']<>'') {
+            $texts = $texts->where('sentence_total', (int)$this->url_args['search_sentence']);
+        } 
+
+        if ($this->url_args['search_included']<>'') {
+            $texts = $texts->where('included', (int)$this->url_args['search_included']);
+        } 
+
         $numAll = $texts->get()->count();
 
         $texts = $texts
@@ -138,7 +149,7 @@ class TextController extends Controller
     public function show($id)
     {
         $text = Text::find($id);
-       
+        
         if (!$text) {
             return Redirect::to('/text/')
                            ->withErrors('The text with ID='. $id .' is not found');            
@@ -290,8 +301,9 @@ class TextController extends Controller
         while ($is_exist_not_broken_text) {
             $texts=Text::
                     whereNull('sentence_total')
-                    ->whereNotIn('id',[21530,402631,125263,125413])
-                    ->orderBy('title')
+                    ->whereNotIn('id',[402631,125263,125413])
+                    ->where('included',1)
+//                    ->orderBy('title')
                     ->take(100)
                     ->get();
 //dd($texts);            
@@ -462,4 +474,139 @@ print sizeof($texts);
         }
     }
     
+    /**
+     * Count in text with ID number of old letters ѢѣѲѳIiѴѵ
+     * and fill in the field old_letter_total
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function countOldLetters($id)
+    {
+        $text=Text::find($id);                
+        if ($text->text) {
+            $letters = 'ѢѣѲѳѴѵ'; 
+            $letter_arr = preg_split('//u',$letters, null, PREG_SPLIT_NO_EMPTY);
+            $count = 0;
+//            print $text->text;
+//            print "<hr>";
+            
+            foreach ($letter_arr as $letter) {
+                print "<p>$letter = ".mb_substr_count($text->text, $letter);
+                $count += mb_substr_count($text->text, $letter);
+            }
+            
+            print "<p>Total: $count";
+            $text->old_letter_total = $count;
+            $text->save();
+        }
+    }
+    
+    /**
+     * Count in all texts with old_letter_total=NULL number of old letters ѢѣѲѳIiѴѵ
+     * and fill in the field old_letter_total
+     * 
+     * select count(*) from texts where old_letter_total is null;
+     * 
+     * select old_letter_total, sentence_total, count(*) from texts where old_letter_total>0 group by old_letter_total, sentence_total order by old_letter_total, sentence_total limit 50;
+     * select old_letter_total, count(*) from texts where sentence_total>0 and old_letter_total is not null group by old_letter_total;
+     * 
+     * update texts set old_letter_total=null,old_to_letters=null;
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function countOldLettersInAllTexts()
+    {
+        $is_exist_not_counted_texts = 1;
+        $letters = 'ѢѣѲѳѴѵ'; 
+        $letter_arr = preg_split('//u',$letters, null, PREG_SPLIT_NO_EMPTY);
+
+        
+        while ($is_exist_not_counted_texts) {
+            $texts=Text::whereNull('old_letter_total')
+                       ->select(DB::raw('id, old_letter_total, char_length(text) as length, text'))
+//                       ->whereNotNull('text')
+                       ->take(100)->get(); 
+            if ($texts->count()) {
+                foreach ($texts as $text) {
+                    $count = 0;
+                    if ($text->text) {
+                        foreach ($letter_arr as $letter) {
+                            $count += mb_substr_count($text->text, $letter);
+                        }
+                        $old_to_letters = $count/ $text->length;
+                    } else {
+                        $old_to_letters = 0;                        
+                    }
+                    print "<p>".$text->id."= $count, $old_to_letters</a>";
+                    $text->old_letter_total = $count;
+                    $text->old_to_letters = $old_to_letters;
+                    $text->save();
+                }
+            } else {
+                $is_exist_not_counted_texts = 0;                
+            }
+        }
+    }
+    
+    /**
+     * Calculate in all texts with old_to_letters=NULL relation number of old letters to all letters
+     * and fill in the field old_to_letters
+     * 
+     * select count(*) from texts where old_to_letters is null;
+     * 
+     * select round(old_to_letters,2) as old,count(*) from texts group by old order by old;
+
+     * @return \Illuminate\Http\Response
+     */
+    public function calculateOldToLetters()
+    {
+        $is_exist_not_counted_texts = 1;
+        
+        while ($is_exist_not_counted_texts) {
+            $texts=Text::whereNull('old_to_letters')
+                       ->select(DB::raw('id, old_letter_total, char_length(text) as length'))
+                       ->take(100)->get(); 
+            if ($texts->count()) {
+                foreach ($texts as $text) {
+                    $count = 0;
+                    if ($text->length>0) {
+                        $count = $text->old_letter_total / $text->length;
+                    }
+                    print "<p>".$text->id."= $count</a>";
+                    $text->old_to_letters = $count;
+                    $text->save();
+                }
+                //$is_exist_not_counted_texts = 0;                
+            } else {
+                $is_exist_not_counted_texts = 0;                
+            }
+        }
+    }
+    
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @param  int  $included (0 or 1)
+     * @return \Illuminate\Http\Response
+     */
+    public function changeIncluded(Request $request, $id, $included)
+    {
+        $text= Text::findOrFail($id);
+        
+        if ($included != '' && $included>0) {
+            $included = 1;
+        } else {
+            $included = 0;
+        }
+        
+        $text->included = $included;
+        $text->save();
+        
+        return Redirect::to('/text/'.($text->id).($this->args_by_get))
+                       ->withSuccess('Text is '.($included ? 'in' : 'ex').'cluded');
+    }
+
 }

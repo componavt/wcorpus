@@ -40,6 +40,12 @@ Route::get('/text/sentences_to_file','TextController@sentencesToFile');
 Route::get('/text/{id}/break_into_sentences','TextController@breakText');
 Route::get('/text/break_texts','TextController@breakAllTexts');
 
+Route::get('/text/calculateOldToLetters', 'TextController@calculateOldToLetters');
+Route::get('/text/{id}/countOldLetters', 'TextController@countOldLetters');
+Route::get('/text/countOldLetters', 'TextController@countOldLettersInAllTexts');
+
+Route::get('/text/{id}/include-exclude/{included}','TextController@ChangeIncluded');
+
 Route::get('/text/title_list', 'TextController@titlesList');
 
 Route::get('/wordform/{id}/lemmatize','WordformController@lemmatize');

@@ -10,12 +10,24 @@ Texts
 
 @section('panel-body')
 
-        <h2>{{$text->title}}</h2>
+        <h2>
+            @if (!$text->included) 
+                <s>
+            @endif        
+            {{$text->title}}
+            @if (!$text->included) 
+                </s> (Text is excluded from research)
+            @endif        
+        </h2>
         
         <p>
-            <a href="/text/{{$text->id}}/edit">Edit</a>&nbsp;&nbsp;|&nbsp;
-            <a href="/text/{{$text->id}}/parseWikitext">Re-parse wikitext</a>&nbsp;&nbsp;|&nbsp;
-            <a href="/text/{{$text->id}}/break_into_sentences">Break the text into sentences</a>            
+            <a href="/text{{$args_by_get}}">Back to the text list</a>&nbsp;&nbsp;|&nbsp;
+            <a href="/text/{{$text->id}}/include-exclude/{{$text->included ? 0 : 1}}?{{$args_by_get}}">
+                {{$text->included ? 'Exclude from' : 'Include to'}} the research
+                </a>&nbsp;&nbsp;|&nbsp;
+            <a href="/text/{{$text->id}}/edit{{$args_by_get}}">Edit</a>&nbsp;&nbsp;|&nbsp;
+            <a href="/text/{{$text->id}}/parseWikitext{{$args_by_get}}">Re-parse wikitext</a>&nbsp;&nbsp;|&nbsp;
+            <a href="/text/{{$text->id}}/break_into_sentences{{$args_by_get}}">Break the text into sentences</a>            
         </p>
         
         <p>

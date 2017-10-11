@@ -248,6 +248,7 @@ print $lang_pos->id .", ";
      * select lemma_id from lemma_wordform where wordform_id=1;
      * 
      * select l1.lemma,l2.lemma, freq_12, freq_21 from lemmas as l1, lemmas as l2, lemma_matrix where lemma_matrix.lemma1=l1.id and lemma_matrix.lemma2=l2.id order by freq_21 desc limit 50;
+     * select l1.lemma, l2.lemma, p1.aot_name, p2.aot_name, freq_12, freq_21 from lemmas as l1, lemmas as l2, lemma_matrix, pos as p1, pos as p2 where lemma_matrix.lemma1=l1.id and lemma_matrix.lemma2=l2.id and l1.pos_id=p1.id and l2.pos_id=p2.id and freq_21=10 order by freq_21 desc limit 50;
      */
     public function createLemmaMatrix() {
         $is_all_checked = false;
@@ -260,6 +261,7 @@ print $lang_pos->id .", ";
                            ->take(10)->get();
             if ($sentences->count()) {
                 foreach($sentences as $sentence) {
+//print "<p>".$sentence->sentence_id;                    
                     $wordforms = DB::table('sentence_wordform')
                            ->where('sentence_id', $sentence->sentence_id)
                            ->orderBy('word_number')
@@ -301,10 +303,6 @@ print $lang_pos->id .", ";
                                             $lemma2 = $left_lemma_id;
                                         }
       print "<P>$left_wordform_id - $right_wordform_id = $lemma1 - $lemma2 = $count12 - $count21"; 
-    /*                                    $pair = DB::table('lemma_matrix')
-                                               ->where('lemma1', $lemma1)
-                                               ->where('lemma2', $lemma2)
-                                               ->first();*/
                                         $pair = LemmaMatrix::firstOrCreate([
                                                 'lemma1'=>$lemma1, 
                                                 'lemma2'=>$lemma2 

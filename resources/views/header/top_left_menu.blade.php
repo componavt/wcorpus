@@ -8,6 +8,7 @@
                                 <li><a href="/text">List of texts</a></li>
                                 <li><a href="/text/extractFromWikiSource">Extraction texts from wikisource</a></li>
                                 <li><a href="/text/parseAllWikitext">Parse wikitext</a></li>
+                                <li><a href="/text/countOldLetters">Count old letters in a text</a></li>
                                 <li><a href="/text/break_texts">Break texts into sentences</a></li>
                             </ul>
                         </li>

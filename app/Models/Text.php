@@ -80,8 +80,9 @@ print "<p>".$text->id;
         foreach($paragraphs as $par) {
             $sentences = Text::splitIntoSentences($par);
             foreach ($sentences as $sen) {                
-                // if any words exists in this sentence
-                if (preg_match("/(([[:alpha:]]+[-])*[[:alpha:]]+?)/u",$sen)) { 
+                // if any words (with 2 and more letters) exists in this sentence
+//                if (preg_match("/(([[:alpha:]]+[-])*[[:alpha:]]+?)/u",$sen)) { 
+                if (preg_match("/[А-Яа-я]{2,}/u",$sen)) { 
                 
 /*
  * id=26189
