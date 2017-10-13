@@ -31,6 +31,19 @@ class Text extends Model
         return $this->hasMany(Sentence::class);
     }
 
+    /** delete all linked Sentences
+     */
+    public function deleteSentences() {
+        if ($this->sentences()) {
+            foreach ($this->sentences as $sentence) {
+                $sentence->deleteWordforms();
+                $sentence->delete();
+            }
+        }
+        $this->sentence_total = 0;
+        $this->save();
+    }
+
     /** Get $text->wikitext and look for title, creation_date, text
      * fill properties and save object
      * 

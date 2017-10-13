@@ -259,7 +259,7 @@ class TextController extends Controller
                     ->orderBy('title')
                     ->take(100)
                     ->get();
-            //$is_exist_not_parse_text = 0;     // когда оттестится, убрать           
+            $is_exist_not_parse_text = 0;     // когда оттестится, убрать           
 //dd($texts);            
             if ($texts->count()) {
                 foreach ($texts as $text) {
@@ -339,11 +339,10 @@ print "<p>".$text->id."</p>\n";
                 ->where('page_namespace',0)
 //                ->orderBy('old_id')
                 ->get(); */
-        
         $is_exist_new_pages = 1;
-        $portion = 100;
+        $portion = 1;
         $incorrect_texts = [39563,291621];
-        $without_ids = join(',',$incorrect_texts);
+//        $without_ids = join(',',$incorrect_texts);
         
         while ($is_exist_new_pages) {
             $latest_text = Text::orderBy('id','desc')->first();
@@ -360,12 +359,13 @@ print "<p>".$text->id."</p>\n";
                     ->table('page')
                     ->where('page_namespace',0)
                     ->where('page_is_redirect',0)
-                    ->whereNotIn('page_id',$without_ids)
+                    ->whereNotIn('page_id',$incorrect_texts)
                     ->where('page_id','>',$from_id)
                     ->select(DB::raw('page_id,page_latest, page_title'))
                     ->orderBy('page_id')
                     ->take($portion)
                     ->get();
+//dd($pages);            
             if (!sizeof($pages)) {
                 $is_exist_new_pages = 0;                
             }
@@ -376,15 +376,16 @@ print "<p>".$text->id."</p>\n";
                         ->where('old_id', $page->page_latest)
                         ->where('old_text', 'not like', '#перенаправление%')
                         ->first();
-
-                DB::connection('mysql')->table('texts')->insert([
-                        'id' => $page->page_id,
-                        'page_latest' => $page->page_latest,
-                        'title' => $page->page_title,
-                        'wikitext' => $text->old_text,
-                        'text' => null
-                    ]
-                );
+                if ($text) {
+                    DB::connection('mysql')->table('texts')->insert([
+                            'id' => $page->page_id,
+                            'page_latest' => $page->page_latest,
+                            'title' => $page->page_title,
+                            'wikitext' => $text->old_text,
+                            'text' => null
+                        ]
+                    );
+                }
 
             }
 //print $pages->count();   
@@ -604,6 +605,10 @@ print sizeof($texts);
         
         $text->included = $included;
         $text->save();
+        
+        if ($included==0) {
+            $text->deleteSentences();
+        }
         
         return Redirect::to('/text/'.($text->id).($this->args_by_get))
                        ->withSuccess('Text is '.($included ? 'in' : 'ex').'cluded');

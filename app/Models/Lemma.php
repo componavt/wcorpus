@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Wcorpus\Wcorpus;
 use Wcorpus\Models\Piwidict\LangPOS;
+//use Wcorpus\Models\LemmaMatrix;
 
 class Lemma extends Model
 {
@@ -48,6 +49,12 @@ class Lemma extends Model
         $builder = $this->belongsToMany(LangPOS::class,'wcorpus.lang_pos_lemma','lemma_id','lang_pos_id');
 //        $builder = $builder -> orderBy('lemma');
         return $builder;
+    }
+    
+    /** delete all records from lemma_matrix where lemma1 or lemma2 is $this->id
+     */
+    public function deleteFromMatrix() {
+        DB::statement('DELETE FROM lemma_matrix WHERE lemma1='.$this->id.' OR lemma2='.$this->id);
     }
     
     public static function lemmatize($word)

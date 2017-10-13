@@ -23,56 +23,111 @@ class Sentence extends Model
         return $builder;
     }
 
+    /** delete all linked Wordforms
+     */
+    public function deleteWordforms() {
+        if ($this->wordforms()->count()) {
+            foreach ($this->wordforms as $wordform) {
+                $this->wordforms()->detach($wordform->id);
+                if (!$wordform->sentences()->wherePivot('sentence_id','<>',$this->id)->count()) { // this wordform links with only this sentence
+                    $wordform->deleteLemmas();
+                    $wordform->delete();
+                }
+            }
+        }
+        $this->wordform_total = 0;
+        $this->save();
+    }
+
     /** Get $sentence->sentence and break it into words,
      * and write words into wordforms table
      */
     public function breakIntoWords() {
-        $sentence = $this;
-        $sentence -> wordforms()->detach();
+        $this -> wordforms()->detach();
         
-        $sentence->wordform_total = 0;
-                
         $wordforms = self::splitIntoWords($sentence->sentence);
-        $total = sizeof($wordforms);
-        $count=0;
-        if ($total>2) {
-            foreach ($wordforms as $wordform_count => $wordform) {
-                if (mb_strlen($wordform)>45) {
-                        $wordform = mb_substr($wordform,0,42).'...';
-                }
-    //print "<p>$wordform</p>";    
-                // save the wordform even without a lemma, so as not to re-lemmatize
-                $wordform_obj = Wordform::firstOrCreate(['wordform' => $wordform]);
-                if ($wordform_obj->lemma_total == null) {
-                    $wordform_obj->update_lemmas();
-                }
-                
-                if ($wordform_obj->lemma_total) {
-                    if ($wordform_obj->lemma_total == 1) {
-                        $lemma_found = 1;
-                        $lemma_id = $wordform_obj-> lemmas() -> first() -> id;
-                    } else {
-                        $lemma_found = 
-                        $lemma_id = NULL;        
-                    }
-                    $wordform_obj->sentences()->attach($sentence->id,
-                            ['word_number' => $wordform_count,
-                             'lemma_found' => $lemma_found,
-                             'lemma_id' => $lemma_id  
-                            ]); 
-                    $count++;
-                    
-                }
-            }
-            $sentence->wordform_total = $count;
-
-            $sentence->save();
+        if (sizeof($wordforms)>2) {
+            $this->processWordforms($wordforms);            
         } else {
-            $text = Text::find($sentence->text_id);
-            $text->sentence_total -=1;
-            $text->save();
-            $sentence->delete();
+            $this->deleteFromText();
         }
+    }
+
+    /** 
+     */
+    public function processWordforms($wordforms) {
+        $count=0;
+        $matrix = [];
+        foreach ($wordforms as $wordform_count => $wordform) {
+            if (mb_strlen($wordform)>45) {
+                    $wordform = mb_substr($wordform,0,42).'...';
+            }
+            // save the wordform even without a lemma, so as not to re-lemmatize (чтобы повторно не лемматизировать, когда снова встетится та же словоформа)
+            $wordform_obj = Wordform::firstOrCreate(['wordform' => $wordform]);
+            $wordform_obj -> linkWithSentence($sentence->id,$wordform_count); 
+            $lemmas = $wordform_obj -> getLemmaIDs();
+            if ($lemmas) {
+                $matrix[] = ['word_count'=>$wordform_count, 
+                             'wordform_id'=>$wordform_id, 
+                             'lemmas'=>$lemmas];
+            }
+            $count++;
+        }
+        $this->addToLemmaMatrix($matrix);
+        $this->processed=1;
+        $this->wordform_total = $count;
+        $this->save();
+    }
+
+    /** 
+     * @param Array $wordforms such as [ ['word_count'=>0, 'wordform_id'=>1, 'lemmas'=>[1,2],
+     *                                ['word_count'=>2, 'wordform_id'=>5, 'lemmas'=>[3], ...   ]
+     */
+    public function addToLemmaMatrix($wordforms) {
+        if (!sizeof($wordforms)) {
+            return;
+        }
+        
+        for ($i=1; $i<$wordforms->count(); $i++) {
+            $left_lemmas = $wordforms[$i-1]['lemmas'];
+            $right_lemmas = $wordforms[$i]['lemmas'];
+
+            foreach ($left_lemmas as $left_lemma_id) {
+                foreach ($right_lemmas as $right_lemma_id) {
+                    if ($left_lemma_id != $right_lemma_id) {
+                        if ($left_lemma_id<$right_lemma_id) {
+                            $count12=1;
+                            $count21=0;
+                            $lemma1 = $left_lemma_id;
+                            $lemma2 = $right_lemma_id;
+                        } else {
+                            $count12=0;
+                            $count21=1;
+                            $lemma1 = $right_lemma_id;
+                            $lemma2 = $left_lemma_id;
+                        }
+print "<P>$left_wordform_id - $right_wordform_id = $lemma1 - $lemma2 = $count12 - $count21"; 
+                        $pair = LemmaMatrix::firstOrCreate([
+                                'lemma1'=>$lemma1, 
+                                'lemma2'=>$lemma2 
+                            ]);
+                        $pair->freq_12 += $count12;
+                        $pair->freq_21 += $count21;
+                        $pair->save();
+                    }
+                }                            
+            }
+        }
+        
+    }
+
+    /** Уменьшить на 1 счетчик предложений у текста и удалить предложение совсем
+     */
+    public function deleteFromText() {
+        $text = Text::find($this->text_id);
+        $text->sentence_total -=1;
+        $text->save();
+        $this->delete();
     }
         
     /**

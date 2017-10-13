@@ -196,4 +196,7 @@ Query OK, 75752 rows affected (0.33 sec)
 update texts set sentence_total=null where included=1;
 Query OK, 288689 rows affected (17.42 sec)
 
+php artisan make:migration add_foreign_keys_to_table_sentence_wordform --table="sentence_wordform"
+php artisan make:migration add_foreign_keys_to_table_lemma_wordform --table="lemma_wordform"
+
 

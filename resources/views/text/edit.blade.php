@@ -22,6 +22,11 @@ Text edition
                  'value' => str_replace("{","\{",$text->wikitext)
                 ])
 
+        @include('widgets.form._formitem_textarea', 
+                ['name' => 'text', 
+                 'title'=> 'Parsed text',
+                ])
+
         @include('widgets.form._formitem_btn_submit', ['title' => 'save'])
         {!! Form::close() !!}
 @stop
