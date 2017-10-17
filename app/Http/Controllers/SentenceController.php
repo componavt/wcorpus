@@ -171,10 +171,8 @@ class SentenceController extends Controller
     public function breakSentence($id)
     {
         $sentence=Sentence::find($id);                
-
-        if ($sentence->wordforms()->count()) {
-            $sentence->wordforms()->detach();
-        }
+        
+        $sentence->deleteWordforms();
         
         $sentence->breakIntoWords();
     }

@@ -34,14 +34,15 @@ class Text extends Model
     /** delete all linked Sentences
      */
     public function deleteSentences() {
+        $this->sentence_total = NULL;
+        $this->save();
+        
         if ($this->sentences()) {
             foreach ($this->sentences as $sentence) {
                 $sentence->deleteWordforms();
                 $sentence->delete();
             }
         }
-        $this->sentence_total = 0;
-        $this->save();
     }
 
     /** Get $text->wikitext and look for title, creation_date, text

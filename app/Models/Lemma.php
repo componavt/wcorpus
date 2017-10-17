@@ -3,6 +3,7 @@
 namespace Wcorpus\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use DB;
 
 use Wcorpus\Wcorpus;
 use Wcorpus\Models\Piwidict\LangPOS;
@@ -73,4 +74,14 @@ class Lemma extends Model
         return $lemma;
     }
     
+    /**
+     * check if this lemma has one of the basic parts of speech 
+     * (noun, adjective, verb, adverb)
+     * @return Boolean true -  if the part of speech of this lemma is basic
+     */
+    public function hasBasicPOS() {
+        $basic_POS = [1,2,8,9];
+        
+        return in_array($this->pos_id, $basic_POS);
+    }
 }

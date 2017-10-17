@@ -33,6 +33,7 @@ class LemmaController extends Controller
                     'page'            => (int)$request->input('page'),
                     'search_wordform'  => (int)$request->input('search_sentence'),
                     'search_lemma'  => $request->input('search_wordform'),
+                    'order_by'      => $request->input('order_by'),
                 ];
         
         if (!$this->url_args['page']) {
@@ -59,10 +60,17 @@ class LemmaController extends Controller
      */
     public function index()
     {
+        if (!$this->url_args['order_by']) {
+            $this->url_args['order_by'] = 'lemma';
+            $direction ='asc';
+        }
+        
+        if ($this->url_args['order_by'] == 'freq') {
+            $direction ='desc';
+        }
+        
         $lemmas = Lemma::
-                select('id')->
-                orderBy('lemma');
-                //->orderBy('id');
+                orderBy($this->url_args['order_by'], $direction);
 
         if ($this->url_args['search_wordform']) {
             $wordform_id = $this->url_args['search_wordform'];
@@ -132,8 +140,8 @@ class LemmaController extends Controller
         }
         
         $grams = [];
-        if ($lemma->animative_name) {
-            $grams[]= $lemma->animative_name;
+        if ($lemma->animative_name()) {
+            $grams[]= $lemma->animative_name();
         }
         if ($lemma->named) {
             $grams[]= $lemma->named->name;
@@ -198,6 +206,35 @@ class LemmaController extends Controller
                 $wordform_count = $lemma->wordforms()->count();
 print " = $wordform_count";
                 $lemma->wordform_total = $wordform_count;
+                $lemma->save();
+            }            
+        }
+    }
+    
+    /**
+     * Count frequency of occurrence of each lemma in the texts under study
+     * fill in freq
+     */
+    public function countFrequency() {
+        $is_all_checked = false;
+        while (!$is_all_checked) {
+            $lemmas = Lemma::whereNull('freq')
+                    ->take(1)
+                    ->get();
+            if (!sizeof($lemmas)) {
+                $is_all_checked = true;
+                continue;
+            }
+
+            foreach ($lemmas as $lemma) {
+    print "<p>".$lemma->lemma;  
+                $query = "SELECT count(*) as count FROM sentence_wordform where "
+                       . "wordform_id in (select wordform_id from lemma_wordform "
+                                       . "where lemma_id=".$lemma->id.")";
+                $results = DB::select( DB::raw($query) );
+                $freq = $results[0]->count;
+print " = $freq";
+                $lemma->freq = $freq;
                 $lemma->save();
             }            
         }

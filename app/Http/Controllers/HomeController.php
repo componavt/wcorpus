@@ -36,6 +36,9 @@ class HomeController extends Controller
         $results = DB::select( DB::raw("SELECT count(*) as count FROM texts") );
         $stats['text_total'] = number_format($results[0]->count, 0, '.', ' ');
 
+        $results = DB::select( DB::raw("SELECT count(*) as count FROM texts WHERE included=1") );
+        $stats['text_included'] = number_format($results[0]->count, 0, '.', ' ');
+
         $results = DB::select( DB::raw("SELECT count(*) as count FROM sentences") );
         $stats['sentence_total'] = number_format($results[0]->count, 0, '.', ' ');
 
@@ -66,7 +69,16 @@ class HomeController extends Controller
 
         $stats['lemma_clear_total'] = number_format($lemma_total - $lemma_predicted_total, 0, '.', ' ');
         
+        $table_names = DB::select(DB::raw("SHOW TABLES"));
+        $tables = [];
+        foreach($table_names as $table_name) {
+            $tname = $table_name->Tables_in_wcorpus;
+            $counts = DB::select( DB::raw("SELECT count(*) as count FROM ".$tname) );
+            $tables[$tname] = number_format($counts[0]->count, 0, '.', ' ');            
+        }
+
         return view('stats')->
-                with(['stats'=>$stats]); //->with(['text'=>$page->page_content_model])
+                with(['stats'=>$stats,
+                      'tables' =>$tables]); 
     }
 }

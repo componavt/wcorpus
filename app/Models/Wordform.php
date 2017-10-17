@@ -21,17 +21,18 @@ class Wordform extends Model
     /** delete all linked Lemmas
      */
     public function deleteLemmas() {
+        $this->lemma_total = NULL;
+        $this->save();
+        
         if ($this->lemmas()->count()) {
             foreach ($this->lemmas as $lemma) {
                 $this->lemmas()->detach($lemma->id);
-                if (!$lemma->wordform()->wherePivot('wordform_id','<>',$this->id)->count()) { // this lemma links with only this wordform
+                if (!$lemma->wordforms()->wherePivot('wordform_id','<>',$this->id)->count()) { // this lemma links with only this wordform
                     $lemma->deleteFromMatrix();
                     $lemma->delete();
                 }
             }
         }
-        $this->lemma_total = 0;
-        $this->save();
     }
 
     // Wordforms __has_many__ Sentences
@@ -55,7 +56,7 @@ class Wordform extends Model
 
         if ($this->lemma_total > 0) { // создаем связи с предложениями
             // словоформы без лемм с предложениями не связываются
-            if ($this->lemma_total == 1) {
+            if ($this->lemma_total == 1) { // && $this-> lemmas() && $this-> lemmas() -> first()
                 $lemma_found = 1;
                 $lemma_id = $this-> lemmas() -> first() -> id;
             } else {
@@ -72,12 +73,16 @@ class Wordform extends Model
     }
     
     /**
+     * @param $only_with_basic_POS - only basic parts of speech is included 
+     *                              (noun, adjective, verb, adverb) 
      * @return Array - lemmas ID
      */
-    public function getLemmaIDs(){
+    public function getLemmaIDs($only_with_basic_POS=1){
         $lemmas =[];
-        foreach($this->lemmas as $lemma) {
-            $lemmas[] = $lemma->id;
+        foreach ($this->lemmas as $lemma) {
+            if (!$only_with_basic_POS || $lemma -> hasBasicPOS()) {
+                $lemmas[] = $lemma->id;
+            }
         }
         return $lemmas;
     }
@@ -149,6 +154,8 @@ class Wordform extends Model
     {
         if ($this->lemmas()->count()) {
             $this->lemmas()->detach();
+            $this->lemma_total = 0;
+            $this->save();
         }
         
         $lemmas = $this->lemmatize();

@@ -26,17 +26,19 @@ class Sentence extends Model
     /** delete all linked Wordforms
      */
     public function deleteWordforms() {
+        $this->wordform_total = NULL;
+        $this->save();
+        
         if ($this->wordforms()->count()) {
             foreach ($this->wordforms as $wordform) {
                 $this->wordforms()->detach($wordform->id);
+                
                 if (!$wordform->sentences()->wherePivot('sentence_id','<>',$this->id)->count()) { // this wordform links with only this sentence
                     $wordform->deleteLemmas();
                     $wordform->delete();
-                }
+                } 
             }
         }
-        $this->wordform_total = 0;
-        $this->save();
     }
 
     /** Get $sentence->sentence and break it into words,
@@ -45,7 +47,7 @@ class Sentence extends Model
     public function breakIntoWords() {
         $this -> wordforms()->detach();
         
-        $wordforms = self::splitIntoWords($sentence->sentence);
+        $wordforms = self::splitIntoWords($this->sentence);
         if (sizeof($wordforms)>2) {
             $this->processWordforms($wordforms);            
         } else {
@@ -57,6 +59,7 @@ class Sentence extends Model
      */
     public function processWordforms($wordforms) {
         $count=0;
+        $only_with_basic_POS=1;
         $matrix = [];
         foreach ($wordforms as $wordform_count => $wordform) {
             if (mb_strlen($wordform)>45) {
@@ -64,22 +67,23 @@ class Sentence extends Model
             }
             // save the wordform even without a lemma, so as not to re-lemmatize (чтобы повторно не лемматизировать, когда снова встетится та же словоформа)
             $wordform_obj = Wordform::firstOrCreate(['wordform' => $wordform]);
-            $wordform_obj -> linkWithSentence($sentence->id,$wordform_count); 
-            $lemmas = $wordform_obj -> getLemmaIDs();
+            $wordform_obj -> linkWithSentence($this->id,$wordform_count); 
+            $lemmas = $wordform_obj -> getLemmaIDs($only_with_basic_POS);
             if ($lemmas) {
                 $matrix[] = ['word_count'=>$wordform_count, 
-                             'wordform_id'=>$wordform_id, 
+                             'wordform_id'=>$wordform_obj->id, 
                              'lemmas'=>$lemmas];
             }
             $count++;
         }
         $this->addToLemmaMatrix($matrix);
-        $this->processed=1;
         $this->wordform_total = $count;
         $this->save();
     }
 
     /** 
+     * creating lemma matrix from array $wordforms
+     * with restriction: the distance between words is not more 2
      * @param Array $wordforms such as [ ['word_count'=>0, 'wordform_id'=>1, 'lemmas'=>[1,2],
      *                                ['word_count'=>2, 'wordform_id'=>5, 'lemmas'=>[3], ...   ]
      */
@@ -88,33 +92,38 @@ class Sentence extends Model
             return;
         }
         
-        for ($i=1; $i<$wordforms->count(); $i++) {
+        for ($i=1; $i<sizeof($wordforms); $i++) {
+            // distance between words
+            if ($wordforms[$i]['word_count'] - $wordforms[$i-1]['word_count'] >2) {
+                continue;
+            }
             $left_lemmas = $wordforms[$i-1]['lemmas'];
             $right_lemmas = $wordforms[$i]['lemmas'];
 
             foreach ($left_lemmas as $left_lemma_id) {
                 foreach ($right_lemmas as $right_lemma_id) {
-                    if ($left_lemma_id != $right_lemma_id) {
-                        if ($left_lemma_id<$right_lemma_id) {
-                            $count12=1;
-                            $count21=0;
-                            $lemma1 = $left_lemma_id;
-                            $lemma2 = $right_lemma_id;
-                        } else {
-                            $count12=0;
-                            $count21=1;
-                            $lemma1 = $right_lemma_id;
-                            $lemma2 = $left_lemma_id;
-                        }
-print "<P>$left_wordform_id - $right_wordform_id = $lemma1 - $lemma2 = $count12 - $count21"; 
-                        $pair = LemmaMatrix::firstOrCreate([
-                                'lemma1'=>$lemma1, 
-                                'lemma2'=>$lemma2 
-                            ]);
-                        $pair->freq_12 += $count12;
-                        $pair->freq_21 += $count21;
-                        $pair->save();
+                    if ($left_lemma_id == $right_lemma_id) {
+                        continue;
                     }
+                    if ($left_lemma_id<$right_lemma_id) {
+                        $count12=1;
+                        $count21=0;
+                        $lemma1 = $left_lemma_id;
+                        $lemma2 = $right_lemma_id;
+                    } else {
+                        $count12=0;
+                        $count21=1;
+                        $lemma1 = $right_lemma_id;
+                        $lemma2 = $left_lemma_id;
+                    }
+print "<P>".$wordforms[$i-1]['wordform_id']." - ".$wordforms[$i]['wordform_id']." = $lemma1 - $lemma2 = $count12 - $count21"; 
+                    $pair = LemmaMatrix::firstOrCreate([
+                            'lemma1'=>$lemma1, 
+                            'lemma2'=>$lemma2 
+                        ]);
+                    $pair->freq_12 += $count12;
+                    $pair->freq_21 += $count21;
+                    $pair->save();
                 }                            
             }
         }

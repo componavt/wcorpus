@@ -199,4 +199,6 @@ Query OK, 288689 rows affected (17.42 sec)
 php artisan make:migration add_foreign_keys_to_table_sentence_wordform --table="sentence_wordform"
 php artisan make:migration add_foreign_keys_to_table_lemma_wordform --table="lemma_wordform"
 
-
+17.10
+php artisan make:controller 'LemmaMatrixController'
+php artisan make:migration add_freq_to_table_lemmas --table="lemmas"

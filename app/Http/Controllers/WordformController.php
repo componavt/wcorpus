@@ -5,6 +5,7 @@ namespace Wcorpus\Http\Controllers;
 use Illuminate\Http\Request;
 use DB;
 
+use Wcorpus\Models\Lemma;
 use Wcorpus\Models\Sentence;
 use Wcorpus\Models\Wordform;
 use Wcorpus\Wcorpus;
@@ -31,6 +32,7 @@ class WordformController extends Controller
                     'limit_num'       => (int)$request->input('limit_num'),
                     'page'            => (int)$request->input('page'),
                     'search_sentence'  => (int)$request->input('search_sentence'),
+                    'search_lemma'  => (int)$request->input('search_lemma'),
                     'search_wordform'  => $request->input('search_wordform'),
                 ];
         
@@ -76,6 +78,19 @@ class WordformController extends Controller
             $sentence = '';
         }
         
+        if ($this->url_args['search_lemma']) {
+            $lemma_id = $this->url_args['search_lemma'];
+        
+            $wordforms = $wordforms->whereIn('id',function($query) use ($lemma_id){
+                                $query->select('wordform_id')
+                                ->from('lemma_wordform')
+                                ->where('lemma_id', $lemma_id);
+                            });  
+            $lemma = Lemma::find($lemma_id)->lemma;
+        } else {
+            $lemma = '';
+        }
+        
         if ($this->url_args['search_wordform']) {
             $wordforms = $wordforms->where('wordform','like',$this->url_args['search_wordform']);
         } 
@@ -89,6 +104,7 @@ class WordformController extends Controller
             return view('wordform.index')
                   ->with(array(
                                'numAll'        => $numAll,
+                               'lemma'         => $lemma,
                                'sentence'      => $sentence,
                                'wordforms'     => $wordforms,
                                'args_by_get'   => $this->args_by_get,

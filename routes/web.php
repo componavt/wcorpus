@@ -23,9 +23,12 @@ Route::get('/stats', 'HomeController@stats');
 
 Route::get('/author/name_list', 'AuthorController@namesList');
 
+Route::get('/lemma/count_freq','LemmaController@countFrequency');
 Route::get('/lemma/count_wordforms','LemmaController@countWordforms');
 Route::get('/lemma/link_ruwikt','LemmaController@linkRuWikt');
 Route::get('/lemma/create_lemma_matrix','LemmaController@createLemmaMatrix');
+
+Route::get('/lemma_matrix/','LemmaMatrixController@index');
 
 Route::get('/sentence/{id}/break_into_words','SentenceController@breakSentence');
 Route::get('/sentence/break_sentences','SentenceController@breakAllSentences');

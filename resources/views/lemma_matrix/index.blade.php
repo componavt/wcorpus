@@ -2,11 +2,11 @@
 @extends('layouts.page')
 
 @section('title')
-List of lemmas
+Lemma matrix
 @stop
 
 @section('panel-heading')
-List of lemmas
+Lemma matrix
 @stop
 
 @section('panel-body')
@@ -27,45 +27,36 @@ List of lemmas
                 'value' => $url_args['limit_num'],
                 'attributes'=>['size' => 5,
                                'placeholder' => 'Number of records' ]]) records
-        @include('widgets.form._formitem_hidden',
-                ['name' => 'search_wordform',
-                'value' => $url_args['search_wordform']]) 
         {!! Form::close() !!}
 
         <p>Founded records: {{$numAll}}</p>
-        @if ($lemmas)
+        @if ($matrix)
         <table class="table">
         <thead>
             <tr>
                 <th>No</th>
-                <th><a href="lemma/{{$args_by_get}}&order_by=lemma">Lemma</a></th>
-                <th>POS</th>
-                <th>Wordforms</th>
-                <th><a href="lemma/{{$args_by_get}}&order_by=freq">Frequency</a></th>
+                <th>Lemma1</th>
+                <th>Lemma2</th>
+                <th><a href="lemma_matrix/{{$args_by_get}}&order_by=freq_12">Frequency 1-2</a></th>
+                <th><a href="lemma_matrix/{{$args_by_get}}&order_by=freq_21">Frequency 2-1</a></th>
             </tr>
         </thead>
-            @foreach($lemmas as $lemma)
-            <?php $lemma_obj = \Wcorpus\Models\Lemma::find($lemma->id); ?>
+            @foreach($matrix as $pair)
+            <?php 
+//dd($pair);            
+                $lemma1 = \Wcorpus\Models\Lemma::find($pair->lemma1); 
+                $lemma2 = \Wcorpus\Models\Lemma::find($pair->lemma2); 
+            ?>
             <tr>
                 <td>{{ $list_count++ }}</td>
-                <td>{{$lemma_obj->lemma}}</td>
-                <td>{{$lemma_obj->pos->name}}</td>
-                <td>
-                    @if($lemma->wordforms())
-                        @foreach ($lemma->wordforms as $wordform)
-                            {{$wordform->wordform}}
-                        @endforeach
-                    @endif
-                </td>
-                <td>
-                    @if($lemma->freq)
-                        {{$lemma->freq}}<br>
-                    @endif
-                </td>
+                <td>{{$lemma1->lemma}}</td>
+                <td>{{$lemma2->lemma}}</td>
+                <td>{{$pair->freq_12}}</td>
+                <td>{{$pair->freq_21}}</td>
             </tr>
             @endforeach
         </table>
-            {!! $lemmas->appends($url_args)->render() !!}
+            {!! $matrix->appends($url_args)->render() !!}
         @endif
 
 @stop

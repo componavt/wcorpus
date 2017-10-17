@@ -13,11 +13,11 @@ Lemmas
         <h2>{{$lemma->lemma}}</h2>
         
         <p>
-            <a href="/lemma/{{$text->id}}/edit">Edit</a>&nbsp;&nbsp;|&nbsp;
+            <a href="/lemma/{{$lemma->id}}/edit">Edit</a>
         </p>
         
         <p>
-            <a href="/wordform/?search_lemma={{$text->id}}">Wordforms</a> ({{$lemma->wordforms()->count()}})
+            <a href="/wordform/?search_lemma={{$lemma->id}}">Wordforms</a> ({{$lemma->wordforms()->count()}})
         </p>
         
         @if($lemma->pos && $lemma->pos->name)

@@ -36,6 +36,10 @@ List of wordforms
         <p><b>Sentence:</b> <i style='color:#bf5329; font-size: 18px'>{{$sentence}}</i></p>
         @endif
         
+        @if ($lemma)
+        <p><b>Lemma:</b> <i style='color:#bf5329; font-size: 18px'>{{$lemma}}</i></p>
+        @endif
+        
         <p>Founded records: {{$numAll}}</p>
         @if ($wordforms)
         <table class="table">
