@@ -52,6 +52,13 @@ class Lemma extends Model
         return $builder;
     }
     
+    public static function getLemmaByID($id) {
+        $lemma = self::find($id);
+        if ($lemma) {
+            return $lemma->lemma;
+        }
+    }
+    
     /** delete all records from lemma_matrix where lemma1 or lemma2 is $this->id
      */
     public function deleteFromMatrix() {
@@ -67,7 +74,7 @@ class Lemma extends Model
         $morphy = Wcorpus::getMorphy();
         $word = mb_strtoupper($word);
         $lemma = $morphy->lemmatize($word);
-            
+//print_r($lemma);            
         // $lemma = "some text";
             //$lemma=Morphy::getPseudoRoot($word);
             

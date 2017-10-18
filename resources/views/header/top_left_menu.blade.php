@@ -49,6 +49,7 @@
                                 <!--li><a href="/lemma/create_lemma_matrix">Create lemma matrix</a></li-->
                                 <li><a href="/lemma_matrix/">Lemma matrix</a></li>
                                 <li><a href="/lemma/count_freq">Recounting frequencies of occurrence of lemmas</a></li>
+                                <li><a href="/lemma/search_context">Search lemma context</a></li>
                             </ul>
                         </li>
                         

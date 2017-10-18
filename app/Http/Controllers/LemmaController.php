@@ -4,9 +4,12 @@ namespace Wcorpus\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use Response;
 
 use Wcorpus\Models\Lemma;
 use Wcorpus\Models\LemmaMatrix;
+use Wcorpus\Models\Sentence;
+use Wcorpus\Models\Wordform;
 use Wcorpus\Wcorpus;
 use Wcorpus\Models\Piwidict\LangPOS;
 
@@ -31,19 +34,20 @@ class LemmaController extends Controller
         $this->url_args = [
                     'limit_num'       => (int)$request->input('limit_num'),
                     'page'            => (int)$request->input('page'),
-                    'search_wordform'  => (int)$request->input('search_sentence'),
-                    'search_lemma'  => $request->input('search_wordform'),
-                    'order_by'      => $request->input('order_by'),
+                    'search_wordform' => (int)$request->input('search_wordform'),
+                    'search_lemma'    => $request->input('search_lemma'),
+                    'search_id'       => $request->input('search_id'),
+                    'order_by'        => $request->input('order_by'),
                 ];
         
         if (!$this->url_args['page']) {
             $this->url_args['page'] = 1;
         }
-/*        
+        
         if (!$this->url_args['search_id']) {
             $this->url_args['search_id'] = NULL;
         }
-*/        
+        
         if ($this->url_args['limit_num']<=0) {
             $this->url_args['limit_num'] = 10;
         } elseif ($this->url_args['limit_num']>1000) {
@@ -103,6 +107,64 @@ class LemmaController extends Controller
                         );
     }
 
+
+    /**
+     * Display a list of lemmas .
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function searchContext()
+    {
+        $sentence_list = 
+        $lemma_values = 
+        $context_lemmas = [];
+        
+        if ($this->url_args['search_id']) {
+            $wordform_list = [];
+            $lemma_id = $this->url_args['search_id'];
+            $lemma_values[$lemma_id] = Lemma::getLemmaByID($lemma_id);
+            $wordforms = Wordform::whereIn('id',function($q) use ($lemma_id){
+                                            $q->select('wordform_id')
+                                              ->from('lemma_wordform')
+                                              ->where('lemma_id',$lemma_id);
+                                        })->get();
+            foreach ($wordforms as $wordform) {
+                $wordform_list[$wordform->id] = $wordform-> wordform;
+                foreach ($wordform->sentences as $sentence) {
+                    $sentence_list[$sentence->id]['sentence']  = $sentence->sentence;
+                    $sentence_list[$sentence->id]['wordforms'][$wordform->id] = $wordform-> wordform;
+                    
+                    foreach($sentence->wordforms as $w) {
+                        foreach ($w->lemmas as $lemma) {
+                            if ($lemma->id != $lemma_id) {
+                                if (isset($context_lemmas[$lemma->id])) {
+                                    $context_lemmas[$lemma->id] +=1;
+                                } else {
+                                    $context_lemmas[$lemma->id] =1;                                    
+                                }
+                            }
+                        }
+                    }
+                }
+            }   
+            if ($sentence_list) {
+                foreach ($sentence_list as $sentence_id => $sentence) {
+                    $sentence_list[$sentence_id]['wordforms']
+                        = join(', ',array_values($sentence_list[$sentence_id]['wordforms']));
+                }
+            }                    
+        }      
+        arsort($context_lemmas);        
+            return view('lemma.context')
+                  ->with(array(
+                               'lemma_values'  => $lemma_values,
+                               'sentence_list' => $sentence_list,
+                               'context_lemmas'=> $context_lemmas,
+                               'args_by_get'   => $this->args_by_get,
+                               'url_args'      => $this->url_args,
+                              )
+                        );
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -365,4 +427,26 @@ print $lang_pos->id .", ";
         }
     }
     
+    /**
+     * Gets list of lemmas for drop down list in JSON format
+     * Test url: /lemma/list_with_pos
+     * 
+     * @return JSON response
+     */
+    public function listWithPOS(Request $request)
+    {
+        $search_name = '%'.$request->input('q').'%';
+
+        $list = [];
+        $lemmas = Lemma::where('lemma','like', $search_name)
+                       ->take(100) 
+                       ->orderBy('lemma')->get();
+        foreach ($lemmas as $lemma) {
+            $list[]=['id'  => $lemma->id, 
+                     'text'=> $lemma->lemma. ' ('.$lemma->pos->name.')'];
+        }  
+
+        return Response::json($list);
+    }
+
 }

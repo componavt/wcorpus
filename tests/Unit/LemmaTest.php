@@ -39,6 +39,15 @@ class LemmaTest extends TestCase
         $this->assertEquals($expected, $text_result);
     }
 
+    public function testLemmatize_lion()
+    {
+        $word = "лев";    // 
+        $expected = ["ЛЕВ","ЛЕВА","ЛЕВЫЙ"]; // 
+        $text_result = Lemma::lemmatize($word);
+
+        $this->assertEquals($expected, $text_result);
+    }
+
     // -----------------------------------------------------------------
     
 

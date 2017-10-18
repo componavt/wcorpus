@@ -18,7 +18,7 @@ List of lemmas
         @include('widgets.form._formitem_text',
                 ['name' => 'search_lemma',
                 'value' => $url_args['search_lemma'],
-                'attributes'=>['placeholder' => 'Wordform' ]]) 
+                'attributes'=>['placeholder' => 'Lemma' ]]) 
         @include('widgets.form._formitem_btn_submit', ['title' => 'View'])
 
         by
