@@ -23,12 +23,13 @@ Route::get('/stats', 'HomeController@stats');
 
 Route::get('/author/name_list', 'AuthorController@namesList');
 
-Route::get('/lemma/list_with_pos','LemmaController@listWithPOS');
-Route::get('/lemma/search_context','LemmaController@searchContext');
 Route::get('/lemma/count_freq','LemmaController@countFrequency');
 Route::get('/lemma/count_wordforms','LemmaController@countWordforms');
-Route::get('/lemma/link_ruwikt','LemmaController@linkRuWikt');
 Route::get('/lemma/create_lemma_matrix','LemmaController@createLemmaMatrix');
+Route::get('/lemma/link_ruwikt','LemmaController@linkRuWikt');
+Route::get('/lemma/list_with_pos','LemmaController@listWithPOS');
+Route::get('/lemma/search_context','LemmaController@searchContext');
+Route::get('/lemma/context_intersection','LemmaController@contextIntersection');
 
 
 Route::get('/lemma_matrix/','LemmaMatrixController@index');

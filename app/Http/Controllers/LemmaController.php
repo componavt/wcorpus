@@ -36,8 +36,12 @@ class LemmaController extends Controller
                     'page'            => (int)$request->input('page'),
                     'search_wordform' => (int)$request->input('search_wordform'),
                     'search_lemma'    => $request->input('search_lemma'),
+                    'search_lemma1'   => $request->input('search_lemma1'),
+                    'search_lemma2'   => $request->input('search_lemma2'),
                     'search_id'       => $request->input('search_id'),
                     'order_by'        => $request->input('order_by'),
+                    'limit_sentences' => $request->input('limit_sentences'),
+                    'limit_lemmas'    => $request->input('limit_lemmas'),
                 ];
         
         if (!$this->url_args['page']) {
@@ -53,6 +57,15 @@ class LemmaController extends Controller
         } elseif ($this->url_args['limit_num']>1000) {
             $this->url_args['limit_num'] = 1000;
         }   
+        
+        if ($this->url_args['limit_sentences']<=0) {
+            $this->url_args['limit_sentences'] = 100;
+        }   
+
+        if ($this->url_args['limit_lemmas']<=0) {
+            $this->url_args['limit_lemmas'] = 1000;
+        }   
+        
         
         $this->args_by_get = Wcorpus::searchValuesByURL($this->url_args);
     }
@@ -109,62 +122,90 @@ class LemmaController extends Controller
 
 
     /**
-     * Display a list of lemmas .
+     * For the value entered (search_id), find all the lemmas from the context
      *
      * @return \Illuminate\Http\Response
      */
     public function searchContext()
     {
-        $sentence_list = 
-        $lemma_values = 
-        $context_lemmas = [];
+        $sentence_list = // array of sentences [text of sentence, wordforms joined with comma)
+        $lemma_values = // array with searched lemmas for select field [5559=>'ЛЕВЫЙ (adjective)']
+        $lemma_strings = // array of pairs lemma_id=>lemma_lemma
+        $context_lemmas = []; // array of pairs lemma_id=>frequency in the context set
         
         if ($this->url_args['search_id']) {
-            $wordform_list = [];
             $lemma_id = $this->url_args['search_id'];
             $lemma_values[$lemma_id] = Lemma::getLemmaByID($lemma_id);
-            $wordforms = Wordform::whereIn('id',function($q) use ($lemma_id){
-                                            $q->select('wordform_id')
-                                              ->from('lemma_wordform')
-                                              ->where('lemma_id',$lemma_id);
-                                        })->get();
-            foreach ($wordforms as $wordform) {
-                $wordform_list[$wordform->id] = $wordform-> wordform;
-                foreach ($wordform->sentences as $sentence) {
-                    $sentence_list[$sentence->id]['sentence']  = $sentence->sentence;
-                    $sentence_list[$sentence->id]['wordforms'][$wordform->id] = $wordform-> wordform;
-                    
-                    foreach($sentence->wordforms as $w) {
-                        foreach ($w->lemmas as $lemma) {
-                            if ($lemma->id != $lemma_id) {
-                                if (isset($context_lemmas[$lemma->id])) {
-                                    $context_lemmas[$lemma->id] +=1;
-                                } else {
-                                    $context_lemmas[$lemma->id] =1;                                    
-                                }
-                            }
-                        }
-                    }
-                }
-            }   
-            if ($sentence_list) {
-                foreach ($sentence_list as $sentence_id => $sentence) {
-                    $sentence_list[$sentence_id]['wordforms']
-                        = join(', ',array_values($sentence_list[$sentence_id]['wordforms']));
-                }
-            }                    
+            list($sentence_list,$context_lemmas, $lemma_strings) = 
+                    Lemma::lemmaContext($lemma_id);
         }      
-        arsort($context_lemmas);        
-            return view('lemma.context')
-                  ->with(array(
-                               'lemma_values'  => $lemma_values,
-                               'sentence_list' => $sentence_list,
-                               'context_lemmas'=> $context_lemmas,
-                               'args_by_get'   => $this->args_by_get,
-                               'url_args'      => $this->url_args,
-                              )
-                        );
+        
+        return view('lemma.context')
+              ->with(array(
+                           'lemma_values'  => $lemma_values, 
+                           'lemma_strings'  => $lemma_strings, 
+                           'sentence_list' => $sentence_list, 
+                           'context_lemmas'=> $context_lemmas, 
+                           'args_by_get'   => $this->args_by_get,
+                           'url_args'      => $this->url_args,
+                          )
+                    );
     }
+    
+    /**
+     * For the value entered (search_id), find all the lemmas from the context
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function contextIntersection()
+    {
+        $lemma1_values = $lemma2_values = // arrays with searched lemmas for select field [5559=>'ЛЕВЫЙ (adjective)']
+        $sentence_list = // array of sentences [text of sentence, wordforms joined with comma)
+        $lemma_list = []; // array of pairs lemma_id=>frequency in the context set
+        
+        if ($this->url_args['search_lemma1']) {
+            $lemma1_id = $this->url_args['search_lemma1'];
+            $lemma1_values[$lemma1_id] = Lemma::getLemmaByID($lemma1_id);
+        }      
+        
+        if ($this->url_args['search_lemma2']) {
+            $lemma2_id = $this->url_args['search_lemma2'];
+            $lemma2_values[$lemma2_id] = Lemma::getLemmaByID($lemma2_id);
+        }      
+        
+        if ($this->url_args['search_lemma1'] && $this->url_args['search_lemma2']) {
+            list($sentence_list1,$context_lemmas1, $lemma_strings1) = 
+                    Lemma::lemmaContext($lemma1_id);
+            list($sentence_list2,$context_lemmas2, $lemma_strings2) = 
+                    Lemma::lemmaContext($lemma2_id);
+            
+            foreach (array_intersect(array_keys($sentence_list1),array_keys($sentence_list2)) as $sentence_id) {
+                $sentence_list[$sentence_id]['sentence'] = $sentence_list1[$sentence_id]['sentence'];
+                
+                $sentence_list[$sentence_id]['wordforms'] = 
+                        array_merge($sentence_list1[$sentence_id]['wordforms'],$sentence_list2[$sentence_id]['wordforms']);
+                        
+            }
+            
+            foreach (array_intersect(array_keys($context_lemmas1),array_keys($context_lemmas2)) as $lemma_id) {
+                $lemma_list[$lemma_id]['lemma'] = $lemma_strings1[$lemma_id];
+                $lemma_list[$lemma_id]['freq1'] = $context_lemmas1[$lemma_id];
+                $lemma_list[$lemma_id]['freq2'] = $context_lemmas2[$lemma_id];
+            }
+        }
+        
+        return view('lemma.context_intersection')
+              ->with(array(
+                           'lemma1_values'  => $lemma1_values, 
+                           'lemma2_values'  => $lemma2_values, 
+                           'lemma_list'     => $lemma_list, 
+                           'sentence_list' => $sentence_list, 
+                           'args_by_get'   => $this->args_by_get,
+                           'url_args'      => $this->url_args,
+                          )
+                    );
+    }
+    
     /**
      * Show the form for creating a new resource.
      *

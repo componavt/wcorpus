@@ -6,18 +6,23 @@
             <file>file:/E:/all/projects/git/wcorpus/app/Models/Lemma.php</file>
             <file>file:/E:/all/projects/git/wcorpus/resources/views/header/top_left_menu.blade.php</file>
             <file>file:/E:/all/projects/git/wcorpus/app/Http/Controllers/HomeController.php</file>
+            <file>file:/E:/all/projects/git/wcorpus/resources/views/lemma/context_intersection.blade.php</file>
             <file>file:/E:/all/projects/git/wcorpus/app/Models/Text.php</file>
             <file>file:/E:/all/projects/git/wcorpus/app/Models/Wordform.php</file>
             <file>file:/E:/all/projects/git/wcorpus/app/Http/Controllers/TextController.php</file>
             <file>file:/E:/all/projects/git/wcorpus/resources/views/stats.blade.php</file>
             <file>file:/E:/all/projects/git/wcorpus/app/Http/Controllers/LemmaController.php</file>
+            <file>file:/E:/all/projects/git/wcorpus/resources/views/lemma/_sentence_list.blade.php</file>
             <file>file:/E:/all/projects/git/wcorpus/resources/views/lemma_matrix/index.blade.php</file>
             <file>file:/E:/all/projects/git/wcorpus/routes/web.php</file>
             <file>file:/E:/all/projects/git/wcorpus/steps.text</file>
             <file>file:/E:/all/projects/git/wcorpus/app/Http/Controllers/SentenceController.php</file>
             <file>file:/E:/all/projects/git/wcorpus/app/Http/Controllers/WordformController.php</file>
             <file>file:/E:/all/projects/git/wcorpus/resources/views/lemma/index.blade.php</file>
+            <file>file:/E:/all/projects/git/wcorpus/resources/views/lemma/context.blade.php</file>
             <file>file:/E:/all/projects/git/wcorpus/resources/views/lemma/show.blade.php</file>
+            <file>file:/E:/all/projects/git/wcorpus/resources/views/widgets/form/_formitem_select2.blade.php</file>
+            <file>file:/E:/all/projects/git/wcorpus/resources/views/lemma/_context_lemma_intersection.blade.php</file>
             <file>file:/E:/all/projects/git/wcorpus/resources/views/sentence/index.blade.php</file>
             <file>file:/E:/all/projects/git/wcorpus/resources/views/wordform/index.blade.php</file>
             <file>file:/E:/all/projects/git/wcorpus/app/Models/Sentence.php</file>

@@ -91,4 +91,52 @@ class Lemma extends Model
         
         return in_array($this->pos_id, $basic_POS);
     }
+    
+    /** 
+     * For $lemma_id find all the lemmas from the context
+     * 
+     * @param $lemma_id lemma ID
+     * @return Array of 3 arrays ($sentences,)
+     */
+    public static function lemmaContext($lemma_id) {
+        $sentence_list = // array of sentences [text of sentence, wordforms joined with comma)
+        $lemma_strings = // array of pairs lemma_id=>lemma_lemma
+        $context_lemmas = []; // array of pairs lemma_id=>frequency in the context set
+        
+        $wordform_list = [];
+        $wordforms = Wordform::whereIn('id',function($q) use ($lemma_id){
+                                        $q->select('wordform_id')
+                                          ->from('lemma_wordform')
+                                          ->where('lemma_id',$lemma_id);
+                                    })->get();
+        foreach ($wordforms as $wordform) {
+            $wordform_list[$wordform->id] = $wordform-> wordform;
+            foreach ($wordform->sentences as $sentence) {
+                $sentence_list[$sentence->id]['sentence']  = $sentence->sentence;
+                $sentence_list[$sentence->id]['wordforms'][$wordform->id] = $wordform-> wordform;
+
+                foreach($sentence->wordforms as $w) {
+                    foreach ($w->lemmas as $lemma) {
+                        if ($lemma->id != $lemma_id) {
+                            $lemma_strings[$lemma->id] = $lemma->lemma;
+                            if (isset($context_lemmas[$lemma->id])) {
+                                $context_lemmas[$lemma->id] +=1;
+                            } else {
+                                $context_lemmas[$lemma->id] =1;                                    
+                            }
+                        }
+                    }
+                }
+            }
+        }   
+/*        if ($sentence_list) {
+            foreach ($sentence_list as $sentence_id => $sentence) {
+                $sentence_list[$sentence_id]['wordforms']
+                    = join(', ',array_values($sentence_list[$sentence_id]['wordforms']));
+            }
+        }    */                
+        arsort($context_lemmas); 
+        
+        return [$sentence_list,$context_lemmas, $lemma_strings];
+    }
 }

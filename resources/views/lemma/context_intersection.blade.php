@@ -4,11 +4,11 @@
 @extends('layouts.page')
 
 @section('title')
-Lemma context search
+Lemma context intersection
 @stop
 
 @section('panel-heading')
-Lemma context search
+Lemma context intersection
 @stop
 
 @section('headExtra')
@@ -17,33 +17,34 @@ Lemma context search
 @stop
 
 @section('panel-body')
-        {!! Form::open(['url' => '/lemma/search_context/',
+        {!! Form::open(['url' => '/lemma/context_intersection/',
                              'method' => 'get',
                              'class' => 'form-inline'])
         !!}
-        <div class="row">
-            <div class="col-sm-4">
             @include('widgets.form._formitem_select2',
-                    ['name' => 'search_id',
-                     'class'=>'select-lemma form-control search-lemma',
-                     'value' =>$url_args['search_id'],
-                     'values' => $lemma_values,
+                    ['name' => 'search_lemma1',
+                     'class'=>'select-lemma1 form-control search-lemma',
+                     'value' =>$url_args['search_lemma1'],
+                     'values' => $lemma1_values,
                      'is_multiple' => false,
-                     'attributes'=>['placeholder' => 'Lemma' ]])
-            </div>     
-            <div class="col-sm-1">
+                     'attributes'=>['placeholder' => 'Lemma 1' ]])
+
+            @include('widgets.form._formitem_select2',
+                    ['name' => 'search_lemma2',
+                     'class'=>'select-lemma2 form-control search-lemma',
+                     'value' =>$url_args['search_lemma2'],
+                     'values' => $lemma2_values,
+                     'is_multiple' => false,
+                     'attributes'=>['placeholder' => 'Lemma 2' ]])
+
             @include('widgets.form._formitem_btn_submit', ['title' => 'View'])
-            </div>     
-            <div class="col-sm-4">
             
             by
             @include('widgets.form._formitem_text',
                     ['name' => 'limit_sentences',
                     'value' => $url_args['limit_sentences'],
                     'attributes'=>['size' => 5,
-                                   'placeholder' => 'Number of records' ]]) sentences
-            </div>     
-            <div class="col-sm-3">
+                    'placeholder' => 'Number of records' ]]) sentences,<span style='padding-right:20px'></span>
             by
             @include('widgets.form._formitem_text',
                     ['name' => 'limit_lemmas',
@@ -51,8 +52,6 @@ Lemma context search
                     'attributes'=>['size' => 5,
                                    'placeholder' => 'Number of records' ]]) lemmas
                  
-            </div>     
-        </div>
         {!! Form::close() !!}
         <div class="row">
             <div class="col-sm-9">
@@ -61,9 +60,9 @@ Lemma context search
                     'list' => $sentence_list])
             </div>
             <div class="col-sm-3">
-            @include('lemma._lemma_list',[
+            @include('lemma._context_lemma_intersection',[
                     'limit'=>$url_args['limit_lemmas'],
-                    'list' => $context_lemmas])
+                    'list' => $lemma_list])
             </div>
         </div>
 @stop
@@ -73,7 +72,27 @@ Lemma context search
 @stop
 
 @section('jqueryFunc')
-    $(".select-lemma").select2({
+    $(".select-lemma1").select2({
+        width: '300px',
+        ajax: {
+          url: "/lemma/list_with_pos",
+          dataType: 'json',
+          delay: 250,
+          data: function (params) {
+            return {
+              q: params.term // search term
+            };
+          },
+          processResults: function (data) {
+            return {
+              results: data
+            };
+          },          
+          cache: true
+        }
+    });
+    
+    $(".select-lemma2").select2({
         width: '300px',
         ajax: {
           url: "/lemma/list_with_pos",
