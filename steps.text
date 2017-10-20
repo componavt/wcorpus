@@ -202,3 +202,5 @@ php artisan make:migration add_foreign_keys_to_table_lemma_wordform --table="lem
 17.10
 php artisan make:controller 'LemmaMatrixController'
 php artisan make:migration add_freq_to_table_lemmas --table="lemmas"
+
+Dist({v}^{1},{v}^{2}) := \frac{{\left|{content}_{1}\bigcap{content}_{2}\right|}^{2}}{\left|{content}_{1}\right|\cdot  \left|{content}_{2}\right|}

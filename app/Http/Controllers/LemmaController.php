@@ -135,7 +135,7 @@ class LemmaController extends Controller
         
         if ($this->url_args['search_id']) {
             $lemma_id = $this->url_args['search_id'];
-            $lemma_values[$lemma_id] = Lemma::getLemmaByID($lemma_id);
+            $lemma_values[$lemma_id] = Lemma::getLemmaWithPOSByID($lemma_id);
             list($sentence_list,$context_lemmas, $lemma_strings) = 
                     Lemma::lemmaContext($lemma_id);
         }      
@@ -165,17 +165,18 @@ class LemmaController extends Controller
         
         if ($this->url_args['search_lemma1']) {
             $lemma1_id = $this->url_args['search_lemma1'];
-            $lemma1_values[$lemma1_id] = Lemma::getLemmaByID($lemma1_id);
+            $lemma1_values[$lemma1_id] = Lemma::getLemmaWithPOSByID($lemma1_id);
         }      
         
         if ($this->url_args['search_lemma2']) {
             $lemma2_id = $this->url_args['search_lemma2'];
-            $lemma2_values[$lemma2_id] = Lemma::getLemmaByID($lemma2_id);
+            $lemma2_values[$lemma2_id] = Lemma::getLemmaWithPOSByID($lemma2_id);
         }      
         
         if ($this->url_args['search_lemma1'] && $this->url_args['search_lemma2']) {
             list($sentence_list1,$context_lemmas1, $lemma_strings1) = 
                     Lemma::lemmaContext($lemma1_id);
+
             list($sentence_list2,$context_lemmas2, $lemma_strings2) = 
                     Lemma::lemmaContext($lemma2_id);
             
@@ -192,6 +193,12 @@ class LemmaController extends Controller
                 $lemma_list[$lemma_id]['freq1'] = $context_lemmas1[$lemma_id];
                 $lemma_list[$lemma_id]['freq2'] = $context_lemmas2[$lemma_id];
             }
+//print "<P>".sizeof($lemma_list);            
+
+//print "<P>".sizeof($context_lemmas1);            
+//print "<P>".sizeof($context_lemmas2);            
+            
+            $dist = (sizeof($lemma_list)*sizeof($lemma_list)) / (sizeof($context_lemmas1)*sizeof($context_lemmas2));
         }
         
         return view('lemma.context_intersection')
@@ -200,6 +207,7 @@ class LemmaController extends Controller
                            'lemma2_values'  => $lemma2_values, 
                            'lemma_list'     => $lemma_list, 
                            'sentence_list' => $sentence_list, 
+                           'dist' => $dist,
                            'args_by_get'   => $this->args_by_get,
                            'url_args'      => $this->url_args,
                           )

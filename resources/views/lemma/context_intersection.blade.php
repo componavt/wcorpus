@@ -54,12 +54,14 @@ Lemma context intersection
                  
         {!! Form::close() !!}
         <div class="row">
-            <div class="col-sm-9">
+            <div class="col-sm-8">
+                <img src="http://latex.numberempire.com/render?Dist({v}^{1},{v}^{2}) := \frac{\, {\left|{context}_{1}\bigcap{context}_{2}\right|}^{2}\, }{\left|{context}_{1}\right|\cdot  \left|{context}_{2}\right|} =  \mathbf{{{$dist}}}" 
+      alt="Distance">
             @include('lemma._sentence_list',[
                     'limit'=>$url_args['limit_sentences'],
                     'list' => $sentence_list])
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-4">
             @include('lemma._context_lemma_intersection',[
                     'limit'=>$url_args['limit_lemmas'],
                     'list' => $lemma_list])

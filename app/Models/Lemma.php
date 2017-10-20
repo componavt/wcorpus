@@ -59,6 +59,13 @@ class Lemma extends Model
         }
     }
     
+    public static function getLemmaWithPOSByID($id) {
+        $lemma = self::find($id);
+        if ($lemma) {
+            return $lemma->lemma. " (".$lemma->pos->name.")";
+        }
+    }
+    
     /** delete all records from lemma_matrix where lemma1 or lemma2 is $this->id
      */
     public function deleteFromMatrix() {
@@ -129,12 +136,6 @@ class Lemma extends Model
                 }
             }
         }   
-/*        if ($sentence_list) {
-            foreach ($sentence_list as $sentence_id => $sentence) {
-                $sentence_list[$sentence_id]['wordforms']
-                    = join(', ',array_values($sentence_list[$sentence_id]['wordforms']));
-            }
-        }    */                
         arsort($context_lemmas); 
         
         return [$sentence_list,$context_lemmas, $lemma_strings];
