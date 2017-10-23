@@ -752,5 +752,61 @@ Igrayet myshtsami krestovyy legkiy svod.
         $text_result = TemplateExtractor::removeRefTags($wikitext);
         $this->assertEquals($expected, $text_result);
     }
+
+//-------------------------------------------------------------------------------
+    public function testDivideByTemplate_emptyWikitext()
+    {
+        $wikitext = "";
+        $template_name = "Poemx";
+        $expected = ['','',''];
+        
+        $text_result = TemplateExtractor::divideByTemplate($wikitext,$template_name);
+        
+        $this->assertEquals($expected, $text_result);
+    }
     
+    public function testDivideByTemplate_emptyTemplateName()
+    {
+        $wikitext = "a{{b}}c";
+        $template_name = "";
+        $expected = ['a{{b}}c','',''];
+        
+        $text_result = TemplateExtractor::divideByTemplate($wikitext,$template_name);
+        
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testDivideByTemplate_OneTemplate()
+    {
+        $wikitext = "a{{b}}c";
+        $template_name = "b";
+        $expected = ['a','{{b}}','c'];
+        
+        $text_result = TemplateExtractor::divideByTemplate($wikitext,$template_name);
+        
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    public function testDivideByTemplate_MoreOneTemplate()
+    {
+        $wikitext = "a{{b}}c {{bfsdgdfg}}";
+        $template_name = "b";
+        $expected = ['a','{{b}}','c {{bfsdgdfg}}'];
+        
+        $text_result = TemplateExtractor::divideByTemplate($wikitext,$template_name);
+        
+        $this->assertEquals($expected, $text_result);
+    }
+    
+    
+    public function testDivideByTemplate_MoreOneTemplateNested()
+    {
+        $wikitext = "a{{brt{{df{{brysdr}}g}}rd{{t}}rt}}c {{bfsdgdfg}}";
+        $template_name = "b";
+        $expected = ['a','{{brt{{df{{brysdr}}g}}rd{{t}}rt}}','c {{bfsdgdfg}}'];
+        
+        $text_result = TemplateExtractor::divideByTemplate($wikitext,$template_name);
+        
+        $this->assertEquals($expected, $text_result);
+    }
 }

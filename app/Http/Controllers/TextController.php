@@ -140,7 +140,7 @@ class TextController extends Controller
         //
     }
 
-    /**
+    /** SHOW()
      * Display the specified resource.
      *
      * @param  int  $id
@@ -163,7 +163,7 @@ class TextController extends Controller
                       ]);
     }
 
-    /**
+    /** EDIT()
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
@@ -237,6 +237,12 @@ class TextController extends Controller
             $text->publication()->delete();
         }
         $text->parseData();
+        
+        $text->deleteSentences();
+        $text->breakIntoSentences();
+        
+        return Redirect::to('/text/'.($text->id).($this->args_by_get))
+                       ->withSuccess('Text is re-parsed');
     }
     
     /**
@@ -330,19 +336,9 @@ print "<p>".$text->id."</p>\n";
      */
     public function extractFromWikiSource()
     {
-//SELECT old_id,page_title,old_text FROM page,text WHERE page_namespace=0 AND page.page_latest=text.old_id order by old_id limit 0,10;
-/*        $pages = DB::connection('wikisource')
-//                ->table('page')->where('page_namespace',0)->orderBy('page_id')->-take(10)->get();
-                ->table('text')
-                ->select(DB::raw('old_id, page_title, old_text'))
-                ->join('page', 'page.page_latest', '=', 'text.old_id')
-                ->where('page_namespace',0)
-//                ->orderBy('old_id')
-                ->get(); */
         $is_exist_new_pages = 1;
-        $portion = 1;
+        $portion = 100;
         $incorrect_texts = [39563,291621];
-//        $without_ids = join(',',$incorrect_texts);
         
         while ($is_exist_new_pages) {
             $latest_text = Text::orderBy('id','desc')->first();
@@ -351,42 +347,34 @@ print "<p>".$text->id."</p>\n";
             } else {
                 $from_id = 1;
             }
-
-// can not to insert pages with id (39563,291621)
-//$from_id = 291621;
-
+//dd($from_id);
             $pages = DB::connection('wikisource')
                     ->table('page')
                     ->where('page_namespace',0)
                     ->where('page_is_redirect',0)
                     ->whereNotIn('page_id',$incorrect_texts)
                     ->where('page_id','>',$from_id)
-                    ->select(DB::raw('page_id,page_latest, page_title'))
+                    ->leftJoin('text','text.old_id','=','page.page_latest')
+                    ->where('old_text', 'not like', '#перенаправление%')
+                    ->select(DB::raw('page_id,page_latest, page_title, old_text'))
                     ->orderBy('page_id')
                     ->take($portion)
                     ->get();
 //dd($pages);            
             if (!sizeof($pages)) {
-                $is_exist_new_pages = 0;                
+                $is_exist_new_pages = 0;   
+                continue;
             }
             foreach ($pages as $page) {
-                $text = DB::connection('wikisource')
-                        ->table('text')
-                        ->select('old_text')
-                        ->where('old_id', $page->page_latest)
-                        ->where('old_text', 'not like', '#перенаправление%')
-                        ->first();
-                if ($text) {
-                    DB::connection('mysql')->table('texts')->insert([
-                            'id' => $page->page_id,
-                            'page_latest' => $page->page_latest,
-                            'title' => $page->page_title,
-                            'wikitext' => $text->old_text,
-                            'text' => null
-                        ]
-                    );
-                }
-
+                DB::connection('mysql')->table('texts')->insert([
+                        'id' => $page->page_id,
+                        'page_latest' => $page->page_latest,
+                        'title' => $page->page_title,
+                        'wikitext' => $page->old_text,
+                        'text' => null
+                    ]
+                );
+//                $from_id = $page->page_id;
             }
 //print $pages->count();   
         }
@@ -608,6 +596,8 @@ print sizeof($texts);
         
         if ($included==0) {
             $text->deleteSentences();
+        } else {
+            $text->breakIntoSentences();
         }
         
         return Redirect::to('/text/'.($text->id).($this->args_by_get))

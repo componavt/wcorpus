@@ -501,4 +501,54 @@ class TemplateExtractor
         return $wikitext;
     }    
     
+    /** Search template {{templateName....}} in wikitext
+     * and divide on three string by this template
+     * Template can include other templates
+     * 
+     * @param String $wikitext
+     * @param String $templateName
+     * 
+     * @return Array [string_before_template, template, string_after_template]
+     */
+    public static function divideByTemplate(String $wikitext, String $templateName) : Array
+    {
+        if (!$templateName) {
+            return [$wikitext,'',''];
+        }
+        
+        $template_start_pos = mb_stripos($wikitext,'{{'.$templateName);
+        if ($template_start_pos ===false) {
+            return [$wikitext,'',''];
+        }
+        
+        $out[0] = mb_substr($wikitext,0,$template_start_pos);
+        
+        $count = 1;
+        $offset = $template_start_pos+2;
+        
+        do {
+            $start_pos = mb_stripos($wikitext,'{{',$offset);
+            $end_pos = mb_stripos($wikitext,'}}',$offset);
+            if ($end_pos !==false) {
+                if ($start_pos === false || $start_pos > $end_pos) {
+                    $offset = $end_pos+2; 
+                    $count -=1;
+                } else {
+                    $offset = $start_pos+2; 
+                    $count +=1;
+                }
+            }
+        } while($count!=0 && $end_pos!==false);
+        
+        if ($end_pos===false) {
+            $out[1] = mb_substr($wikitext,$template_start_pos);
+            $out[2] = '';
+        } else {
+            $out[1] = mb_substr($wikitext,$template_start_pos,$end_pos-$template_start_pos+2);
+            $out[2] = mb_substr($wikitext,$end_pos+2);
+        }
+        
+        return $out;
+    }    
+    
 }

@@ -53,31 +53,31 @@ class Text extends Model
     public function parseData() {
         $text = $this;
 print "<p>".$text->id;           
-                    $wikitext = TemplateExtractor::removeComments($text->wikitext); // remove comments
+        $wikitext = TemplateExtractor::removeComments($text->wikitext); // remove comments
 
-                    $wikitext = TemplateExtractor::removeTale($text->wikitext); 
-                    
-                    $wikitext = TemplateExtractor::removeWikiLinks($wikitext); // remove wiki links
-                    
-                    $wikitext = TemplateExtractor::removeLangTemplates($wikitext); // remove lang templates
+        $wikitext = TemplateExtractor::removeTale($text->wikitext); 
 
-                    $wikitext = TemplateExtractor::removeRefTags($wikitext); // remove tags <ref...>...</ref>
+        $wikitext = TemplateExtractor::removeWikiLinks($wikitext); // remove wiki links
 
-                    $text->author_id = Author::searchAuthorID($wikitext); // extract author
-                    
-                    $text_info = Text::parseWikitext($wikitext);
-                    $text->text = $text_info['text'];
-                    
-                    $text->publication_id = Publication::parseWikitext(
-                                                            $wikitext, 
-                                                            $text->author_id,
-                                                            $text_info['title'],
-                                                            $text_info['creation_date']
-                            );
-                    if ($text->publication && $text->publication->author_id) {
-                        $text->author_id = $text->publication->author_id;
-                    }
-                    $text->push();
+        $wikitext = TemplateExtractor::removeLangTemplates($wikitext); // remove lang templates
+
+        $wikitext = TemplateExtractor::removeRefTags($wikitext); // remove tags <ref...>...</ref>
+
+        $text->author_id = Author::searchAuthorID($wikitext); // extract author
+
+        $text_info = self::parseWikitext($wikitext);
+        $text->text = $text_info['text'];
+
+        $text->publication_id = Publication::parseWikitext(
+                                                $wikitext, 
+                                                $text->author_id,
+                                                $text_info['title'],
+                                                $text_info['creation_date']
+                );
+        if ($text->publication && $text->publication->author_id) {
+            $text->author_id = $text->publication->author_id;
+        }
+        $text->push();
     }
     
     /** Get $text->text and break it into paragraphs,
@@ -161,18 +161,26 @@ print 16^4;
         
         $text_info['text'] = TemplateExtractor::parsePoetryLadder($wikitext);
         
-        if (preg_match("/\{\{(poemx?1?)\|/",$text_info['text'],$regs)) {
-            // extracts a text of second parameter from the template {{Poemx|1|2|3}}
-            $template_name = $regs[1];
-            $text_info['title'] = TemplateExtractor::getParameterValueWithoutNames($template_name, 1, $text_info['text']); 
-            $text_info['text'] = TemplateExtractor::getParameterValueWithoutNames($template_name, 2, $text_info['text']); 
-            $text_info['creation_date'] = TemplateExtractor::getParameterValueWithoutNames($template_name, 3, $text_info['text']); 
-    //print "\n\n".$wikitext."\n\n".$text_info['text']."\n\n";     
-        } 
-        // не проходит тест с эпиграфом!!!   
-        //$text_info = TemplateExtractor::extractPoetry($text_info);
-        elseif (preg_match("/\{\{poem\-on\|/i",$text_info['text'])) {
+        if (preg_match("/\{\{poem\-on\|/i",$text_info['text'])) {
             $text_info = TemplateExtractor::extractPoem_on($text_info);
+        }
+        
+        while (preg_match("/\{\{(poemx?1?)\|/",$text_info['text'], $regs)) {
+            $template_name = $regs[1];
+            $splited_text = TemplateExtractor::divideByTemplate($text_info['text'],$template_name);
+            
+            $title = TemplateExtractor::getParameterValueWithoutNames($template_name, 1,  $splited_text[1]);
+            $text = TemplateExtractor::getParameterValueWithoutNames($template_name, 2, $splited_text[1]); 
+            $creation_date = TemplateExtractor::getParameterValueWithoutNames($template_name, 3, $splited_text[1]); 
+            
+            if ($title && !$text_info['title']) {
+                $text_info['title'] =  $title;
+            }
+            if ($creation_date && !$text_info['creation_date']) {
+                $text_info['creation_date'] =  $creation_date;
+            }
+            
+            $text_info['text']  = $splited_text[0].$text.$splited_text[2];
         }
         
         if ($text_info['title']) {

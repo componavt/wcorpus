@@ -1,3 +1,4 @@
+-- SET foreign_key_checks=0;
 mysql> set names binary; SOURCE ruwikisource20170201.sql;
 alter table page add index page_namespace(`page_namespace`);
 alter table page add index page_latest(`page_latest`);
@@ -204,3 +205,15 @@ php artisan make:controller 'LemmaMatrixController'
 php artisan make:migration add_freq_to_table_lemmas --table="lemmas"
 
 Dist({v}^{1},{v}^{2}) := \frac{{\left|{content}_{1}\bigcap{content}_{2}\right|}^{2}}{\left|{content}_{1}\right|\cdot  \left|{content}_{2}\right|}
+
+delete from lemma_matrix;
+delete from lemma_wordform;
+delete from sentence_wordform;
+delete from lemmas;
+delete from wordforms;
+delete from sentences;
+
+delete from texts;
+SET foreign_key_checks=0;
+delete from authors;
+delete from publications;

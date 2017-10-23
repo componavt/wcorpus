@@ -182,6 +182,46 @@ K Rimu eto ochen' idot.",
         $this->assertEquals($expected, $text_result['text']);
     }
 
+    public function testParseWikitext_textWithIncludedPoetry()
+    {
+        $wikitext = "{{Отексте
+| АВТОР          = Александр Сергеевич Пушкин
+| НАЗВАНИЕ       = Станционный смотритель
+| ИЗЦИКЛА        = [[Повести покойного Ивана Петровича Белкина]]
+| ДАТАСОЗДАНИЯ   = 1830
+| ДАТАПУБЛИКАЦИИ = 1831<ref>Все повести цикла вышли в свет отдельной книжкой в конце октября 1831 г. под заголовком: «Повести покойного Ивана Петровича Белкина, изданные А. П.»</ref>
+| ИСТОЧНИК       = [http://rvb.ru/pushkin/01text/06prose/01prose/0861.htm РВБ (1959)]
+| ДРУГОЕ         =
+| ВИКИПЕДИЯ      = Станционный смотритель (повесть)
+| ВИКИЦИТАТНИК   = Станционный смотритель (повесть)
+| ПРЕДЫДУЩИЙ     = [[../Гробовщик|Гробовщик]]
+| СЛЕДУЮЩИЙ      = [[../Барышня-крестьянка|Барышня-крестьянка]]
+| ИЗОБРАЖЕНИЕ    =
+| КАЧЕСТВО       = 3
+}}
+Лошади были давно готовы, а мне все не хотелось расстаться с смотрителем и его дочкой. Наконец я с ними простился; отец пожелал мне доброго пути, а дочь проводила до телеги. В сенях я остановился и просил у ней позволения ее поцеловать; Дуня согласилась… Много могу я насчитать поцелуев,
+
+{{poemx1||
+С тех пор, как этим занимаюсь,<ref>Строка выделена в тексте как цитата, но её источник не установлен.</ref>
+|}}
+{{Noindent|но ни один не оставил во мне столь долгого, столь приятного воспоминания.}}
+
+Прошло несколько лет, и обстоятельства привели меня на тот самый тракт, в те самые места. Я вспомнил дочь старого смотрителя и обрадовался при мысли, что увижу ее снова. Но, подумал я, старый смотритель, может быть, уже сменен; вероятно Дуня уже замужем. Мысль о смерти того или другого также мелькнула в уме моем, и я приближался к станции *** с печальным предчувствием.";
+        
+        $expected ="Лошади были давно готовы, а мне все не хотелось расстаться с смотрителем и его дочкой. Наконец я с ними простился; отец пожелал мне доброго пути, а дочь проводила до телеги. В сенях я остановился и просил у ней позволения ее поцеловать; Дуня согласилась… Много могу я насчитать поцелуев,
+
+С тех пор, как этим занимаюсь,
+
+Прошло несколько лет, и обстоятельства привели меня на тот самый тракт, в те самые места. Я вспомнил дочь старого смотрителя и обрадовался при мысли, что увижу ее снова. Но, подумал я, старый смотритель, может быть, уже сменен; вероятно Дуня уже замужем. Мысль о смерти того или другого также мелькнула в уме моем, и я приближался к станции *** с печальным предчувствием.";
+        $text = new Text();
+        $text_result = $text->parseWikitext( $wikitext );
+//print "___\n";
+
+//print $text_result['text'];
+//print "___\n";
+        $this->assertEquals($expected, $text_result['text']);
+    }
+    
     // -----------------------------------------------------------------
     
     public function testsplitIntoSentences_empty()
@@ -241,16 +281,17 @@ K Rimu eto ochen' idot.",
         $text_result = Text::splitIntoSentences($text);
         $this->assertEquals($expected, $text_result);
     }
-/*    
+    
     public function testsplitIntoSentences_PointWithinSentence()
     {
         $text = "1. Razreshit' NKO SSSR vo izmeneniye poryadka, ustanovlennogo Postanovleniyem GOKO ot 4 noyabrya 1944 g. № 6884s, napravit' dlya raboty na predpriyatiya ugol'noy promyshlennosti, chernoy metallurgii i na lesozagotovki Narkomlesa SSSR v rayony Kamskogo basseyna voyennosluzhashchikh Krasnoy Armii, osvobozhdennykh iz nemetskogo plena, proshedshikh predvaritel'nuyu registratsiyu; repatriiruyemykh sovetskikh grazhdan, priznannykh po sostoyaniyu zdorov'ya godnymi k voyennoy sluzhbe i podlezhashchikh po zakonu mobilizatsii v Krasnuyu Armiyu.";
         $expected = ["1. Razreshit' NKO SSSR vo izmeneniye poryadka, ustanovlennogo Postanovleniyem GOKO ot 4 noyabrya 1944 g. № 6884s, napravit' dlya raboty na predpriyatiya ugol'noy promyshlennosti, chernoy metallurgii i na lesozagotovki Narkomlesa SSSR v rayony Kamskogo basseyna voyennosluzhashchikh Krasnoy Armii, osvobozhdennykh iz nemetskogo plena, proshedshikh predvaritel'nuyu registratsiyu; repatriiruyemykh sovetskikh grazhdan, priznannykh po sostoyaniyu zdorov'ya godnymi k voyennoy sluzhbe i podlezhashchikh po zakonu mobilizatsii v Krasnuyu Armiyu."];
-        $text_result = TemplateExtractor::splitIntoSentences($text);
+        $text_result = Text::splitIntoSentences($text);
         $this->assertEquals($expected, $text_result);
     }
 
-    public function testsplitIntoSentences_WithinAbbr()
+/* V dueli uchastvovali g. Pushkin - разбивается на 2 предложения 
+ *   public function testsplitIntoSentences_WithinAbbr()
     {
         $text = "Vopros zdes' ne v tom, skol'ko dney ili let vy uchite tot ili inoy yazyk, vopros v tom, chto vam real'no nuzhno obuchit' programmu ponimat' tekst. Konkretnyy yazyk programmirovaniya tut ne pri chom, eto vopros teorii. Vy ne mozhete po-logkomu, na osnove formal'nykh kriteriyev, otlichit' konets predlozheniya ot sokrashcheniya. Sravnite, naprimer: «V dueli uchastvovali g. Pushkin i g. Dantes» i «Moi stikhi — odno sploshnoye g. Pushkin by zastrelilsya, no ne stal chitat' takoye.";
         $expected = ["Vopros zdes' ne v tom, skol'ko dney ili let vy uchite tot ili inoy yazyk, vopros v tom, chto vam real'no nuzhno obuchit' programmu ponimat' tekst.", 
@@ -258,7 +299,7 @@ K Rimu eto ochen' idot.",
             "Vy ne mozhete po-logkomu, na osnove formal'nykh kriteriyev, otlichit' konets predlozheniya ot sokrashcheniya.", 
             "Sravnite, naprimer: «V dueli uchastvovali g. Pushkin i g. Dantes» i «Moi stikhi — odno sploshnoye g. ",
             "Pushkin by zastrelilsya, no ne stal chitat' takoye."];
-        $text_result = TemplateExtractor::splitIntoSentences($text);
+        $text_result = Text::splitIntoSentences($text);
         $this->assertEquals($expected, $text_result);
     }
 */
@@ -350,28 +391,6 @@ Spat' ne dayet mne vsyu noch'.";
         $text_result = Text::splitIntoParagraphs($text);
         $this->assertEquals($expected, $text_result);
     }
-/*    
-    public function testsplitIntoWords_withDash()
-    {
-        $text = "И всякую ночь,  около  полуночи,  я  поднимал щеколду и приотворял его дверь - тихо-тихо!";
-        $expected = ["И",
-            "всякую",
-            "ночь",  
-            "около",  
-            "полуночи",  
-            "я",
-            "поднимал",
-            "щеколду", 
-            "и", 
-            "приотворял", 
-            "его", 
-            "дверь",
-            "тихо-тихо"
-                    ];
-        $text_result = Text::splitIntoWords($text);
-        $this->assertEquals($expected, $text_result);
-    }
-*/    
     
     
 }
