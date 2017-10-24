@@ -76,7 +76,7 @@ class Sentence extends Model
             }
             $count++;
         }
-        $this->addToLemmaMatrix($matrix);
+        //$this->addToLemmaMatrix($matrix);
         $this->wordform_total = $count;
         $this->save();
     }

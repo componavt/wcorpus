@@ -187,6 +187,9 @@ print 16^4;
             $text_info['title'] = TemplateExtractor::clearText($text_info['title']);
         }
         $text_info['text'] = TemplateExtractor::clearText($text_info['text']);
+//print "___\n";
+//print $text_info['text'];
+//print "___\n";
         if ($text_info['creation_date']) {
             $text_info['creation_date'] = TemplateExtractor::clearDate($text_info['creation_date']);
         }

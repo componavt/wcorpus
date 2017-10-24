@@ -353,12 +353,26 @@ class TemplateExtractor
         if( !$wikitext ) {
             return '';
         }
+        
+        //{{Noindent|no ni odin ne ostavil vo mne stol' dolgogo, stol' priyatnogo vospominaniya.}}
+        $tags_for_format = ['Noindent']; // безобидные теги для форматирования, удаляем теги, внутренний текст оставляем
+        foreach ($tags_for_format as $template_name) {
+        while (preg_match("/\{\{".$template_name."\|/",$wikitext)) {
+            $splited_text = TemplateExtractor::divideByTemplate($wikitext,$template_name);
+            if (preg_match("/^\{\{".$template_name."\|(.*)\}\}$/",$splited_text[1],$regs)) {
+                $splited_text[1] = $regs[1];
+            }
+            $wikitext  = join('',$splited_text);
+        }
+        }
+
+        
         // remove another templates inside text
         while (preg_match("/^(.*)\{\{[^\}]+\}\}(.*)$/s",$wikitext,$regs)) {
             $wikitext = $regs[1].$regs[2];
         }
         
-        //remove referances
+        //remove references
         $wikitext = preg_replace("/\<ref.+\<\/ref\>/sU","",$wikitext);
 //        $wikitext = preg_replace("/\<ref[^\<]+\<\/ref\>/","",$wikitext);
 
@@ -430,12 +444,20 @@ class TemplateExtractor
         } elseif (preg_match("/\|\s*НАЗВАНИЕ\s*=\s*\[*([^\|\]\}]+)/",$wikitext,$regs)) {
             $title = trim($regs[1]);
             
-            if (preg_match("/^([^\[]*)\[\[([^\|\]]+\|?[^\]]*\]\](.*)$)/",$title,$regs1)) {
+            if (preg_match("/^\([^\[]*)\[\[([^\|\]]+\|?[^\]]*\]\](.*)$)/",$title,$regs1)) {
                 $title = $regs1[1].$regs1[2].$regs1[3];                
             }
             
         }
         
+        if (preg_match("/^\<(.+)\>$/",$title,$regs)) {
+            $title = $regs[1];                
+        }
+        
+        if ((!$title || $title=='?') && preg_match("/\{\{О\s?тексте[^\}]+ПОДЗАГОЛОВОК\s*=\s*\[*([^\|\]\}]+)/",$wikitext,$regs)) {
+            $title = trim($regs[1]);
+        }
+//print "\n______\n$title\n___________\n";        
         $title = TemplateExtractor::clearText($title);
 
         return $title;

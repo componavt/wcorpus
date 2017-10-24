@@ -77,8 +77,8 @@ Zachem vash mrak sgonyayet svet</poem>|1863 ili 1864}}";
                 ['text'=>"«Zachem vy, dni?» — skazal poet.
 A ya sproshu: «Zachem vy, nochi?»
 Zachem vash mrak sgonyayet svet",
-                 'title' => '',
-                 'creation_date' => ''];
+                 'title' => null,
+                 'creation_date' => '1863 ili 1864'];
         $text = new Text();
         $text_result = $text->parseWikitext( $wikitext );
         $this->assertEquals($expected, $text_result);
@@ -184,35 +184,26 @@ K Rimu eto ochen' idot.",
 
     public function testParseWikitext_textWithIncludedPoetry()
     {
-        $wikitext = "{{Отексте
-| АВТОР          = Александр Сергеевич Пушкин
-| НАЗВАНИЕ       = Станционный смотритель
-| ИЗЦИКЛА        = [[Повести покойного Ивана Петровича Белкина]]
-| ДАТАСОЗДАНИЯ   = 1830
-| ДАТАПУБЛИКАЦИИ = 1831<ref>Все повести цикла вышли в свет отдельной книжкой в конце октября 1831 г. под заголовком: «Повести покойного Ивана Петровича Белкина, изданные А. П.»</ref>
-| ИСТОЧНИК       = [http://rvb.ru/pushkin/01text/06prose/01prose/0861.htm РВБ (1959)]
-| ДРУГОЕ         =
-| ВИКИПЕДИЯ      = Станционный смотритель (повесть)
-| ВИКИЦИТАТНИК   = Станционный смотритель (повесть)
-| ПРЕДЫДУЩИЙ     = [[../Гробовщик|Гробовщик]]
-| СЛЕДУЮЩИЙ      = [[../Барышня-крестьянка|Барышня-крестьянка]]
-| ИЗОБРАЖЕНИЕ    =
-| КАЧЕСТВО       = 3
+        $wikitext = "{{Otekste
+| AVTOR = Aleksandr Sergeyevich Pushkin
+| NAZVANIYe = Stantsionnyy smotritel'
+| DATASOZDANIYA = 1830
 }}
-Лошади были давно готовы, а мне все не хотелось расстаться с смотрителем и его дочкой. Наконец я с ними простился; отец пожелал мне доброго пути, а дочь проводила до телеги. В сенях я остановился и просил у ней позволения ее поцеловать; Дуня согласилась… Много могу я насчитать поцелуев,
+Loshadi byli davno gotovy, a mne vse ne khotelos' rasstat'sya s smotritelem i yego dochkoy. Nakonets ya s nimi prostilsya; otets pozhelal mne dobrogo puti, a doch' provodila do telegi. V senyakh ya ostanovilsya i prosil u ney pozvoleniya yeye potselovat'; Dunya soglasilas'… Mnogo mogu ya naschitat' potseluyev,
 
 {{poemx1||
-С тех пор, как этим занимаюсь,<ref>Строка выделена в тексте как цитата, но её источник не установлен.</ref>
+S tekh por, kak etim zanimayus',<ref>Stroka vydelena v tekste kak tsitata, no yeyo istochnik ne ustanovlen.</ref>
 |}}
-{{Noindent|но ни один не оставил во мне столь долгого, столь приятного воспоминания.}}
+{{Noindent|no ni odin ne ostavil vo mne stol' dolgogo, stol' priyatnogo vospominaniya.}}
 
-Прошло несколько лет, и обстоятельства привели меня на тот самый тракт, в те самые места. Я вспомнил дочь старого смотрителя и обрадовался при мысли, что увижу ее снова. Но, подумал я, старый смотритель, может быть, уже сменен; вероятно Дуня уже замужем. Мысль о смерти того или другого также мелькнула в уме моем, и я приближался к станции *** с печальным предчувствием.";
+Proshlo neskol'ko let, i obstoyatel'stva priveli menya na tot samyy trakt, v te samyye mesta. YA vspomnil doch' starogo smotritelya i obradovalsya pri mysli, chto uvizhu yeye snova. No, podumal ya, staryy smotritel', mozhet byt', uzhe smenen; veroyatno Dunya uzhe zamuzhem. Mysl' o smerti togo ili drugogo takzhe mel'knula v ume moyem, i ya priblizhalsya k stantsii *** s pechal'nym predchuvstviyem.";
         
-        $expected ="Лошади были давно готовы, а мне все не хотелось расстаться с смотрителем и его дочкой. Наконец я с ними простился; отец пожелал мне доброго пути, а дочь проводила до телеги. В сенях я остановился и просил у ней позволения ее поцеловать; Дуня согласилась… Много могу я насчитать поцелуев,
+        $expected ="Loshadi byli davno gotovy, a mne vse ne khotelos' rasstat'sya s smotritelem i yego dochkoy. Nakonets ya s nimi prostilsya; otets pozhelal mne dobrogo puti, a doch' provodila do telegi. V senyakh ya ostanovilsya i prosil u ney pozvoleniya yeye potselovat'; Dunya soglasilas'… Mnogo mogu ya naschitat' potseluyev,
 
-С тех пор, как этим занимаюсь,
+S tekh por, kak etim zanimayus',
+no ni odin ne ostavil vo mne stol' dolgogo, stol' priyatnogo vospominaniya.
 
-Прошло несколько лет, и обстоятельства привели меня на тот самый тракт, в те самые места. Я вспомнил дочь старого смотрителя и обрадовался при мысли, что увижу ее снова. Но, подумал я, старый смотритель, может быть, уже сменен; вероятно Дуня уже замужем. Мысль о смерти того или другого также мелькнула в уме моем, и я приближался к станции *** с печальным предчувствием.";
+Proshlo neskol'ko let, i obstoyatel'stva priveli menya na tot samyy trakt, v te samyye mesta. YA vspomnil doch' starogo smotritelya i obradovalsya pri mysli, chto uvizhu yeye snova. No, podumal ya, staryy smotritel', mozhet byt', uzhe smenen; veroyatno Dunya uzhe zamuzhem. Mysl' o smerti togo ili drugogo takzhe mel'knula v ume moyem, i ya priblizhalsya k stantsii *** s pechal'nym predchuvstviyem.";
         $text = new Text();
         $text_result = $text->parseWikitext( $wikitext );
 //print "___\n";

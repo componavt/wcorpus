@@ -101,7 +101,7 @@ class TextController extends Controller
 
         $numAll = $texts->get()->count();
 
-        $texts = $texts
+        $texts = $texts->take(1000)
                 //->with('author')
                 ->paginate($this->url_args['limit_num']);         
         
@@ -265,7 +265,7 @@ class TextController extends Controller
                     ->orderBy('title')
                     ->take(100)
                     ->get();
-            $is_exist_not_parse_text = 0;     // когда оттестится, убрать           
+            //$is_exist_not_parse_text = 0;     // когда оттестится, убрать           
 //dd($texts);            
             if ($texts->count()) {
                 foreach ($texts as $text) {
