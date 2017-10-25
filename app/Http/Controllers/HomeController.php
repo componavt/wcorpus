@@ -68,7 +68,13 @@ class HomeController extends Controller
         $stats['lemma_predicted_total'] = number_format($lemma_predicted_total, 0, '.', ' ');
 
         $stats['lemma_clear_total'] = number_format($lemma_total - $lemma_predicted_total, 0, '.', ' ');
-        
+
+        return view('stats.index')->
+                with(['stats'=>$stats]); 
+    }
+    
+    public function statsTables()
+    {
         $table_names = DB::select(DB::raw("SHOW TABLES"));
         $tables = [];
         foreach($table_names as $table_name) {
@@ -77,8 +83,7 @@ class HomeController extends Controller
             $tables[$tname] = number_format($counts[0]->count, 0, '.', ' ');            
         }
 
-        return view('stats')->
-                with(['stats'=>$stats,
-                      'tables' =>$tables]); 
+        return view('stats.tables')->
+                with(['tables' =>$tables]); 
     }
 }

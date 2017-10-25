@@ -56,6 +56,17 @@
                         
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                Bigrams <span class="caret"></span>
+                            </a>
+                            
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="/bigram/create">Create bigrams for an author</a></li>
+                                <li><a href="/bigram">Comparison of bigrams</a></li>
+                            </ul>
+                        </li>
+                        
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                                 References <span class="caret"></span>
                             </a>
                             
@@ -75,6 +86,15 @@
                             </ul>
                         </li>
                         
-                        <li><a href="/stats">Statistics</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                Statistics <span class="caret"></span>
+                            </a>
+                            
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="/stats">Statistics</a></li>
+                                <li><a href="/stats/tables">DB structure</a></li>
+                            </ul>
+                        </li>
                     </ul>
 

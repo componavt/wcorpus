@@ -23,7 +23,7 @@ class LemmaMatrixController extends Controller
                     'limit_num'       => (int)$request->input('limit_num'),
                     'page'            => (int)$request->input('page'),
 //                    'search_wordform'  => (int)$request->input('search_sentence'),
-                    'search_lemma'  => $request->input('search_wordform'),
+                    'search_lemma'  => $request->input('search_lemma'),
                     'order_by'      => $request->input('order_by'),
                 ];
         

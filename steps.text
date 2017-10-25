@@ -217,3 +217,13 @@ delete from texts;
 SET foreign_key_checks=0;
 delete from authors;
 delete from publications;
+
+update texts set included=0 where author_id <>20;
+php artisan make:migration add_bigram_processes_to_table_sentences --table="sentences"
+
+php artisan make:migration create_bigram_author_table 
+
+php artisan make:controller 'BigramController'
+php artisan make:model 'Models\Bigram'
+
+php artisan make:migration add_keys_to_table_bigram_author --table="bigram_author"

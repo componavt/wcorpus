@@ -310,7 +310,7 @@ class TextController extends Controller
                     ->whereNotIn('id',[402631,125263,125413])
                     ->where('included',1)
 //                    ->orderBy('title')
-                    ->take(100)
+                    ->take(10)
                     ->get();
 //dd($texts);            
             if ($texts->count()) {
@@ -318,6 +318,7 @@ class TextController extends Controller
 print "<p>".$text->id."</p>\n";                    
                     $text->breakIntoSentences();
                 }
+//                $is_exist_not_broken_text = 0;
             } else {
                 $is_exist_not_broken_text = 0;
             }

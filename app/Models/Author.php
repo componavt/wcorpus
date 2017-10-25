@@ -21,6 +21,17 @@ class Author extends Model
         return $this->hasMany(Publication::class);
     }
 
+    public static function getNameByID(INT $id)
+    {
+        $author = self::find($id);
+        
+        if (!$author) {
+            return NULL;
+        }
+        
+        return $author->name;
+    }
+
     /** Gets list of authors
      * 
      * @return Array [1=>'Alexander Sergeevich Pushkin',..]

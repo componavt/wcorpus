@@ -25,6 +25,17 @@ class Text extends Model
         return $this->belongsTo(Publication::class);
     }
 
+    public static function getTitleByID(INT $id)
+    {
+        $text = self::find($id);
+        
+        if (!$text) {
+            return NULL;
+        }
+        
+        return $text->title;
+    }
+
     // Text __has_many__ Sentences
     public function sentences()
     {

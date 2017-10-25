@@ -63,8 +63,11 @@ class SentenceController extends Controller
                 orderBy('text_id');
                 //->orderBy('id');
 
+        $text_values = [];
+        
         if ($this->url_args['search_text']) {
             $sentences = $sentences->where('text_id',$this->url_args['search_text']);
+            $text_values[$this->url_args['search_text']] = Text::getTitleByID($this->url_args['search_text']);
         } 
         
         if ($this->url_args['search_wordform']) {
@@ -89,6 +92,7 @@ class SentenceController extends Controller
                   ->with(array(
                                'numAll'          => $numAll,
                                'sentences'       => $sentences,
+                               'text_values'     => $text_values,
                                'wordform'        => $wordform,
                                'args_by_get'     => $this->args_by_get,
                                'url_args'        => $this->url_args,

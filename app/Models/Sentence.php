@@ -3,6 +3,7 @@
 namespace Wcorpus\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use DB;
 
 use Wcorpus\Models\Wordform;
 
@@ -23,6 +24,35 @@ class Sentence extends Model
         return $builder;
     }
 
+    public static function countByAuthor($author_id) {
+        if (!$author_id) {
+            return null;
+        }
+        $query = "SELECT count(*) as count FROM sentences WHERE text_id in "
+               . "(select id FROM texts where author_id=".(int)$author_id.")";
+//print '<p>'.$query;        
+        $results = DB::select( DB::raw($query) );
+        if (!$results) {
+            return null;
+        }
+        return $results[0]->count;
+        
+    }
+
+    public static function countByIDAndAuthor($id,$author_id) {
+        if (!$id || !$author_id) {
+            return null;
+        }
+        $results = DB::select( DB::raw("SELECT count(*) as count FROM sentences WHERE "
+                . "text_id in (select id FROM texts where author_id=".(int)$author_id.") "
+                 . "AND sentence_id=".(int)$id.")") );
+        if (!$results) {
+            return null;
+        }
+        return $results[0]->count;
+        
+    }
+    
     /** delete all linked Wordforms
      */
     public function deleteWordforms() {

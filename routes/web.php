@@ -20,8 +20,11 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index');
 Route::get('/stats', 'HomeController@stats');
+Route::get('/stats/tables', 'HomeController@statsTables');
 
 Route::get('/author/name_list', 'AuthorController@namesList');
+
+Route::get('/bigram/create', 'BigramController@create');
 
 Route::get('/lemma/count_freq','LemmaController@countFrequency');
 Route::get('/lemma/count_wordforms','LemmaController@countWordforms');

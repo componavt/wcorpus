@@ -15,13 +15,15 @@ List of sentences
 @stop
 
 @section('panel-body')
-        {!! Form::open(['url' => '/text/',
+        {!! Form::open(['url' => '/sentence/',
                              'method' => 'get',
                              'class' => 'form-inline'])
         !!}
         @include('widgets.form._formitem_select2',
                 ['name' => 'search_text',
                  'value' =>$url_args['search_text'],
+                 'values' => $text_values,
+                 'is_multiple' => false,
                  'class'=>'multiple-select-text form-control',
                  'attributes'=>['placeholder' => 'Text' ]])
         

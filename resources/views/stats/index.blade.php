@@ -21,10 +21,5 @@ Statistics
     <br>Number of predicted lemmas (Lp): <big>{{$stats['lemma_predicted_total']}}</big>
     <br>L - Lp = <big>{{$stats['lemma_clear_total']}}</big>
     </p>
-
-    <h3>Tables:</h3>
-    @foreach($tables as $tname => $count)
-        {{$tname}}: {{$count}}<br>
-    @endforeach
 @stop
 
