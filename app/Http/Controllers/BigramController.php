@@ -97,13 +97,13 @@ print "<p>".$sentence->sentence;
             }
         }      
         
-/*        return view('bigram.create')
+        return view('bigram.create')
               ->with(['author_values' => $author_values,
 
 //                               'matrix'        => $matrix,
 //                              'args_by_get'   => $this->args_by_get,
                       'url_args'      => $this->url_args,
                       ]
-                );*/
+                );
     }
 }

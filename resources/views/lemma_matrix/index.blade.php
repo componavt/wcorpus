@@ -49,8 +49,8 @@ Lemma matrix
             ?>
             <tr>
                 <td>{{ $list_count++ }}</td>
-                <td>{{$lemma1->lemma}}</td>
-                <td>{{$lemma2->lemma}}</td>
+                <td><a href="/lemma/{{$lemma1->id}}">{{$lemma1->lemma}}</a> ({{$lemma1->pos->name}})</td>
+                <td><a href="/lemma/{{$lemma2->id}}">{{$lemma2->lemma}}</a> ({{$lemma2->pos->name}})</td>
                 <td>{{$pair->freq_12}}</td>
                 <td>{{$pair->freq_21}}</td>
             </tr>
