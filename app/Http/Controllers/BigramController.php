@@ -3,6 +3,7 @@
 namespace Wcorpus\Http\Controllers;
 
 use Illuminate\Http\Request;
+use DB;
 
 use Wcorpus\Models\Author;
 use Wcorpus\Models\Bigram;
@@ -24,11 +25,11 @@ class BigramController extends Controller
     public function __construct(Request $request)
     {
         $this->url_args = [
-//                    'limit_num'       => (int)$request->input('limit_num'),
-//                    'page'            => (int)$request->input('page'),
-//                    'search_wordform'  => (int)$request->input('search_sentence'),
+                    'limit_num'       => (int)$request->input('limit_num'),
+                    'page'            => (int)$request->input('page'),
                     'search_author'  => $request->input('search_author'),
-//                    'order_by'      => $request->input('order_by'),
+                    'search_author2'  => $request->input('search_author2'),
+                    'order_by'      => $request->input('order_by'),
                 ];
  /*       
         if (!$this->url_args['page']) {
@@ -42,6 +43,36 @@ class BigramController extends Controller
         }   
 */        
         $this->args_by_get = Wcorpus::searchValuesByURL($this->url_args);
+    }
+
+    /**
+     * View bigrams for authors $search_author and $search_author2.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
+    {
+        $query = "SELECT DISTINCT author_id FROM bigram_author";
+        $authors = DB::select(DB::raw($query));
+        $author_values= [];
+        foreach ($authors as $author) {
+            $author_values[$author->author_id] = Author::getNameByID($author->author_id);
+        }
+
+        if ($this->url_args['search_author'] && $this->url_args['search_author2']) {
+            if (!$this->url_args['order_by'] && $this->url_args['order_by']!='author2') {
+                $this->url_args['order_by'] = 'author';
+            }
+            
+            $bigrams = Bigram::where('author_id',$this->url_args['search_'.$this->url_args['order_by']])
+                    ;
+        }
+        
+        return view('bigram.index')
+              ->with(['author_values' => $author_values,
+                      'url_args'      => $this->url_args,
+                      ]
+                );
     }
 
     /**
@@ -89,7 +120,9 @@ print "<p>".$sentence->sentence;
                         $lemmas1 = $lemmas2;
                     }
 //print "<br>".$lemma1->lemma." - finish";   
-                    Bigram::updateBigram($author_id, $lemma1->id, null);
+                    if ($lemma1->id) {
+                        Bigram::updateBigram($author_id, $lemma1->id, null);
+                    }
                     $sentence->bigram_processed=1;
                     $sentence->save();
                 }   

@@ -347,6 +347,12 @@ print " = $sentence_count";
      */
     public function lemmatizeAll()
     {
+/*        $wordform = new Wordform();
+        $wordform->wordform = "проходило";
+print "<pre>";
+        $text_result = $wordform->lemmatize();
+var_dump($text_result);
+exit(0);*/
         // stop when there is no sentences with wordform_total=NULL
         $is_exist_not_lemmatized = 1;
         

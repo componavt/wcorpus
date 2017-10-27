@@ -110,6 +110,7 @@ class Wordform extends Model
         }
         
         foreach($collection as $paradigm) {
+//var_dump($paradigm[0]);            
             $pos = $paradigm[0]->getPartOfSpeech();
             $pos_obj = POS::firstOrCreate(['aot_name'=>$pos]);
             if (!$pos_obj->name) {
@@ -152,19 +153,20 @@ class Wordform extends Model
     
     public function update_lemmas()
     {
-        if ($this->lemmas()->count()) {
+        if ($this->lemmas) {
             $this->lemmas()->detach();
             $this->lemma_total = 0;
             $this->save();
         }
         
         $lemmas = $this->lemmatize();
-        
+        $lemma_ids=[];
         foreach ($lemmas as $lemma) {
 print "<br>".$lemma['lemma']." (dictionary:".$lemma['dictionary'].", pos_id:".$lemma['pos_id'].", animative:".$lemma['animative'].", named: ". $lemma['name_id']. ")\n";            
             $lemma_obj = Lemma::firstOrCreate($lemma);
-            $this->lemmas()->attach($lemma_obj);
+            $lemma_ids[$lemma_obj->id] = 1;            
         }
+        $this->lemmas()->attach(array_keys($lemma_ids));
         $this->lemma_total = $this->lemmas()->count();
         $this->push();
     }

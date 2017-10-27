@@ -29,12 +29,24 @@ class Bigram extends Model
                       ->where('lemma1',$lemma1)
                       ->where('lemma2',$lemma2)->first();
         if ($bigram) {
-            $bigram->count12 += 1;
+//print "<p>!!!";            
+            $bigram->count12 = 1+$bigram->count12;
+            $bigram->save();
         } else {
             if ($lemma1) {
-                $count1 = Lemma::countByIDAndAuthor($lemma1,$author_id);
+                $bigram=Bigram::where('lemma1',$lemma1)->first();
+                if ($bigram && $bigram->count1) {
+                    $count1 = $bigram->count1;
+                } else {
+                    $count1 = Lemma::countByIDAndAuthor($lemma1,$author_id);
+                }
             } else {
-                $count1 = Sentence::countByAuthor($author_id);
+                $bigram=Bigram::whereNull('lemma1')->first();
+                if ($bigram && $bigram->count1) {
+                    $count1 = $bigram->count1;
+                } else {
+                    $count1 = Sentence::countByAuthor($author_id);
+                }
             }
             $bigram = self::create(['author_id'=>$author_id,
                                     'lemma1' => $lemma1,

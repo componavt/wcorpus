@@ -227,3 +227,5 @@ php artisan make:controller 'BigramController'
 php artisan make:model 'Models\Bigram'
 
 php artisan make:migration add_keys_to_table_bigram_author --table="bigram_author"
+
+php artisan make:migration add_unique_to_table_lemma_wordform --table="lemma_wordform"

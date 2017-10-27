@@ -24,6 +24,7 @@ Route::get('/stats/tables', 'HomeController@statsTables');
 
 Route::get('/author/name_list', 'AuthorController@namesList');
 
+Route::get('/bigram/', 'BigramController@index');
 Route::get('/bigram/create', 'BigramController@create');
 
 Route::get('/lemma/count_freq','LemmaController@countFrequency');
