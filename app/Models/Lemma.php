@@ -66,6 +66,7 @@ class Lemma extends Model
         }
     }
     
+//SELECT count(*) as count FROM sentence_wordform WHERE sentence_id in (SELECT id FROM sentences WHERE text_id in (select id FROM texts where author_id=62)) AND wordform_id in (select wordform_id from lemma_wordform WHERE lemma_id=901101);    
     public static function countByIDAndAuthor($id,$author_id) {
         if (!$id || !$author_id) {
             return null;
@@ -80,7 +81,6 @@ class Lemma extends Model
         return $results[0]->count;
         
     }
-    
     /** delete all records from lemma_matrix where lemma1 or lemma2 is $this->id
      */
     public function deleteFromMatrix() {

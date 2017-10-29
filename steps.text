@@ -229,3 +229,32 @@ php artisan make:model 'Models\Bigram'
 php artisan make:migration add_keys_to_table_bigram_author --table="bigram_author"
 
 php artisan make:migration add_unique_to_table_lemma_wordform --table="lemma_wordform"
+
+DROP TABLE IF EXISTS `bigram_author`;
+CREATE TABLE `bigram_author` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `author_id` int(10) unsigned NOT NULL,
+  `lemma1` int(10) unsigned DEFAULT NULL,
+  `lemma2` int(10) unsigned DEFAULT NULL,
+  `count1` int(10) unsigned NOT NULL DEFAULT '0',
+  `count12` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `bigram_author_author_id_lemma1_lemma2_unique` (`author_id`,`lemma1`,`lemma2`),
+  KEY `bigram_author_author_id_index` (`author_id`),
+  KEY `bigram_author_count1_index` (`count1`),
+  KEY `bigram_author_count12_index` (`count12`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+DROP TABLE IF EXISTS `lemma_wordform`;
+CREATE TABLE `lemma_wordform` (
+  `lemma_id` int(10) unsigned NOT NULL,
+  `wordform_id` int(10) unsigned NOT NULL,
+  KEY `lemma_id_index` (`lemma_id`),
+  KEY `wordform_id_index` (`wordform_id`),
+  KEY `lemma_wordform_index` (`lemma_id`,`wordform_id`),
+  CONSTRAINT `lemma_wordform_lemma_id_foreign` FOREIGN KEY (`lemma_id`) REFERENCES `lemmas` (`id`),
+  CONSTRAINT `lemma_wordform_wordform_id_foreign` FOREIGN KEY (`wordform_id`) REFERENCES `wordforms` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+update sentences set bigram_processed=0;
+update wordforms set lemma_total=0;
