@@ -11,17 +11,153 @@ use Wcorpus\Models\Sentence;
 class Bigram extends Model
 {
     protected $connection = 'mysql';
-    protected $fillable = ['author_id','lemma1','lemma2','count1','count12'];
-    protected $table = 'bigram_author';
+    protected $fillable = ['author_id','text_id','sentence_id','lemma1','lemma2','count1','count12'];
+/*    protected $fillable = ['author_id','lemma1','lemma2','count1','count12'];
+    protected $table = 'bigram_author'; */
     
     public $timestamps = false;
     
     /**
      * 
      * @param INT $author_id
+     * @param INT $text_id
+     * @param INT $sentence_id
      * @param INT $lemma1
      * @param INT $lemma2
-     */
+     */ 
+    public static function createBigram(INT $author_id, $text_id, $sentence_id, $lemma1, $lemma2) {
+        if (!$author_id || !$text_id || !$sentence_id) {
+            return;
+        }
+        $bigram = self::create(['author_id'=>$author_id,
+                                'text_id' => $text_id,
+                                'sentence_id' => $sentence_id,
+                                'lemma1' => $lemma1,
+                                'lemma2' => $lemma2,
+                               ]);
+        $bigram->save();
+    }
+    
+    /**
+     * 
+     * @param INT $author_id
+     */ 
+    public static function createAuthorBigrams(INT $author_id) {
+        if (!$author_id) {
+            return;
+        }
+        
+        $is_exists_not_processed = true;
+
+        while ($is_exists_not_processed) {
+            $sentences = Sentence::where('bigram_processed',0)
+                                  ->whereIn('text_id',function($query) use ($author_id){
+                                        $query->select('id')
+                                        ->from('texts')
+                                        ->where('author_id', $author_id);
+                                    })->take(10)->get();
+            if (!sizeof($sentences)) {
+                $is_exists_not_processed = false;
+                continue;
+            }      
+
+            foreach($sentences as $sentence) {
+print "<p>".$sentence->sentence;                    
+                $wordforms = Wordform::leftJoin('sentence_wordform','sentence_wordform.wordform_id','=','wordforms.id')
+                                     ->where('sentence_id',$sentence->id)
+                                     ->orderBy('word_number')->get();
+                $lemmas1[0] = new Lemma;
+                foreach ($wordforms as $wordform) {
+//print "<br>".$wordform->wordform. ", ".$wordform->word_number;                        
+                    $lemmas2 = $wordform->lemmas;
+                    foreach ($lemmas1 as $lemma1) {
+                        foreach ($lemmas2 as $lemma2) {
+//print "<br>".$lemma1->lemma." - ".$lemma2->lemma. ", ".$wordform->word_number;   
+                            Bigram::createBigram($author_id, $sentence->text_id, $sentence->id, $lemma1->id, $lemma2->id);
+                            //Bigram::updateBigram($author_id, $lemma1->id, $lemma2->id);
+                        }
+                    } 
+                    $lemmas1 = $lemmas2;
+                }
+//print "<br>".$lemma1->lemma." - finish";   
+                if ($lemma1->id) {
+                    Bigram::createBigram($author_id, $sentence->text_id, $sentence->id, $lemma1->id, null);
+//                        Bigram::updateBigram($author_id, $lemma1->id, null);
+                }
+                $sentence->bigram_processed=1;
+                $sentence->save();
+            }   
+//$is_exists_not_processed = false;                
+        }
+            
+    }
+    
+    /**
+     * 
+     * @param INT $author_id
+     */ 
+    public static function countAuthorLemmaFrequency(INT $author_id) {
+        if (!$author_id) {
+            return;
+        }
+        
+        $is_exists_not_processed = true;
+
+        while ($is_exists_not_processed) {
+            $lemmas = self::whereNull('count1')
+                             ->groupBy('author_id','lemma1')
+                             ->where('author_id', $author_id)
+                             ->select(DB::raw('lemma1, count(*) as count'))
+                             ->take(100)->get();
+            if (!sizeof($lemmas)) {
+                $is_exists_not_processed = false;
+                continue;
+            }      
+
+            foreach($lemmas as $lemma) {
+                DB::statement("update bigrams set count1=".(int)$lemma->count.
+                        " where lemma1=".(int)$lemma->lemma1.
+                        " and author_id=".(int)$author_id);
+            }   
+        }
+    }
+        
+    /**
+     * 
+     * @param INT $author_id
+     */ 
+    public static function countAuthorBigramFrequency(INT $author_id) {
+        if (!$author_id) {
+            return;
+        }
+        
+        $is_exists_not_processed = true;
+
+        while ($is_exists_not_processed) {
+            $lemmas = self::whereNull('count12')
+                             ->groupBy('author_id','lemma1','lemma2')
+                             ->where('author_id', $author_id)
+                             ->select(DB::raw('lemma1, lemma2, count(*) as count'))
+                             ->take(100)->get();
+            if (!sizeof($lemmas)) {
+                $is_exists_not_processed = false;
+                continue;
+            }      
+
+            foreach($lemmas as $lemma) {
+                DB::statement("update bigrams set count12=".(int)$lemma->count.
+                        " where lemma1=".(int)$lemma->lemma1.
+                        " and lemma2=".(int)$lemma->lemma2).
+                        " and author_id=".(int)$author_id;
+            }   
+        }
+    }
+/**
+     * 
+     * @param INT $author_id
+     * @param INT $lemma1
+     * @param INT $lemma2
+     */ /*
     public static function updateBigram(INT $author_id, $lemma1, $lemma2) {
         if (!$author_id) {
             return;
@@ -57,7 +193,7 @@ class Bigram extends Model
                                    ]);
             $bigram->save();
         }       
-    }
+    }*/
     /**
      * 
      * @param INT $author_id
