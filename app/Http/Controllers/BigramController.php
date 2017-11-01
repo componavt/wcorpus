@@ -99,7 +99,7 @@ class BigramController extends Controller
             
             Bigram::countAuthorLemmaFrequency($author_id);
             
-            Bigram::countAuthorBigramsFrequency($author_id);
+            Bigram::countAuthorBigramFrequency($author_id);
         }      
 
         

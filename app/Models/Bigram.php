@@ -101,12 +101,27 @@ print "<p>".$sentence->sentence;
             return;
         }
         
+        // lemma1 - begining of sentence
+        $lemmas = self::whereNull('count1')
+                      ->where('author_id', $author_id)
+                      ->whereNull('lemma1')
+                      ->first();
+        
+        if ($lemmas) {
+            $count = Sentence::countByAuthor($author_id);
+//dd($count);            
+            DB::statement("update bigrams set count1=".(int)$count.
+                        " where lemma1=NULL".
+                        " and author_id=".(int)$author_id);
+        }
+        
         $is_exists_not_processed = true;
 
         while ($is_exists_not_processed) {
             $lemmas = self::whereNull('count1')
                              ->groupBy('author_id','lemma1')
                              ->where('author_id', $author_id)
+                             ->whereNotNull('lemma1')
                              ->select(DB::raw('lemma1, count(*) as count'))
                              ->take(100)->get();
             if (!sizeof($lemmas)) {
@@ -145,10 +160,22 @@ print "<p>".$sentence->sentence;
             }      
 
             foreach($lemmas as $lemma) {
-                DB::statement("update bigrams set count12=".(int)$lemma->count.
-                        " where lemma1=".(int)$lemma->lemma1.
-                        " and lemma2=".(int)$lemma->lemma2).
-                        " and author_id=".(int)$author_id;
+                $query = "update bigrams set count12=".(int)$lemma->count.
+                        " where lemma1";
+                if ($lemma->lemma1 === null) {
+                    $query .= " is null";
+                } else {
+                    $query .= "=".(int)$lemma->lemma1;
+                }
+                $query .= " and lemma2";
+                if ($lemma->lemma2 === null) {
+                    $query .= " is null";
+                } else {
+                    $query .= "=".(int)$lemma->lemma2;
+                }
+                $query .= " and author_id=".(int)$author_id;
+                
+                DB::statement($query);
             }   
         }
     }
