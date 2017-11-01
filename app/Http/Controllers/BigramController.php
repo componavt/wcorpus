@@ -52,7 +52,7 @@ class BigramController extends Controller
      */
     public function index(Request $request)
     {
-        $query = "SELECT DISTINCT author_id FROM bigram_author";
+        $query = "SELECT DISTINCT author_id FROM bigrams";
         $authors = DB::select(DB::raw($query));
         $author_values= [];
         $bigrams = null;
@@ -69,7 +69,8 @@ class BigramController extends Controller
             $bigrams = Bigram::where('author_id',$this->url_args['search_'.$this->url_args['order_by']])
                      -> select(DB::raw('lemma1, lemma2, count1, count12, count12/count1 as probability'))
 //                     ->take(10)
-                     ->orderBy('probability', 'desc');
+                     -> groupBy('author_id','lemma1','lemma2')
+                     -> orderBy('probability', 'desc');
             
             $bigrams = $bigrams ->paginate($this->url_args['limit_num']);         
         }
