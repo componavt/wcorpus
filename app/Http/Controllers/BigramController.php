@@ -68,8 +68,10 @@ class BigramController extends Controller
             
             $bigrams = Bigram::where('author_id',$this->url_args['search_'.$this->url_args['order_by']])
                      -> select(DB::raw('lemma1, lemma2, count1, count12, count12/count1 as probability'))
-//                     ->take(10)
-                     -> groupBy('author_id','lemma1','lemma2')
+                     -> where('count1', '>', 10)
+                     -> where('count12', '>', 10)
+//                     -> take(10)
+                     -> groupBy('lemma1','lemma2','count1','count12')
                      -> orderBy('probability', 'desc');
             
             $bigrams = $bigrams ->paginate($this->url_args['limit_num']);         

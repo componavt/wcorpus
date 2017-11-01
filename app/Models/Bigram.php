@@ -232,7 +232,7 @@ print "<p>".$sentence->sentence;
             return 0;
         }
         
-        $query = "SELECT count12/count1 as prob FROM bigram_author WHERE author_id='".$author_id."' ";
+        $query = "SELECT count12/count1 as prob FROM bigrams WHERE author_id='".$author_id."' ";
         if (!$lemma1) {
             $query .= " AND lemma1 is null";
         } else {
@@ -262,7 +262,7 @@ print "<p>".$sentence->sentence;
             $out;
         }
         
-        $query = "SELECT count1, count12, count12/count1 as probability FROM bigram_author WHERE author_id='".$author_id."' ";
+        $query = "SELECT count1, count12, count12/count1 as probability FROM bigrams WHERE author_id='".$author_id."' ";
         if (!$lemma1) {
             $query .= " AND lemma1 is null";
         } else {
@@ -273,6 +273,7 @@ print "<p>".$sentence->sentence;
         } else {
             $query .= " AND lemma2 = ".(int)$lemma2;
         }
+//print "<p>$query";        
         $result = DB::select(DB::raw($query));
         if ($result) {
             return ['count12'=>$result[0]->count12, 'count1'=>$result[0]->count1, 'probability'=>$result[0]->probability];

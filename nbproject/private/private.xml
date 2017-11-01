@@ -3,25 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/E:/all/projects/git/wcorpus/resources/views/header/top_left_menu.blade.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/app/Models/Lemma.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/app/Http/Controllers/HomeController.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/app/Models/Text.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/app/Models/Wordform.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/app/Http/Controllers/TextController.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/app/Models/Publication.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/app/Http/Controllers/LemmaController.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/database/migrations/2017_09_29_155332_create_table_lemma_matrix.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/app/Http/Controllers/BigramController.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/steps.text</file>
-            <file>file:/E:/all/projects/git/wcorpus/app/Http/Controllers/WordformController.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/tests/Unit/TextTest.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/resources/views/stats/tables.blade.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/resources/views/bigram/index.blade.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/database/migrations/2017_10_24_143736_add_bigram_processes_to_table_sentences.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/database/migrations/2017_10_24_144854_create_bigram_author_table.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/app/Models/Sentence.php</file>
-            <file>file:/E:/all/projects/git/wcorpus/app/Models/Bigram.php</file>
+            <file>file:/data/all/projects/git/wcorpus/app/Models/Bigram.php</file>
+            <file>file:/data/all/projects/git/wcorpus/resources/views/bigram/index.blade.php</file>
+            <file>file:/data/all/projects/git/wcorpus/app/Http/Controllers/BigramController.php</file>
+            <file>file:/data/all/projects/git/wcorpus/routes/web.php</file>
         </group>
     </open-files>
 </project-private>
