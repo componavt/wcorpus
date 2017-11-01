@@ -96,48 +96,13 @@ class BigramController extends Controller
             $author_id = $this->url_args['search_author'];
             $author_values[$author_id] = Author::getNameByID($author_id);
             
-            $is_exists_not_processed = true;
+            Bigram::createAuthorBigrams($author_id);
             
-            while ($is_exists_not_processed) {
-                $sentences = Sentence::where('bigram_processed',0)
-                                      ->whereIn('text_id',function($query) use ($author_id){
-                                            $query->select('id')
-                                            ->from('texts')
-                                            ->where('author_id', $author_id);
-                                        })->take(10)->get();
-                if (!sizeof($sentences)) {
-                    $is_exists_not_processed = false;
-                    continue;
-                }      
-                
-                foreach($sentences as $sentence) {
-print "<p>".$sentence->sentence;                    
-                    $wordforms = Wordform::leftJoin('sentence_wordform','sentence_wordform.wordform_id','=','wordforms.id')
-                                         ->where('sentence_id',$sentence->id)
-                                         -> orderBy('word_number')
-                                         ->get();
-                    $lemmas1[0] = new Lemma;
-                    foreach ($wordforms as $wordform) {
-//print "<br>".$wordform->wordform. ", ".$wordform->word_number;                        
-                        $lemmas2 = $wordform->lemmas;
-                        foreach ($lemmas1 as $lemma1) {
-                            foreach ($lemmas2 as $lemma2) {
-//print "<br>".$lemma1->lemma." - ".$lemma2->lemma. ", ".$wordform->word_number;   
-                                Bigram::updateBigram($author_id, $lemma1->id, $lemma2->id);
-                            }
-                        } 
-                        $lemmas1 = $lemmas2;
-                    }
-//print "<br>".$lemma1->lemma." - finish";   
-                    if ($lemma1->id) {
-                        Bigram::updateBigram($author_id, $lemma1->id, null);
-                    }
-                    $sentence->bigram_processed=1;
-                    $sentence->save();
-                }   
-//$is_exists_not_processed = false;                
-            }
+            Bigram::countAuthorLemmaFrequency($author_id);
+            
+            Bigram::countAuthorBigramFrequency($author_id);
         }      
+
         
         return view('bigram.create')
               ->with(['author_values' => $author_values,

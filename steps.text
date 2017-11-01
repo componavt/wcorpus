@@ -258,3 +258,7 @@ CREATE TABLE `lemma_wordform` (
 
 update sentences set bigram_processed=0;
 update wordforms set lemma_total=0;
+
+php artisan make:migration create_table_bigrams --table="bigrams"
+
+php artisan make:migration add_keys_to_table_bigrams --table="bigrams"
