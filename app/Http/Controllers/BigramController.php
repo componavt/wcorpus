@@ -30,6 +30,7 @@ class BigramController extends Controller
                     'search_author'  => $request->input('search_author'),
                     'search_author2'  => $request->input('search_author2'),
                     'order_by'      => $request->input('order_by'),
+                    'conversely'    =>(int)$request->input('conversely'),
                 ];
         
         if (!$this->url_args['page']) {
@@ -42,6 +43,15 @@ class BigramController extends Controller
             $this->url_args['limit_num'] = 1000;
         }   
         
+        if ($this->url_args['conversely']) {
+            $tmp = $this->url_args['search_author'];
+            $this->url_args['search_author'] = $this->url_args['search_author2'];
+            $this->url_args['search_author2'] = $tmp;
+        }
+        if (!$this->url_args['order_by']) {
+            $this->url_args['order_by'] = 'probability';
+        }
+
         $this->args_by_get = Wcorpus::searchValuesByURL($this->url_args);
     }
 
@@ -52,6 +62,7 @@ class BigramController extends Controller
      */
     public function index(Request $request)
     {
+            
         $query = "SELECT DISTINCT author_id FROM bigrams";
         $authors = DB::select(DB::raw($query));
         $author_values= [];
@@ -62,18 +73,14 @@ class BigramController extends Controller
         }
 
         if ($this->url_args['search_author'] && $this->url_args['search_author2']) {
-            if (!$this->url_args['order_by'] && $this->url_args['order_by']!='author2') {
-                $this->url_args['order_by'] = 'author';
-            }
-            
-            $bigrams = Bigram::where('author_id',$this->url_args['search_'.$this->url_args['order_by']])
+            $bigrams = Bigram::where('author_id',$this->url_args['search_author'])
                      -> select(DB::raw('lemma1, lemma2, count1, count12, count12/count1 as probability'))
                      -> where('count1', '>', 10)
                      -> where('count12', '>', 10)
 //                     -> take(10)
                      -> groupBy('lemma1','lemma2','count1','count12')
-                     -> orderBy('probability', 'desc');
-            
+                     -> orderBy($this->url_args['order_by'], 'desc');
+//dd($bigrams->toSql());            
             $bigrams = $bigrams ->paginate($this->url_args['limit_num']);         
         }
         
