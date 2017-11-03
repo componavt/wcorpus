@@ -7,6 +7,7 @@ use DB;
 
 use Wcorpus\Models\Lemma;
 use Wcorpus\Models\Sentence;
+use Wcorpus\Wcorpus;
 
 class Bigram extends Model
 {
@@ -256,10 +257,11 @@ print "<p>".$sentence->sentence;
      * @param INT $lemma1
      * @param INT $lemma2
      */
-    public static function getCountsAndProbability(INT $author_id, $lemma1, $lemma2) {
+    public static function getCountsAndProbability(INT $author_id, $lemma1, $lemma2, $max_count1, $max_count12) {
         $out = ['count12'=>'','count1'=>'','probability'=>0];
+//        $out = null;
         if (!$author_id) {
-            $out;
+            null;
         }
         
         $query = "SELECT count1, count12, count12/count1 as probability FROM bigrams WHERE author_id='".$author_id."' ";
@@ -268,17 +270,34 @@ print "<p>".$sentence->sentence;
         } else {
             $query .= " AND lemma1 = ".(int)$lemma1;
         }
-        if (!$lemma1) {
+        
+        if (!$lemma2) {
             $query .= " AND lemma2 is null";
         } else {
             $query .= " AND lemma2 = ".(int)$lemma2;
         }
+        
 //print "<p>$query";        
         $result = DB::select(DB::raw($query));
         if ($result) {
-            return ['count12'=>$result[0]->count12, 'count1'=>$result[0]->count1, 'probability'=>$result[0]->probability];
+//print "<P>(".$max_count1." == '' || ".$result[0]->count1." <=$max_count1) &&  ($max_count12 == '' || ".$result[0]->count12." <=$max_count12)) ";        
+            
+            if (($max_count1 == '' || $result[0]->count1 <=$max_count1) 
+                    &&  ($max_count12 == '' || $result[0]->count12 <=$max_count12)) {        
+                return ['count12'=>$result[0]->count12, 'count1'=>$result[0]->count1, 'probability'=>$result[0]->probability];
+            } else {
+                return false;
+            }
         } else {
             $out;
         }
+    }
+    
+    public static function authorConversely($url_args) {
+        $tmp = isset($url_args['search_author']) ? $url_args['search_author'] : null;
+        $url_args['search_author'] = isset($url_args['search_author2']) ? $url_args['search_author2'] : null;
+        $url_args['search_author2'] = $tmp;
+        
+        return Wcorpus::searchValuesByURL($url_args);
     }
 }
