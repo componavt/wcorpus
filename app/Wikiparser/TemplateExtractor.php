@@ -437,14 +437,14 @@ class TemplateExtractor
         if (preg_match("/\{\{О\s?тексте[^\}]+НАЗВАНИЕ\s*=\s*\[*([^\|\]\}]+)/",$wikitext,$regs)) {
             $title = trim($regs[1]);
             
-            if (preg_match("/^([^\[]*)\[\[([^\|\]]+\|?[^\]]*\]\](.*)$)/",$title,$regs1)) {
+            if (preg_match("/^([^\[]*)\[\[([^\|\]]+)\|?[^\]]*\]\](.*)$/",$title,$regs1)) {
                 $title = $regs1[1].$regs1[2].$regs1[3];                
             }
             
         } elseif (preg_match("/\|\s*НАЗВАНИЕ\s*=\s*\[*([^\|\]\}]+)/",$wikitext,$regs)) {
             $title = trim($regs[1]);
             
-            if (preg_match("/^\([^\[]*)\[\[([^\|\]]+\|?[^\]]*\]\](.*)$)/",$title,$regs1)) {
+            if (preg_match("/^([^\[]*)\[\[([^\|\]]+)\|?[^\]]*\]\](.*)$/",$title,$regs1)) {
                 $title = $regs1[1].$regs1[2].$regs1[3];                
             }
             

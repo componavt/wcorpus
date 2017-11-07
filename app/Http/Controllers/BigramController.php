@@ -30,7 +30,11 @@ class BigramController extends Controller
                     'search_author'  => $request->input('search_author'),
                     'search_author2'  => $request->input('search_author2'),
                     'order_by'      => $request->input('order_by'),
-                    'conversely'    =>(int)$request->input('conversely'),
+                    'min_count1'      => $request->input('min_count1'),
+                    'min_count12'      => $request->input('min_count12'),
+                    'max_count1'      => $request->input('max_count1'),
+                    'max_count12'      => $request->input('max_count12'),
+//                    'conversely'    =>(int)$request->input('conversely'),
                 ];
         
         if (!$this->url_args['page']) {
@@ -43,25 +47,30 @@ class BigramController extends Controller
             $this->url_args['limit_num'] = 1000;
         }   
         
-        if ($this->url_args['conversely']) {
-            $tmp = $this->url_args['search_author'];
-            $this->url_args['search_author'] = $this->url_args['search_author2'];
-            $this->url_args['search_author2'] = $tmp;
-        }
         if (!$this->url_args['order_by']) {
             $this->url_args['order_by'] = 'probability';
         }
-
+        
+        if (!$this->url_args['min_count1']) {
+            $this->url_args['min_count1'] = 10;
+        }
+        
+        if (!$this->url_args['min_count12']) {
+            $this->url_args['min_count12'] = 10;
+        }
+//dd($this->url_args);        
         $this->args_by_get = Wcorpus::searchValuesByURL($this->url_args);
     }
 
     /**
      * View bigrams for authors $search_author and $search_author2.
      *
+     * select lemma1, lemma2, count1, count12, count12/count1 as probability from `bigrams` where `author_id` = 62 and `count1` > 10 and `count12` > 10 group by `lemma1`, `lemma2`, `count1`, `count12` order by `count12` desc
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
+//dd($this->url_args);
             
         $query = "SELECT DISTINCT author_id FROM bigrams";
         $authors = DB::select(DB::raw($query));
@@ -75,18 +84,20 @@ class BigramController extends Controller
         if ($this->url_args['search_author'] && $this->url_args['search_author2']) {
             $bigrams = Bigram::where('author_id',$this->url_args['search_author'])
                      -> select(DB::raw('lemma1, lemma2, count1, count12, count12/count1 as probability'))
-                     -> where('count1', '>', 10)
-                     -> where('count12', '>', 10)
+                     -> where('count1', '>=', (int)$this->url_args['min_count1'])
+                     -> where('count12', '>=', (int)$this->url_args['min_count12'])
 //                     -> take(10)
                      -> groupBy('lemma1','lemma2','count1','count12')
                      -> orderBy($this->url_args['order_by'], 'desc');
 //dd($bigrams->toSql());            
-            $bigrams = $bigrams ->paginate($this->url_args['limit_num']);         
+            $bigrams = $bigrams -> get();
+                    //paginate($this->url_args['limit_num']);         
         }
         
         return view('bigram.index')
               ->with(['author_values' => $author_values,
                       'bigrams' => $bigrams,
+//                      'bigrams' => null,
                       'args_by_get'   => $this->args_by_get,
                       'url_args'      => $this->url_args,
                       ]

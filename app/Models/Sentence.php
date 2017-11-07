@@ -188,7 +188,7 @@ print "<P>".$wordforms[$i-1]['wordform_id']." - ".$wordforms[$i]['wordform_id'].
 //        if (preg_match_all("/(([[:alpha:]]+['-])*[[:alpha:]]+'?)/u",$text,$regs, PREG_PATTERN_ORDER)) {
 //        if (preg_match_all("/(([[:alpha:]]+[-])*[[:alpha:]]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
 //        if (preg_match_all("/(([А-Яа-яѢѣѲѳIiѴѵ]+[-])*[А-Яа-яѢѣѲѳIiѴѵ]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
-        if (preg_match_all("/(([А-Яа-я]+[-])*[А-Яа-я]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
+        if (preg_match_all("/(([А-Яа-яё]+[-])*[А-Яа-яё]+)/u",$text,$regs, PREG_PATTERN_ORDER)) {
             foreach ($regs[0] as $word) {
                if (mb_strlen($word)>1) { // skip one-letter words
                    $words[] = $word;
@@ -203,10 +203,10 @@ print "<P>".$wordforms[$i-1]['wordform_id']." - ".$wordforms[$i]['wordform_id'].
     /**
      * Highlight a word
      *
-     * @param String $wordform_id  
+     * @param String $wordform  
      * @return String sentence with highlighted words
      */
-    public function highlightSentence(String $wordform): String
+    public function highlightWordform(String $wordform): String
     {
         $sentence = $this->sentence;
         //$wordform_obj = Wordform::find($wordform_id);
@@ -214,6 +214,33 @@ print "<P>".$wordforms[$i-1]['wordform_id']." - ".$wordforms[$i]['wordform_id'].
         
         if ($wordform) {
             $sentence = preg_replace("/\b(".$wordform.")\b/ui","<span class=\"highlighted\">\\1</span>",$sentence);
+        }
+            
+        return $sentence;
+    }
+    
+    /**
+     * Highlight all wordforms for $lemmas
+     *
+     * @param Array $lemmas  array with id of lemmas
+     * @return String sentence with highlighted words
+     */
+    public function highlightLemmas(Array $lemmas): String
+    {
+        $sentence = $this->sentence;
+        $wordforms = DB::table('sentence_wordform')
+                       ->select(DB::raw('wordform_id'))
+                       ->where('sentence_id',$this->id)
+                       ->whereIn('wordform_id',function($query) use ($lemmas){
+                                $query->select('wordform_id')
+                                ->from('lemma_wordform')
+                                ->whereIn('lemma_id', $lemmas);
+                       })->get();
+        
+        
+        foreach ($wordforms as $wordform) {
+            $wordform_obj = Wordform::find($wordform->wordform_id);
+            $sentence = preg_replace("/\b(".$wordform_obj->wordform.")\b/ui","<span class=\"highlighted\">\\1</span>",$sentence);
         }
             
         return $sentence;

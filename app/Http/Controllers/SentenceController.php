@@ -30,6 +30,9 @@ class SentenceController extends Controller
         $this->url_args = [
                     'limit_num'       => (int)$request->input('limit_num'),
                     'page'            => (int)$request->input('page'),
+                    'bigram_lemma1'  => (int)$request->input('bigram_lemma1'),
+                    'bigram_lemma2'  => (int)$request->input('bigram_lemma2'),
+                    'search_author'  => (int)$request->input('search_author'),
                     'search_text'  => (int)$request->input('search_text'),
                     'search_wordform'  => (int)$request->input('search_wordform'),
                 ];
@@ -70,6 +73,28 @@ class SentenceController extends Controller
             $text_values[$this->url_args['search_text']] = Text::getTitleByID($this->url_args['search_text']);
         } 
         
+        if ($this->url_args['search_author'] && ($this->url_args['bigram_lemma1'] || $this->url_args['bigram_lemma2'])) {
+            $author_id = $this->url_args['search_author'];
+            $lemma1 = $this->url_args['bigram_lemma1'];
+            $lemma2 = $this->url_args['bigram_lemma2'];
+            
+            $sentences = $sentences->whereIn('id',function($query) use ($author_id, $lemma1, $lemma2){
+                                $query->select('sentence_id')
+                                ->from('bigrams')
+                                ->where('author_id', $author_id);
+                                if ($lemma1) {
+                                    $query->where('lemma1',$lemma1);
+                                } else {
+                                    $query->whereNull('lemma1');
+                                }
+                                if ($lemma2) {
+                                    $query->where('lemma2',$lemma2);
+                                } else {
+                                    $query->whereNull('lemma2');
+                                }
+                            });
+        } 
+        
         if ($this->url_args['search_wordform']) {
             $wordform_id = $this->url_args['search_wordform'];
             $sentences = $sentences->whereIn('id',function($query) use ($wordform_id){
@@ -94,6 +119,8 @@ class SentenceController extends Controller
                                'sentences'       => $sentences,
                                'text_values'     => $text_values,
                                'wordform'        => $wordform,
+                               'bigram_lemma1'   => $this->url_args['bigram_lemma1'],
+                               'bigram_lemma2'   => $this->url_args['bigram_lemma2'],
                                'args_by_get'     => $this->args_by_get,
                                'url_args'        => $this->url_args,
                               )
