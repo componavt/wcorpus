@@ -51,6 +51,15 @@ class SentenceTest extends TestCase
         $this->assertEquals($expected, $text_result);
     }
 
+    public function testSplitIntoWords_withE()
+    {
+        $text = "А чёрт меня знает, кто я!";    
+        $expected = ["чёрт", "меня", "знает","кто"]; 
+        $text_result = Sentence::SplitIntoWords($text);
+
+        $this->assertEquals($expected, $text_result);
+    }
+
 /* не нужен для русских слов
     public function testSplitIntoWords_withApostrophe()
     {

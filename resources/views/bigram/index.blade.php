@@ -76,9 +76,9 @@ Comparision of bigrams for authors
                 <th colspan='3'>{{$author_values[$url_args['search_author2']]}}</th>
             </tr>
             <tr>
-                <th><a href="/bigram/?{{$args_by_get}}&order_by=count12">Frequency (Lemma1 Lemma2)</a></th>
-                <th><a href="/bigram/?{{$args_by_get}}&order_by=count1">Frequency (Lemma1)</a></th>
-                <th><a href="/bigram/?{{$args_by_get}}&order_by=probability">Probability</a></th>
+                <th><a href="/bigram/{{$args_by_get}}&order_by=count12">Frequency (Lemma1 Lemma2)</a></th>
+                <th><a href="/bigram/{{$args_by_get}}&order_by=count1">Frequency (Lemma1)</a></th>
+                <th><a href="/bigram/{{$args_by_get}}&order_by=probability">Probability</a></th>
                 <th>Frequency (Lemma1 Lemma2)</th>
                 <th>Frequency (Lemma1)</th>
                 <th>Probability</th>
@@ -102,7 +102,11 @@ Comparision of bigrams for authors
                 <td>{{$bigram->count1}}</td>
                 <td>{{$bigram->probability}}</td>
                 
-                <td style="text-align:right">{{$bigram->lemma1 ? \Wcorpus\Models\Lemma::getLemmaWithPOSByID($bigram->lemma1) : "<s>"}} {{--({{$bigram->lemma1}})--}}</td>
+                <td style="text-align:right">
+                    <a href="/sentence/?bigram_lemma1={{$bigram->lemma1}}&bigram_lemma2={{$bigram->lemma2}}&search_author={{$url_args['search_author']}}">
+                    {{$bigram->lemma1 ? \Wcorpus\Models\Lemma::getLemmaWithPOSByID($bigram->lemma1) : "<s>"}}
+                    </a>  {{--({{$bigram->lemma1}})--}}
+                </td>
                 <td>{{$bigram->lemma2 ? \Wcorpus\Models\Lemma::getLemmaWithPOSByID($bigram->lemma2) : "</s>"}} {{--({{$bigram->lemma2}})--}}</td>
                 
                 <td>{{$author2['count12']}}</td>

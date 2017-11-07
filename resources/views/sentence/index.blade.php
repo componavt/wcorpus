@@ -35,6 +35,19 @@ List of sentences
                 'value' => $url_args['limit_num'],
                 'attributes'=>['size' => 5,
                                'placeholder' => 'Number of records' ]]) records
+                               
+        @include('widgets.form._formitem_hidden',
+                ['name' => 'search_wordform',
+                'value' => $url_args['search_wordform']]) 
+        @include('widgets.form._formitem_hidden',
+                ['name' => 'search_author',
+                'value' => $url_args['search_author']]) 
+        @include('widgets.form._formitem_hidden',
+                ['name' => 'bigram_lemma1',
+                'value' => $url_args['bigram_lemma1']]) 
+        @include('widgets.form._formitem_hidden',
+                ['name' => 'bigram_lemma2',
+                'value' => $url_args['bigram_lemma2']]) 
         {!! Form::close() !!}
 
         @if ($wordform)
@@ -59,7 +72,15 @@ List of sentences
             <?php $sentence_obj = \Wcorpus\Models\Sentence::find($sentence->id); ?>
             <tr>
                 <td>{{ $list_count++ }}</td>
-                <td>{!!$sentence_obj->highlightSentence($wordform)!!}</td>
+                <td>
+                @if($bigram_lemma1 || $bigram_lemma2)
+                    {!!$sentence_obj->highlightLemmas([$bigram_lemma1,$bigram_lemma2])!!}
+                @elseif ($wordform)
+                    {!!$sentence_obj->highlightWordform($wordform)!!}
+                @else
+                    {{$sentence_obj->sentence}}
+                @endif
+                </td>
                 <td>
                     @if($sentence_obj->text)
                         <a href="text/{{$sentence_obj->text_id}}">{{$sentence_obj->text->title}}</a>
