@@ -4,6 +4,7 @@ namespace Wcorpus\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Wcorpus\Models\Bigram;
 use Wcorpus\Models\Sentence;
 use Wcorpus\Models\Text;
 use Wcorpus\Models\Wordform;
@@ -216,6 +217,7 @@ class SentenceController extends Controller
     public function breakAllSentences()
     {
         // stop when there is no sentences with wordform_total=NULL
+/*        
         $is_exist_not_broken_sentence = 1;
         
         while ($is_exist_not_broken_sentence) {
@@ -233,6 +235,14 @@ print "<p>".$sentence->id."</p>\n";
             } else {
                 $is_exist_not_broken_text = 0;
             }
+        }
+*/        
+        foreach ([62,298,423] as $author_id) {
+            Bigram::createAuthorBigrams($author_id);
+            
+            Bigram::countAuthorLemmaFrequency($author_id);
+            
+            Bigram::countAuthorBigramFrequency($author_id);
         }
     }
     
