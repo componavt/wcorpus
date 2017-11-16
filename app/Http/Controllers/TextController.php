@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
 
 use DB;
+use Response;
 
 use Wcorpus\Models\Author;
 use Wcorpus\Models\Publication;
@@ -430,8 +431,14 @@ print sizeof($texts);
         $search_title = '%'.$request->input('q').'%';
 
         $list = [];
+        $query = "SELECT id, title FROM texts where title like '$search_title' order by title limit 100";
+        $texts = DB::select(DB::raw($query));
+        
+/*        
         $texts = Text::where('title','like', $search_title)
+                       ->take(1000)
                        ->orderBy('title')->get();
+*/
         foreach ($texts as $text) {
             $list[]=['id'  => $text->id, 
                            'text'=> $text->title];

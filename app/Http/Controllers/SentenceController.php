@@ -4,6 +4,7 @@ namespace Wcorpus\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Wcorpus\Models\Lemma;
 use Wcorpus\Models\Sentence;
 use Wcorpus\Models\Text;
 use Wcorpus\Models\Wordform;
@@ -33,6 +34,7 @@ class SentenceController extends Controller
                     'bigram_lemma1'  => (int)$request->input('bigram_lemma1'),
                     'bigram_lemma2'  => (int)$request->input('bigram_lemma2'),
                     'search_author'  => (int)$request->input('search_author'),
+                    'search_lemma'  => $request->input('search_lemma'),
                     'search_text'  => (int)$request->input('search_text'),
                     'search_wordform'  => (int)$request->input('search_wordform'),
                 ];
@@ -73,6 +75,25 @@ class SentenceController extends Controller
             $text_values[$this->url_args['search_text']] = Text::getTitleByID($this->url_args['search_text']);
         } 
         
+        if ($this->url_args['search_lemma']) {
+            $lemmas = [];
+            foreach (Lemma::where('lemma', 'like', $this->url_args['search_lemma'])
+                            ->get() as $lemma) {
+                $lemmas[]=$lemma->id;
+            }
+            $sentences = $sentences->whereIn('id',function($query) use ($lemmas){
+                                $query->select('sentence_id')
+                                ->from('sentence_wordform')
+                                ->whereIn('wordform_id',function($query) use ($lemmas){
+                                    $query->select('wordform_id')
+                                    ->from('lemma_wordform')
+                                    ->whereIn('lemma_id', $lemmas);
+                                });
+                            });
+        } else {
+            $lemmas = [];
+        } 
+        
         if ($this->url_args['search_author'] && ($this->url_args['bigram_lemma1'] || $this->url_args['bigram_lemma2'])) {
             $author_id = $this->url_args['search_author'];
             $lemma1 = $this->url_args['bigram_lemma1'];
@@ -93,7 +114,7 @@ class SentenceController extends Controller
                                     $query->whereNull('lemma2');
                                 }
                             });
-        } 
+        }
         
         if ($this->url_args['search_wordform']) {
             $wordform_id = $this->url_args['search_wordform'];
@@ -115,6 +136,7 @@ class SentenceController extends Controller
         
             return view('sentence.index')
                   ->with(array(
+                               'lemmas'          => $lemmas,
                                'numAll'          => $numAll,
                                'sentences'       => $sentences,
                                'text_values'     => $text_values,

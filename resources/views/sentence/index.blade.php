@@ -19,6 +19,11 @@ List of sentences
                              'method' => 'get',
                              'class' => 'form-inline'])
         !!}
+        @include('widgets.form._formitem_text',
+                ['name' => 'search_lemma',
+                'value' => $url_args['search_lemma'],
+                'attributes'=>['placeholder' => 'Lemma' ]])
+                               
         @include('widgets.form._formitem_select2',
                 ['name' => 'search_text',
                  'value' =>$url_args['search_text'],
@@ -75,6 +80,8 @@ List of sentences
                 <td>
                 @if($bigram_lemma1 || $bigram_lemma2)
                     {!!$sentence_obj->highlightLemmas([$bigram_lemma1,$bigram_lemma2])!!}
+                @elseif ($url_args['search_lemma'])
+                    {!!$sentence_obj->highlightLemmas($lemmas)!!}
                 @elseif ($wordform)
                     {!!$sentence_obj->highlightWordform($wordform)!!}
                 @else

@@ -236,8 +236,7 @@ print "<P>".$wordforms[$i-1]['wordform_id']." - ".$wordforms[$i]['wordform_id'].
                                 ->from('lemma_wordform')
                                 ->whereIn('lemma_id', $lemmas);
                        })->get();
-        
-        
+                
         foreach ($wordforms as $wordform) {
             $wordform_obj = Wordform::find($wordform->wordform_id);
             $sentence = preg_replace("/\b(".$wordform_obj->wordform.")\b/ui","<span class=\"highlighted\">\\1</span>",$sentence);
