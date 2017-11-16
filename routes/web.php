@@ -35,7 +35,6 @@ Route::get('/lemma/list_with_pos','LemmaController@listWithPOS');
 Route::get('/lemma/search_context','LemmaController@searchContext');
 Route::get('/lemma/context_intersection','LemmaController@contextIntersection');
 
-
 Route::get('/lemma_matrix/','LemmaMatrixController@index');
 
 Route::get('/sentence/{id}/break_into_words','SentenceController@breakSentence');
@@ -81,6 +80,11 @@ Route::resource('/sentence', 'SentenceController',
                 ['names' => ['update' => 'sentence.update',
                              'store' => 'sentence.store',
                              'destroy' => 'sentence.destroy']]);
+
+Route::resource('/synset', 'SynsetController',
+                ['names' => ['update' => 'synset.update',
+                             'store' => 'synset.store',
+                             'destroy' => 'synset.destroy']]);
 
 Route::resource('/text', 'TextController',
                 ['names' => ['update' => 'text.update',

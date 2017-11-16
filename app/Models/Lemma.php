@@ -45,6 +45,12 @@ class Lemma extends Model
         return $builder;
     }
     
+    // Lemmas __has_many__ Synsets
+    public function synsets(){
+        $builder = $this->belongsToMany(Synset::class,'lemma_sentence_synset');
+        return $builder;
+    }
+    
     // Lemmas __has_many__ LangPOSes
     public function lang_poses(){
         $builder = $this->belongsToMany(LangPOS::class,'wcorpus.lang_pos_lemma','lemma_id','lang_pos_id');

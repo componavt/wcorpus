@@ -275,3 +275,8 @@ delete from publications where author_id in (62,298,423);
 update texts set sentence_total=NULL, text=NULL;
 delete from sentences where text_id in (select id from texts where author_id is null);
 delete from sentences where text_id in (select id from texts where author_id not in (62,298,423));
+
+---------------16-11-2017----
+php artisan make:model 'Models\Synset' --migration
+php artisan make:controller 'SynsetController' --resource
+php artisan make:migration create_table_lemma_sentence_synset --table="lemma_sentence_synset"
