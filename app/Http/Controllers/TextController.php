@@ -309,6 +309,7 @@ class TextController extends Controller
             $texts=Text::
                     whereNull('sentence_total')
                     ->whereNotIn('id',[402631,125263,125413])
+//                    ->whereIn('author_id',[62,298,423])
                     ->where('included',1)
 //                    ->orderBy('title')
                     ->take(10)

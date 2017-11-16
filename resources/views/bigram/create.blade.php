@@ -17,13 +17,18 @@ Creating of bigrams for an author
                              'method' => 'get',
                              'class' => 'form-inline'])
         !!}
-        @include('widgets.form._formitem_select2',
+        @include('widgets.form._formitem_select',
+                ['name' => 'search_author',
+                 'value' =>$url_args['search_author'],
+                 'values' => $author_values,
+                 'attributes'=>['placeholder' => 'Author' ]])
+{{--        @include('widgets.form._formitem_select2',
                 ['name' => 'search_author',
                  'class'=>'select-author form-control search-author',
                  'value' =>$url_args['search_author'],
                  'values' => $author_values,
                  'is_multiple' => false,
-                 'attributes'=>['placeholder' => 'Author' ]])
+                 'attributes'=>['placeholder' => 'Author' ]]) --}}
         @include('widgets.form._formitem_btn_submit', ['title' => 'Create'])
         {!! Form::close() !!}
         
@@ -34,7 +39,7 @@ Creating of bigrams for an author
 @stop
 
 @section('jqueryFunc')
-    $(".select-author").select2({
+/*    $(".select-author").select2({
         width: '300px',
         ajax: {
           url: "/author/name_list",
@@ -52,6 +57,6 @@ Creating of bigrams for an author
           },          
           cache: true
         }
-    });
+    }); */
     
 @stop

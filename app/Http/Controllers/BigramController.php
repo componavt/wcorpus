@@ -111,10 +111,16 @@ class BigramController extends Controller
      */
     public function create(Request $request)
     {
-        $author_values = [];
+        $query = "SELECT DISTINCT author_id FROM texts WHERE id in (SELECT text_id from sentences)";
+        $authors = DB::select(DB::raw($query));
+        $author_values= [];
+        
+        foreach ($authors as $author) {
+            $author_values[$author->author_id] = Author::getNameByID($author->author_id);
+        }
+        
         if ($this->url_args['search_author']) {
             $author_id = $this->url_args['search_author'];
-            $author_values[$author_id] = Author::getNameByID($author_id);
             
             Bigram::createAuthorBigrams($author_id);
             

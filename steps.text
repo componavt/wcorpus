@@ -262,3 +262,16 @@ update wordforms set lemma_total=0;
 php artisan make:migration create_table_bigrams --table="bigrams"
 
 php artisan make:migration add_keys_to_table_bigrams --table="bigrams"
+
+------------достоевский
+update texts set sentence_total=NULL where author_id=423;
+http://local.wcorpus.com/text/break_texts
+update sentences set wordform_total=NULL; 
+delete from lemmas;
+delete from wordforms;
+http://local.wcorpus.com/sentence/break_sentences
+
+delete from publications where author_id in (62,298,423);
+update texts set sentence_total=NULL, text=NULL;
+delete from sentences where text_id in (select id from texts where author_id is null);
+delete from sentences where text_id in (select id from texts where author_id not in (62,298,423));
