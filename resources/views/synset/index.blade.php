@@ -10,11 +10,11 @@ List of lemmas with synsets
 @stop
 
 @section('panel-body')
-{{--        @if (\Wcorpus\User::checkAccess('auth')) --}}
+        @if (Auth::check())
         <a href="/synset/create">Create new word with synsets</a>
-{{--        @endif --}}
+        @endif 
         @if ($lemmas)
-        <table class="table">
+        <table class="table table-bordered">
         <thead>
             <tr>
                 <th>No</th>
@@ -22,19 +22,35 @@ List of lemmas with synsets
                 <th>POS</th>
                 <th>Synsets</th>
                 <th>Meaning</th>
+                <th></th>
             </tr>
         </thead>
             @foreach($lemmas as $id => $synsets)
-            <?php $lemma_obj = \Wcorpus\Models\Lemma::find($id); ?>
+            <?php $lemma_obj = \Wcorpus\Models\Lemma::find($id); 
+                  $rows = sizeof($synsets)>1 ? sizeof($synsets): 1;?>
             <tr>
-                <td>{{$count++ }}</td>
-                <td>{{$lemma_obj->lemma}}</td>
-                <td>{{$lemma_obj->pos->name}}</td>
-                @foreach ($synsets as $synset)
-                <td>{{$synset->meaning_n}}. {{$synset->synset}}</td>
-                <td>{{$synset->meaning_text}}</td>
-                @endforeach
+                <td rowspan="{{$rows}}">{{$count++ }}</td>
+                <td rowspan="{{$rows}}">{{$lemma_obj->lemma}}</td>
+                <td rowspan="{{$rows}}">{{$lemma_obj->pos->name}}</td>
+                @if (isset($synsets[0]))
+                <td>{{$synsets[0]->meaning_n}}. {{$synsets[0]->synset}}</td>
+                <td>{{$synsets[0]->meaning_text}}</td>
+                @endif
+                @if (Auth::check())
+                <td rowspan="{{$rows}}" style="text-align:center; vertical-align:middle">
+                    @include('widgets.form._button_edit', 
+                             ['is_button'=>true, 
+                              'route' => '/synset/'.$id.'/edit',
+                             ])
+                </td>
+                @endif
             </tr>
+            @for ($i=1; $i<sizeof($synsets); $i++)
+            <tr>
+                <td>{{$synsets[$i]->meaning_n}}. {{$synsets[$i]->synset}}</td>
+                <td>{{$synsets[$i]->meaning_text}}</td>
+            </tr>
+            @endfor
             @endforeach
         </table>
         @endif

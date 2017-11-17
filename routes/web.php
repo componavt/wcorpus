@@ -40,6 +40,8 @@ Route::get('/lemma_matrix/','LemmaMatrixController@index');
 Route::get('/sentence/{id}/break_into_words','SentenceController@breakSentence');
 Route::get('/sentence/break_sentences','SentenceController@breakAllSentences');
 
+Route::get('synset/synset/create', 'SynsetController@createSynset');
+
 Route::get('/text/extractFromWikiSource','TextController@extractFromWikiSource');
 Route::get('/text/{id}/parseWikitext','TextController@parseWikitext');
 Route::get('/text/parseAllWikitext','TextController@parseAllWikitext');

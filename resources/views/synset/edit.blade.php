@@ -2,11 +2,11 @@
 @extends('layouts.page')
 
 @section('title')
-Creation of synsets
+Edition of synsets
 @stop
 
 @section('panel-heading')
-Creation of synsets
+Edition of synsets
 @stop
 
 @section('headExtra')
@@ -15,10 +15,9 @@ Creation of synsets
 
 @section('panel-body')
         <a href="/synset">Back to the list</a>
-        {!! Form::open(array('method'=>'POST', 'route' => array('synset.store'))) !!}
+        {!! Form::open(array('method'=>'PUT', 'route' => ['synset.update', $lemma_id])) !!}
         @include('synset._form_create_edit', ['submit_title' => "SAVE",
-                                      'action' => 'create',
-                                      'lemma_id' => ''])
+                                      'action' => 'update'])
         {!! Form::close() !!}
 @stop
 

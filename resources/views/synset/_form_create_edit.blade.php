@@ -3,6 +3,7 @@
     <div class="col-sm-8">        
         @include('widgets.form._formitem_select2',
                 ['name' => 'lemma_id',
+                 'value' => $lemma_id,
                  'class'=>'select-lemma form-control',
                  'is_multiple' => false,
                  'attributes'=>['placeholder' => 'Lemma' ]])
@@ -33,13 +34,17 @@
         ?>
     @endif
 </div>
-
-        <button type="button" class="btn btn-info add-new-synset" 
+<div class="row">
+    <div class="col-sm-6">
+        @include('widgets.form._formitem_btn_submit', ['title' => $submit_title])
+    </div>
+    <div class="col-sm-6" style="text-align:right">
+        <button type="button" class="btn btn-success add-new-synset" 
                  data-count='{{ $count }}' data-meaning_n='{{$new_meaning_n}}'>
             Add new synset
         </button>
-
-        @include('widgets.form._formitem_btn_submit', ['title' => $submit_title])
+    </div>
+</div>
 
 
 
