@@ -86,8 +86,8 @@ class SynsetController extends Controller
         $lemma_id = (int)$request->lemma_id;
         $new_synsets = (array)$request->new_synsets;
         
-        $query = "DELETE FROM synsets WHERE id=".$lemma_id;
-        $lemma_res = DB::select(DB::raw($query));
+/*        $query = "DELETE FROM synsets WHERE id=".$lemma_id;
+        $lemma_res = DB::select(DB::raw($query)); */
 
         foreach ($new_synsets as $count => $synset) {
             $synset = Synset::create(['lemma_id'=>$lemma_id,
@@ -98,7 +98,7 @@ class SynsetController extends Controller
         }      
     
         return Redirect::to('/synset/')
-            ->withSuccess('Word with synsets is added');        
+            ->withSuccess('Synsets of the lemma "'.Lemma::getLemmaByID($lemma_id). '"  are added');        
     }
 
     /**
@@ -120,17 +120,20 @@ class SynsetController extends Controller
      */
     public function edit($id)
     {
-        $synset_builder = Synset::where('lemma_id',(int)$id);
-        $synsets = $synset_builder->orderBy('meaning_n')->get();
+        $synsets = Synset::where('lemma_id',(int)$id)
+                        ->orderBy('meaning_n')->get();
         if (!$synsets) {
             return Redirect::to('/synset/')
-                           ->withError('The lemma with ID='.$id.' doesn\'t exist');                    
+                           ->withError('The synsets with with lemma ID='.$id.' doesn\'t exist');                    
         }
-        $lemma_values[$lemma_id] = Lemma::getNameByID($id);
-        $new_meaning_n = $synset_builder->orderBy('meaning_n','desc')->select('meaning_n')->first()->meaning_n;
-        return view('synset.update')
+        $lemma_values[$id] = Lemma::getLemmaByID($id);
+        $new_meaning_n = 1 + (int)Synset::where('lemma_id',(int)$id)
+                       ->orderBy('meaning_n','desc')
+                       ->select('meaning_n')->first()->meaning_n;
+        return view('synset.edit')
                   ->with(['new_meaning_n' => $new_meaning_n,
                           'lemma_id' => $id,
+                          'lemma_values' => $lemma_values,
                           'synsets' => $synsets
                          ]);
     }
@@ -144,7 +147,35 @@ class SynsetController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $this->validate($request, [
+            'lemma_id' => 'required|max:255',
+        ]);
+        $lemma_id = (int)$request->lemma_id;
+        $synsets = Synset::where('lemma_id',$lemma_id)->get();
+        if (!$synsets) {
+            return Redirect::to('/synset/')
+                           ->withError('The synsets with with lemma ID='.$id.' doesn\'t exist');                    
+        }
+        foreach ((array)$request->synsets as $synset_id => $synset) {
+            $synset_obj = Synset::findOrFail($synset_id);
+            $synset_obj->lemma_id = $lemma_id;
+            $synset_obj->synset = $synset['synset'];
+            $synset_obj->meaning_n =$synset['meaning_n'];
+            $synset_obj->meaning_text =$synset['meaning_text'];
+            $synset_obj->save();
+            
+        }
+       
+        foreach ((array)$request->new_synsets as $count => $synset) {
+            $synset = Synset::create(['lemma_id'=>$lemma_id,
+                                      'synset'  =>$synset['synset'],
+                                      'meaning_n'  =>$synset['meaning_n'],
+                                      'meaning_text'=>$synset['meaning_text'],
+                                     ]);
+        }      
+    
+        return Redirect::to('/synset/')
+            ->withSuccess('Synsets of the lemma "'.Lemma::getLemmaByID($lemma_id). '" are updated');        
     }
 
     /**

@@ -18,7 +18,9 @@ Creation of synsets
         {!! Form::open(array('method'=>'POST', 'route' => array('synset.store'))) !!}
         @include('synset._form_create_edit', ['submit_title' => "SAVE",
                                       'action' => 'create',
-                                      'lemma_id' => ''])
+                                      'lemma_id' => '',
+                                      'lemma_values'=>[],
+                                      'new_meaning_n' => 1])
         {!! Form::close() !!}
 @stop
 

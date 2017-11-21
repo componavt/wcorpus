@@ -17,7 +17,7 @@ Edition of synsets
         <a href="/synset">Back to the list</a>
         {!! Form::open(array('method'=>'PUT', 'route' => ['synset.update', $lemma_id])) !!}
         @include('synset._form_create_edit', ['submit_title' => "SAVE",
-                                      'action' => 'update'])
+                                      'action' => 'edit'])
         {!! Form::close() !!}
 @stop
 

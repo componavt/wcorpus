@@ -4,6 +4,7 @@
         @include('widgets.form._formitem_select2',
                 ['name' => 'lemma_id',
                  'value' => $lemma_id,
+                 'values' => $lemma_values,
                  'class'=>'select-lemma form-control',
                  'is_multiple' => false,
                  'attributes'=>['placeholder' => 'Lemma' ]])
@@ -26,7 +27,7 @@
     @if ($action == 'create')
         @include('synset._form_create_synset',
                  ['count' => 0,
-                  'new_meaning_n' => 1
+                  'new_meaning_n' => $new_meaning_n
                  ])
         <?php
             $count = 1;
