@@ -8,6 +8,7 @@ use DB;
 use Redirect;
 
 use Wcorpus\Models\Lemma;
+use Wcorpus\Models\Sentence;
 use Wcorpus\Models\Synset;
 
 class SynsetController extends Controller
@@ -30,7 +31,7 @@ class SynsetController extends Controller
      */
     public function index()
     {
-        $query = "SELECT DISTINCT lemma_id FROM synsets";
+        $query = "SELECT DISTINCT lemma_id, lemma FROM synsets, lemmas where lemmas.id=lemma_id order by lemma";
         $lemma_res = DB::select(DB::raw($query));
         $lemmas = [];
         foreach ($lemma_res as $lemma) {
@@ -187,5 +188,61 @@ class SynsetController extends Controller
     public function destroy($id)
     {
         //
+    }
+    /**
+     * Assign sentences to lemma synsets
+     */
+    public function sentences(Request $request)
+    {
+        $synset_values = (array)$request->synset_values;
+        $lemma_id = (int)$request->lemma_id;
+        $lemma = Lemma::find($lemma_id);
+
+        $query = "SELECT DISTINCT lemma_id, lemma FROM synsets, lemmas where lemmas.id=lemma_id order by lemma";
+        $lemma_res = DB::select(DB::raw($query));
+        $lemma_values[''] = 'Choose lemma';
+        foreach ($lemma_res as $lemma) {
+            $lemma_values[$lemma->lemma_id] = $lemma->lemma;
+        }
+        
+        $sentence_synset = [];
+//        $synset_values[''] = ['Choose synset'];
+        
+        if ($lemma_id) {
+            $synsets = Synset::where('lemma_id',(int)$lemma_id)
+                            ->orderBy('meaning_n')->get();
+            foreach ($synsets as $synset) {
+                $synset_values[$synset->id] 
+                        = $synset->meaning_n. '. '. $synset->synset 
+                        .' ('. $synset->meaning_text.')';
+            }
+            
+            $sentences = Sentence::orderBy('text_id')
+                    ->whereIn('id',function($query) use ($lemma_id){
+                                $query->select('sentence_id')
+                                ->from('sentence_wordform')
+                                ->whereIn('wordform_id',function($query) use ($lemma_id){
+                                    $query->select('wordform_id')
+                                    ->from('lemma_wordform')
+                                    ->where('lemma_id', $lemma_id);
+                                });
+                            })->get();
+            if (!sizeof($synset_values)) {
+                foreach ($sentences as $sentence) {
+                    $query = "SELECT synset_id FROM lemma_sentence_synset where lemma_id=$lemma_id and sentence_id = ".$sentence->id;
+                    $res = DB::select(DB::raw($query));
+                    $sentence_synset[$sentence->id] = $res ? $res[0]->synset_id : NULL;
+                }
+            }
+        } else {
+            $sentences = [];
+        }
+        return view('synset.sentences')
+                  ->with(['sentences' => $sentences,
+                          'lemma_id' => $lemma_id,
+                          'lemma_values' => $lemma_values,
+                          'synset_values' => $synset_values,
+                          'sentence_synset' => $sentence_synset
+                         ]);
     }
 }

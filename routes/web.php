@@ -41,6 +41,7 @@ Route::get('/sentence/{id}/break_into_words','SentenceController@breakSentence')
 Route::get('/sentence/break_sentences','SentenceController@breakAllSentences');
 
 Route::get('synset/synset/create', 'SynsetController@createSynset');
+Route::get('synset/sentences', 'SynsetController@sentences');
 
 Route::get('/text/extractFromWikiSource','TextController@extractFromWikiSource');
 Route::get('/text/{id}/parseWikitext','TextController@parseWikitext');
