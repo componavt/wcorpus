@@ -48,8 +48,8 @@ Assign sentences to lemma synsets
                 <!--/td--> 
                 <td>
                 @include('widgets.form._formitem_select',
-                        ['name' => 'sentence_synset[$sentence->id]',
-                         'value' => $sentence_synset[$sentence->id],
+                        ['name' => 'sentence_synset['.$sentence->id.']',
+                         'value' => isset($sentence_synset[$sentence->id]) ? $sentence_synset[$sentence->id] : NULL,
                          'values' => $synset_values,
                          'attributes'=>['placeholder' => 'Choose synset' ]])
                 </td>            

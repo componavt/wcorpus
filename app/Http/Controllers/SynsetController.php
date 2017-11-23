@@ -194,7 +194,8 @@ class SynsetController extends Controller
      */
     public function sentences(Request $request)
     {
-        $synset_values = (array)$request->synset_values;
+        $sentence_synset = (array)$request->sentence_synset;
+
         $lemma_id = (int)$request->lemma_id;
         $lemma = Lemma::find($lemma_id);
 
@@ -205,7 +206,7 @@ class SynsetController extends Controller
             $lemma_values[$lemma->lemma_id] = $lemma->lemma;
         }
         
-        $sentence_synset = [];
+        $synset_values = [];
 //        $synset_values[''] = ['Choose synset'];
         
         if ($lemma_id) {
@@ -227,16 +228,32 @@ class SynsetController extends Controller
                                     ->where('lemma_id', $lemma_id);
                                 });
                             })->get();
-            if (!sizeof($synset_values)) {
+            if (!sizeof($sentence_synset)) {
                 foreach ($sentences as $sentence) {
                     $query = "SELECT synset_id FROM lemma_sentence_synset where lemma_id=$lemma_id and sentence_id = ".$sentence->id;
                     $res = DB::select(DB::raw($query));
                     $sentence_synset[$sentence->id] = $res ? $res[0]->synset_id : NULL;
                 }
+                asort($sentence_synset);
+            } else {
+                foreach ($sentence_synset as $sentence_id => $synset_id) {
+                    if ($synset_id) {
+                        $query = "SELECT synset_id FROM lemma_sentence_synset where lemma_id=$lemma_id and sentence_id = ".$sentence_id;
+                        $res = DB::select(DB::raw($query));
+                        if (!isset($res[0])) {
+                            $query = "INSERT INTO  lemma_sentence_synset (lemma_id, sentence_id, synset_id) VALUES ($lemma_id, $sentence_id, $synset_id)";
+                            $res = DB::select(DB::raw($query));
+                        } elseif ($res[0] != $synset_id) {
+                            $query = "UPDATE lemma_sentence_synset SET synset_id=".(int)$synset_id." where lemma_id=$lemma_id and sentence_id = ".$sentence_id;
+                            $res = DB::select(DB::raw($query));
+                        }
+                    }
+                }
             }
         } else {
             $sentences = [];
         }
+//dd($sentences);        
         return view('synset.sentences')
                   ->with(['sentences' => $sentences,
                           'lemma_id' => $lemma_id,
