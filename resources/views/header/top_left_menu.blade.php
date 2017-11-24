@@ -72,7 +72,7 @@
                             
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="/synset">Synset list</a></li>
-                                <li><a href="/synset/sentences">Assign sentences to lemma synsets</a></li>
+                                <li><a href="/synset/sentences">Assign lemma synsets to sentences</a></li>
                             </ul>
                         </li>
                         
