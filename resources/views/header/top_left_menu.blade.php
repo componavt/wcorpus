@@ -73,6 +73,7 @@
                             <ul class="dropdown-menu" role="menu">
                                 <li><a href="/synset">Synset list</a></li>
                                 <li><a href="/synset/sentences">Assign lemma synsets to sentences</a></li>
+                                <li><a href="/synset/download_for_python">Download for python</a></li>
                             </ul>
                         </li>
                         

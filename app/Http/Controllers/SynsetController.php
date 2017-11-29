@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use DB;
 use Redirect;
+use Storage;
 
 use Wcorpus\Models\Lemma;
 use Wcorpus\Models\Sentence;
@@ -39,8 +40,8 @@ class SynsetController extends Controller
 //                                             ->select()
                                              ->orderBy('meaning_n')->get();
         }
-            return view('synset.index')
-                  ->with(['lemmas' => $lemmas]);
+        return view('synset.index')
+              ->with(['lemmas' => $lemmas]);
     }
 
     /**
@@ -286,4 +287,60 @@ class SynsetController extends Controller
                           'synset_sentences' => $synset_sentences
                          ]);
     }
+    
+    /**
+     * Create 2 python files:
+     * synsets.py with code:
+     *  synsets = {
+     *  }
+     * sentences.py
+     */
+    public function downloadForPython()
+    {
+        $query = "SELECT DISTINCT lemma_id, lemma FROM synsets, lemmas where lemmas.id=lemma_id order by lemma limit 10";
+        $lemma_res = DB::select(DB::raw($query));
+        $lemmas = [];
+        $sentences = [];
+        foreach ($lemma_res as $lemma) {
+            $synset_lines = [];
+            $synsets = Synset::where('lemma_id',(int)$lemma->lemma_id)
+                            ->orderBy('meaning_n')->get();
+            foreach ($synsets as $synset) {
+                $synset_lines[] = "\t\t".$synset->id. ": ". $synset->synsetToUtfList() ."";
+            }
+            $lemmas[] = "\tu'".$lemma->lemma."': {\n".join(",\n",$synset_lines)."\n\t}";
+            
+            $query = "SELECT sentence_id, synset_id FROM lemma_sentence_synset where synset_id>0 and lemma_id=".(int)$lemma->lemma_id." limit 1";
+            $sentences_res = DB::select(DB::raw($query));
+            
+            foreach ($sentences_res as $sentence) {
+                $sentence_obj = Sentence::find($sentence->sentence_id);
+                $sentences[] = "\tu'".$sentence_obj->sentence."': {\n"
+                             . "\t\t'lemmas': ".$sentence_obj->toUtfLemmaList().",\n"
+                             . "\t\t'lemma': u'".$lemma->lemma."',\n"
+                             . "\t\t'synset_exp': ".$sentence->synset_id.",\n"
+                             . "\t\t'synset_alg1': '',\n\t\t'synset_alg2': ''\n\t}";
+            }
+        }
+        
+        $synset_lines = "#!/usr/bin/env python\n"
+                      . "# -*- coding: utf-8 -*-\n"
+                      . "synsets = {\n"
+                      . join(",\n",$lemmas)
+                      . "\n}\n";
+        Storage::disk('public')->put('synsets.py', $synset_lines);
+        print '<p><a href="'.asset('storage/synsets.py').'">synsets.py</a></p>';
+        
+        $sentence_lines = "#!/usr/bin/env python\n"
+                      . "# -*- coding: utf-8 -*-\n"
+                      . "sentences = {\n"
+                      . join(",\n",$sentences)
+                      . "\n}\n";
+        Storage::disk('public')->put('sentences.py', $sentence_lines);
+        print '<p><a href="'.asset('storage/sentences.py').'">sentences.py</a></p>';
+    }
 }
+# select synset_id,lemma_id, count(*) as count from lemma_sentence_synset where synset_id>0 group by synset_id, lemma_id order by synset_id;
+# select * from lemmas where id = 1060683;
+# delete from lemma_sentence_synset where synset_id in (7,8,9,10) and lemma_id <> 1061428;
+# delete from lemma_sentence_synset where synset_id in (14,15) and lemma_id <> 1064659;

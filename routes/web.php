@@ -40,6 +40,7 @@ Route::get('/lemma_matrix/','LemmaMatrixController@index');
 Route::get('/sentence/{id}/break_into_words','SentenceController@breakSentence');
 Route::get('/sentence/break_sentences','SentenceController@breakAllSentences');
 
+Route::get('synset/download_for_python', 'SynsetController@downloadForPython');
 Route::get('synset/synset/create', 'SynsetController@createSynset');
 Route::get('synset/sentences', 'SynsetController@sentencesSearch');
 Route::post('synset/sentences', 'SynsetController@sentencesEdit');
