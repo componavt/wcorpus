@@ -189,13 +189,36 @@ class SynsetController extends Controller
     {
         //
     }
+    
+    /**
+     * Search form for assigning lemma synsets to sentences
+     */
+    public function sentencesSearch()
+    {
+        $query = "SELECT DISTINCT lemma_id, lemma FROM synsets, lemmas where lemmas.id=lemma_id order by lemma";
+        $lemma_res = DB::select(DB::raw($query));
+        $lemma_values[''] = 'Choose lemma';
+        foreach ($lemma_res as $l) {
+            $lemma_values[$l->lemma_id] = $l->lemma;
+        }
+        return view('synset.sentences_search')
+                  ->with([
+                          'lemma_values' => $lemma_values,
+                         ]);
+    }
+    
     /**
      * Assign lemma synsets to sentences
      */
-    public function sentences(Request $request)
+    public function sentencesEdit(Request $request)
     {
         $lemma_id = (int)$request->lemma_id;
+      
         $lemma = Lemma::find($lemma_id);
+        
+        if (!$lemma) {
+            return Redirect::to('/synset/sentences');
+        }
 
         if (isset($request->sentence_synset) && is_array($request->sentence_synset)) {
             foreach ($request->sentence_synset as $sentence_id => $synset_id) {
@@ -213,13 +236,6 @@ class SynsetController extends Controller
             }
         }
 
-        $query = "SELECT DISTINCT lemma_id, lemma FROM synsets, lemmas where lemmas.id=lemma_id order by lemma";
-        $lemma_res = DB::select(DB::raw($query));
-        $lemma_values[''] = 'Choose lemma';
-        foreach ($lemma_res as $lemma) {
-            $lemma_values[$lemma->lemma_id] = $lemma->lemma;
-        }
-        
         $synset_values = [];
         $synset_sentences[NULL] = [0,[]];
 //        $synset_values[''] = ['Choose synset'];
@@ -263,10 +279,9 @@ class SynsetController extends Controller
             $sentences = [];
         }
 //dd($synset_sentences);        
-        return view('synset.sentences')
+        return view('synset.sentences_edit')
                   ->with([
-                          'lemma_id' => $lemma_id,
-                          'lemma_values' => $lemma_values,
+                          'lemma' => $lemma,
                           'synset_values' => $synset_values,
                           'synset_sentences' => $synset_sentences
                          ]);

@@ -18,17 +18,17 @@ Assign lemma synsets to sentences
         <a href="/synset/sentences">Search another lemma</a>    
             
         {!! Form::open(['url' => '/synset/sentences/',
-                             'method' => 'get',
+                             'method' => 'post',
                              'class' => 'form-inline'])
         !!}
-        @include('widgets.form._formitem_select',
+        @include('widgets.form._formitem_hidden',
                 ['name' => 'lemma_id',
-                 'value' => $lemma_id,
-                 'values' => $lemma_values,
-                 'attributes'=>['placeholder' => 'Lemma' ]])
-        @include('widgets.form._formitem_btn_submit', ['title' => $lemma_id ? 'Save' : 'Search'])
-        
-        @if ($lemma_id)
+                 'value' => $lemma->id]) 
+
+        <h2>
+            For lemma "{{$lemma->lemma}}"
+            @include('widgets.form._formitem_btn_submit', ['title' => 'Save'])
+        </h2>
         <div>
             <ul class="nav nav-tabs" role="tablist">
             @foreach($synset_sentences as $synset => $info)
@@ -39,14 +39,14 @@ Assign lemma synsets to sentences
                 </li>
             @endforeach
             </ul>
-        
+
             <div class="tab-content tabs">
             @foreach($synset_sentences as $synset => $info)
                 <div id="panel{{$synset==NULL ? '' : $info[0]}}" role="tabpanel" class="tab-pane fade{{$synset==NULL ? ' in active' : ''}}">
                 @foreach($info[1] as $sentence)
                     <div class="row">
                         <div class="col col-sm-1" style='text-align:right'>{{ $list_count++ }}</div>
-                        <div class="col col-sm-8">{!!$sentence->highlightLemmas([$lemma_id])!!}</div>
+                        <div class="col col-sm-8">{!!$sentence->highlightLemmas([$lemma->id])!!}</div>
                         <div class="col col-sm-3">
                         @include('widgets.form._formitem_select',
                                 ['name' => 'sentence_synset['.$sentence->id.']',
@@ -60,8 +60,7 @@ Assign lemma synsets to sentences
             @endforeach
             </div>
         </div>            
-            @include('widgets.form._formitem_btn_submit', ['title' => 'Save'])
-        @endif
+        @include('widgets.form._formitem_btn_submit', ['title' => 'Save'])
         {!! Form::close() !!}
 @stop
 
