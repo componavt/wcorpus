@@ -297,7 +297,7 @@ class SynsetController extends Controller
      */
     public function downloadForPython()
     {
-        $query = "SELECT DISTINCT lemma_id, lemma FROM synsets, lemmas where lemmas.id=lemma_id order by lemma limit 10";
+        $query = "SELECT DISTINCT lemma_id, lemma FROM synsets, lemmas where lemmas.id=lemma_id order by lemma"; #limit 10
         $lemma_res = DB::select(DB::raw($query));
         $lemmas = [];
         $sentences = [];
@@ -336,8 +336,8 @@ class SynsetController extends Controller
                       . "sentences = {\n"
                       . join(",\n",$sentences)
                       . "\n}\n";
-        Storage::disk('public')->put('sentences.py', $sentence_lines);
-        print '<p><a href="'.asset('storage/sentences.py').'">sentences.py</a></p>';
+        Storage::disk('public')->put('sentences_in.py', $sentence_lines);
+        print '<p><a href="'.asset('storage/sentences_in.py').'">sentences_in.py</a></p>';
     }
 }
 # select synset_id,lemma_id, count(*) as count from lemma_sentence_synset where synset_id>0 group by synset_id, lemma_id order by synset_id;

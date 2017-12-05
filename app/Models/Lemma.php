@@ -72,6 +72,25 @@ class Lemma extends Model
         }
     }
     
+    public static function getLemmaPOSPosfix($id) {
+        $lemma_obj = self::find($id);
+        $posfix = $lemma_obj->pos->universal;
+        if ($posfix) {
+            return "_$posfix";
+        }
+    }
+    
+    
+    public static function getLemmaWithPOSPosfix($id) {
+        $lemma_obj = self::find($id);
+        $lemma = mb_strtolower($lemma_obj->lemma);
+        $posfix = $lemma_obj->pos->universal;
+        if ($posfix) {
+            $lemma .= "_$posfix";
+        }
+        return $lemma;
+    }
+    
 //SELECT count(*) as count FROM sentence_wordform WHERE sentence_id in (SELECT id FROM sentences WHERE text_id in (select id FROM texts where author_id=62)) AND wordform_id in (select wordform_id from lemma_wordform WHERE lemma_id=901101);    
     public static function countByIDAndAuthor($id,$author_id) {
         if (!$id || !$author_id) {

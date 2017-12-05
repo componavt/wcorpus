@@ -246,13 +246,15 @@ print "<P>".$wordforms[$i-1]['wordform_id']." - ".$wordforms[$i]['wordform_id'].
     }
     
     public function toUtfLemmaList() {
-        $query = "SELECT lemma, word_number FROM lemmas, lemma_wordform, sentence_wordform where sentence_id=".$this->id
-               . " and sentence_wordform.wordform_id=lemma_wordform.wordform_id and lemmas.id=lemma_wordform.lemma_id ORDER BY word_number";
+        $query = "SELECT word_number,lemma_wordform.lemma_id as lemma_id FROM lemma_wordform, sentence_wordform where sentence_id=".$this->id
+               . " and sentence_wordform.wordform_id=lemma_wordform.wordform_id ORDER BY word_number";
         $lemmas = [];
         $res = DB::select(DB::raw($query));
         foreach ($res as $row) {
-            $lemmas[] = "u'".$row->lemma."'";
+            $lemma = Lemma::getLemmaWithPOSPosfix($row->lemma_id);
+            $lemmas[] = "u'".$lemma."'";
         }
+        $lemmas = array_unique($lemmas);
         return "[".join(", ", $lemmas)."]";
     }
 }
