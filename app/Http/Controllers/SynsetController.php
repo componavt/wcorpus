@@ -310,16 +310,17 @@ class SynsetController extends Controller
             }
             $lemmas[] = "\tu'".$lemma->lemma."': {\n".join(",\n",$synset_lines)."\n\t}";
             
-            $query = "SELECT sentence_id, synset_id FROM lemma_sentence_synset where synset_id>0 and lemma_id=".(int)$lemma->lemma_id." limit 1";
+            $query = "SELECT sentence_id, synset_id FROM lemma_sentence_synset where synset_id>0 and lemma_id=".(int)$lemma->lemma_id;#." limit 1";
             $sentences_res = DB::select(DB::raw($query));
             
             foreach ($sentences_res as $sentence) {
                 $sentence_obj = Sentence::find($sentence->sentence_id);
-                $sentences[] = "\tu'".$sentence_obj->sentence."': {\n"
+                $sentences[] = "\tu'".str_replace("'",'&#39;',$sentence_obj->sentence)."': {\n"
                              . "\t\t'lemmas': ".$sentence_obj->toUtfLemmaList().",\n"
                              . "\t\t'lemma': u'".$lemma->lemma."',\n"
                              . "\t\t'synset_exp': ".$sentence->synset_id.",\n"
-                             . "\t\t'synset_alg1': '',\n\t\t'synset_alg2': ''\n\t}";
+                             . "\t\t'synset_alg1': '',\n\t\t'synset_alg2': ''\n,"
+                             . "\t\t'alg1_right': '',\n\t\t'alg2_right': ''\n\t}";
             }
         }
         
