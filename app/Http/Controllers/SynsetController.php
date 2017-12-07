@@ -319,7 +319,7 @@ class SynsetController extends Controller
                              . "\t\t'lemmas': ".$sentence_obj->toUtfLemmaList().",\n"
                              . "\t\t'lemma': u'".$lemma->lemma."',\n"
                              . "\t\t'synset_exp': ".$sentence->synset_id.",\n"
-                             . "\t\t'synset_alg1': '',\n\t\t'synset_alg2': ''\n,"
+                             . "\t\t'synset_alg1': '',\n\t\t'synset_alg2': '',\n"
                              . "\t\t'alg1_right': '',\n\t\t'alg2_right': ''\n\t}";
             }
         }
