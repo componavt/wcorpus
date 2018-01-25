@@ -198,7 +198,8 @@ class SynsetController extends Controller
     {
         $query = "SELECT DISTINCT lemma_id, lemma FROM synsets, lemmas where lemmas.id=lemma_id order by lemma";
         $lemma_res = DB::select(DB::raw($query));
-        $lemma_values[''] = 'Choose lemma';
+//        $lemma_values[''] = 'Choose lemma';
+        $lemma_values = [];
         foreach ($lemma_res as $l) {
             $lemma_values[$l->lemma_id] = $l->lemma;
         }
@@ -319,8 +320,8 @@ class SynsetController extends Controller
                              . "\t\t'lemmas': ".$sentence_obj->toUtfLemmaList().",\n"
                              . "\t\t'lemma': u'".$lemma->lemma."',\n"
                              . "\t\t'synset_exp': ".$sentence->synset_id.",\n"
-                             . "\t\t'synset_alg1': '',\n\t\t'synset_alg2': '',\n"
-                             . "\t\t'alg1_right': '',\n\t\t'alg2_right': ''\n\t}";
+                             . "\t\t'synset_alg1': '',\n\t\t'synset_alg2': '',\n\t\t'synset_alg3': '',\n"
+                             . "\t\t'alg1_right': '',\n\t\t'alg2_right': '',\n\t\t'alg3_right': ''\n\t}";
             }
         }
         
