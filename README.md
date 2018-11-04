@@ -18,3 +18,6 @@ to the WCorpus database. See more information at [the page 156 of our article](h
 ## Further reading ##
 ### In English ###
   * A. Kirillov, N. Krizhanovskaya, A. Krizhanovsky. [WSD algorithm based on a new method of vector-word contexts proximity calculation via epsilon-filtration](https://arxiv.org/abs/1805.09559) // Transactions of Karelian Research Centre RAS. No. 7. 2018. P. 149–163. DOI: [10.17076/mat829](http://journals.krc.karelia.ru/index.php/mathem/article/view/829). URL: [arxiv.org/abs/1805.09559](https://arxiv.org/abs/1805.09559).
+
+## Links ##
+  * [Insert attestation exploiting Wikisource as a corpus](https://meta.wikimedia.org/wiki/Community_Wishlist_Survey_2019/Wiktionary/Insert_attestation_exploiting_Wikisource_as_a_corpus) // Community Wishlist Survey 2019
