@@ -3,7 +3,10 @@ Wikipedia and Wikisource-based text corpus analysis
 
 See [Machine-readable database schema](https://github.com/componavt/wcorpus/wiki/SQL#machine-readable-database-schema).
 
-[WCorpus MySQL database with texts of three Russian writers: Chekhov, Tolstoy and Dostoevsky](https://doi.org/10.6084/m9.figshare.5938150.v1) is available at Figshare.
+[WCorpus MySQL database with texts of three Russian writers: Chekhov, Tolstoy and Dostoevsky](https://doi.org/10.6084/m9.figshare.5938150.v1) 
+is available at Figshare. Russian Wikisource (the database dump as of February 2017) 
+was used in our research. The texts of Wikisource were parsed, analysed and stored 
+to the WCorpus database. See more information at [the page 156 of our article](https://arxiv.org/pdf/1805.09559.pdf#page=8).
 
 
 ## See also ##
