@@ -1,7 +1,7 @@
 # wcorpus
 Wikipedia and Wikisource-based text corpus analysis
 
-See [Machine-readable database schema](https://github.com/componavt/wcorpus/blob/wiki/SQL.md#machine-readable-database-schema).
+See [Machine-readable database schema](https://github.com/componavt/wcorpus/wiki/SQL#machine-readable-database-schema).
 
 
 ## Further reading ##
