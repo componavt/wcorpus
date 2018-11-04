@@ -11,7 +11,7 @@ to the WCorpus database. See more information at [the page 156 of our article](h
 
 ## See also ##
 
-[wcorpus.py](https://github.com/componavt/wcorpus.py) ‒ Python scripts for text corpus analysis which work with wcorpus database.
+[wcorpus.py](https://github.com/componavt/wcorpus.py) ‒ Python scripts for text corpus analysis which work with WCorpus database.
 
 
 
